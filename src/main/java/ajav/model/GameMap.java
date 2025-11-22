@@ -24,10 +24,13 @@ public class GameMap {
 
         this.cells[size / 2][size / 2] = CellType.HERO;
 
-        int amountEasy = size * 2 - 9;
-        int amountMedium = size * 3 - 12;
-        int amountHard = size * 4 - 35;
-        int amountArtifacts = size * 4 - 32;
+        int amountEasy = (size - 3) * 4 - 9;
+        int amountMedium = (size - 2) * 3 - 12;
+        int amountHard = (size - 2) * 2 - 35;
+        if (amountHard < 0) {
+            amountHard = 3;
+        }
+        int amountArtifacts = (size - 2) * 2 - 9;
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
