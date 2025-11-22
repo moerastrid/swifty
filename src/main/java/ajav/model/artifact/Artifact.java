@@ -1,7 +1,7 @@
 package ajav.model.artifact;
 
 import ajav.model.Quality;
-import ajav.model.util.QualityDefiner;
+import ajav.util.QualityDefiner;
 
 public abstract class Artifact {
     protected String name;

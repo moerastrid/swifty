@@ -38,7 +38,13 @@ public abstract class Hero {
         this.hp += 10;
     }
 
+    public int getLevel() {
+        return level;
+    }
 
+    public HeroType getType() {
+        return type;
+    }
 
     public int getHp() {
         return hp;

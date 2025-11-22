@@ -1,6 +1,6 @@
 package ajav;
 
-import ajav.model.HeroFactory;
+import ajav.model.GameMap;
 
 public class Main {
     public static void main(String[] args) {
@@ -12,6 +12,10 @@ public class Main {
         final var turtle = HeroFactory.getInstance().newHero("TURTLE", "Kowalski");
         final var frog = HeroFactory.getInstance().newHero("FROG", "Greg");
         System.out.println("-------- start --------");
+
+        final var bearGame = new GameMap(bear);
+        final var hareGame = new GameMap(hare);
+
         for (int i = 1; i <= 12; i++) {
 
             System.out.println("xp += " + 500 * i);
@@ -21,11 +25,21 @@ public class Main {
             turtle.gainExperience(500 * i);
             frog.gainExperience(500 * i);
         }
+
+        final var penguinGame = new GameMap(penguin);
+        final var turtleGame = new GameMap(turtle);
+        final var frogGame = new GameMap(frog);
+
         System.out.println("-------- end --------");
         System.out.println(bear);
+        System.out.println(bearGame);
         System.out.println(hare);
+        System.out.println(hareGame);
         System.out.println(penguin);
+        System.out.println(penguinGame);
         System.out.println(turtle);
+        System.out.println(turtleGame);
         System.out.println(frog);
+        System.out.println(frogGame);
     }
 }
