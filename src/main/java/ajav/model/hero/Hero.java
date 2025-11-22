@@ -1,5 +1,9 @@
 package ajav.model.hero;
 
+import ajav.model.artifact.Armor;
+import ajav.model.artifact.Helm;
+import ajav.model.artifact.Weapon;
+
 public abstract class Hero {
     protected String name;
     protected HeroType type;
@@ -8,6 +12,9 @@ public abstract class Hero {
     protected int attack = 10;
     protected int defense = 10;
     protected int hp = 100;
+    protected Armor armor;
+    protected Helm helm;
+    protected Weapon weapon;
 
     protected Hero(String name) {
         this.name = name;
@@ -31,12 +38,34 @@ public abstract class Hero {
         this.hp += 10;
     }
 
-    public String getName() {
-        return name;
-    }
+
 
     public int getHp() {
         return hp;
+    }
+
+    public Armor getArmor() {
+        return armor;
+    }
+
+    public Helm getHelm() {
+        return helm;
+    }
+
+    public Weapon getWeapon() {
+        return weapon;
+    }
+
+    public void setArmor(Armor armor) {
+        this.armor = armor;
+    }
+
+    public void setHelm(Helm helm) {
+        this.helm = helm;
+    }
+
+    public void setWeapon(Weapon weapon) {
+        this.weapon = weapon;
     }
 
     @Override
@@ -44,4 +73,5 @@ public abstract class Hero {
         return "%s%s(lvl %d): - HP: %d, Attack: %d, Defense: %d, EXP: %d".formatted(
                 name, type.toString(), level, hp, attack, defense, experience);
     }
+
 }

@@ -1,42 +1,23 @@
 package ajav.model.artifact;
 
+import ajav.model.Quality;
+import ajav.model.util.QualityDefiner;
+
 public abstract class Artifact {
-    private String name;
-    private ArtifactType type;
-    private String description;
-    private int value;
+    protected String name;
+    protected ArtifactType type;
+    protected String description;
+    protected int value;
+    protected Quality quality;
 
-
-    public String getName() {
-        return name;
-    }
-
-    public ArtifactType getType() {
-        return type;
-    }
-
-    public String getDescription() {
-        return description;
+    protected Artifact(String name, String description, int value) {
+        this.name = name;
+        this.description = description;
+        this.value = value;
+        this.quality = QualityDefiner.defineQuality();
     }
 
     public int getValue() {
         return value;
-    }
-
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setType(ArtifactType type) {
-        this.type = type;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setValue(int value) {
-        this.value = value;
     }
 }
