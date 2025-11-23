@@ -1,11 +1,22 @@
 package ajav;
 
 import ajav.model.GameMap;
+import ajav.swing.SwingGui;
+
+import java.awt.GraphicsEnvironment;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello and welcome!");
 
+//        tryMaps();
+
+        final var gui = new SwingGui();
+        gui.show();
+
+    }
+
+    private static void tryMaps() {
         final var bear = HeroFactory.getInstance().newHero("BEAR", "Rico");
         final var hare = HeroFactory.getInstance().newHero("HARE", "Private");
         final var penguin = HeroFactory.getInstance().newHero("PENGUIN", "Skipper");
