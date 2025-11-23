@@ -24,6 +24,8 @@ public class Main {
             penguin.gainExperience(500 * i);
             turtle.gainExperience(500 * i);
             frog.gainExperience(500 * i);
+            bearGame.moveLeft();
+            hareGame.moveUp();
         }
 
         final var penguinGame = new GameMap(penguin);

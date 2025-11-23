@@ -18,6 +18,7 @@ public enum CellType {
             case MONSTER_EASY -> "m";
             case MONSTER_MEDIUM -> "M";
             case MONSTER_HARD -> "W";
+
             case ARTIFACT -> "A";
         };
     }
