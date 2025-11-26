@@ -1,4 +1,4 @@
-package ajav.swing;
+package ajav.view.swing;
 
 import java.awt.Color;
 

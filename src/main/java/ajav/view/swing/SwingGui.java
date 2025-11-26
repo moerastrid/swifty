@@ -1,4 +1,6 @@
-package ajav.swing;
+package ajav.view.swing;
+
+import ajav.view.GameView;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,7 +18,7 @@ import java.util.Locale;
 import static javax.swing.SwingConstants.CENTER;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
 
-public class SwingGui {
+public class SwingGui implements GameView {
     private static final String TITLE = "Mazie - an a-maze-ing RPG";
     private final JFrame frame = initFrame();
 
@@ -181,5 +183,21 @@ public class SwingGui {
         newTextField.addActionListener(event -> errorLabel.setText(textField.getText()));
 
         return newTextField;
+    }
+
+    public void showStart() {
+        frame.add(startPanel, BorderLayout.CENTER);
+    }
+
+    public void showGame() {
+        frame.add(gamePanel, BorderLayout.CENTER);
+    }
+
+    public void showPrompt(String prompt) {
+        this.promptLabel.setText(prompt);
+    }
+
+    public void showError(String errorMessage) {
+        this.errorLabel.setText(errorMessage);
     }
 }

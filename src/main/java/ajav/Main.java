@@ -1,7 +1,7 @@
 package ajav;
 
 import ajav.model.GameMap;
-import ajav.swing.SwingGui;
+import ajav.view.swing.SwingGui;
 
 
 public class Main {
