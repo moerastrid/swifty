@@ -6,9 +6,9 @@ import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
+import javax.swing.JButton;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-import java.awt.Button;
 import java.awt.Font;
 import java.awt.Insets;
 import java.util.Locale;
@@ -76,7 +76,7 @@ public class SwingGui {
         newFrame.setLocationRelativeTo(null);
 
 //        newFrame.setFont(fontHeader); -> doet niks
-        newFrame.setBackground(ThemeColor.BLACK); //-> doet niks
+//        newFrame.setBackground(ThemeColor.BLACK); //-> doet niks
 //        newFrame.setForeground(ThemeColor.LILA); -> doet niks
 
         final var icon = new ImageIcon("src/main/resources/mazie-icon.png");
@@ -152,8 +152,8 @@ public class SwingGui {
         return label;
     }
 
-    private Button initStartButton() {
-        var button = new Button("Start");
+    private JButton initStartButton() {
+        final var button = new JButton("Start");
         button.setBackground(ThemeColor.PURPLE);
         button.setFont(fontInput);
         button.setForeground(ThemeColor.YELLOW);

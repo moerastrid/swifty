@@ -3,13 +3,12 @@ package ajav;
 import ajav.model.GameMap;
 import ajav.swing.SwingGui;
 
-import java.awt.GraphicsEnvironment;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello and welcome!");
 
-//        tryMaps();
+        tryMaps();
 
         final var gui = new SwingGui();
         gui.show();
