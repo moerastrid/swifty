@@ -181,6 +181,14 @@ public class SwingGui implements GameView {
         newTextField.setBorder(BorderFactory.createLoweredBevelBorder());
 
         newTextField.addActionListener(event -> errorLabel.setText(textField.getText()));
+        // action moet uit de controller komen
+        // controller meegeven in constructor van gui (of alleen de action listener?)
+        // controller.updateOFzo(textField.getText())
+        // controller doet logica met model
+        // controller roept gui.updatePrompt() of gui.showError() aan, of geeft een DTO terug?
+        // later kijken hoe je zorgt dat de view niet van de controller af weet ?
+        // model mag niks weten van controller of view.
+        // je kunt abstractie ertussen zetten, dan weet de view alleen van bijvoorbeeld die functie / die interface af maar niet van de controller zelf.
 
         return newTextField;
     }
