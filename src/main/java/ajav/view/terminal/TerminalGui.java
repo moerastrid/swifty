@@ -2,11 +2,11 @@ package ajav.view.terminal;
 
 import ajav.view.GameView;
 import java.util.Scanner;
+import ajav.view.terminal.AnsiColor;
 
 public class TerminalGui implements GameView {
-	
 
-	static final Scanner in;
+	static Scanner in;
 
 	public TerminalGui() {
 		in = new Scanner(System.in);
@@ -14,7 +14,7 @@ public class TerminalGui implements GameView {
 
     public void showStart() {
 		final var welcome_text = "welcome to mazie, an a-maze-ing RPG";
-		System.out.println(ANSI_CYAN + welcome_text + ANSI_RESET);
+		System.out.println(AnsiColor.CYAN + welcome_text + AnsiColor.RESET);
     }
 
     public void showGame() {
@@ -22,11 +22,11 @@ public class TerminalGui implements GameView {
     }
 
     public void showPrompt(String prompt) {
-		System.out.println(ANSI_PURPLE + prompt + ANSI_RESET);
+		System.out.println(AnsiColor.PURPLE + prompt + AnsiColor.RESET);
     }
 
     public void showError(String error) {
-		System.out.println(ANSI_YELLOW + error + ANSI_RESET);
+		System.out.println(AnsiColor.YELLOW + error + AnsiColor.RESET);
     }
 
 	public String getInput() {

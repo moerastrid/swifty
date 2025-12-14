@@ -3,6 +3,7 @@ package ajav;
 import ajav.model.GameMap;
 import ajav.view.swing.SwingGui;
 import ajav.view.terminal.TerminalGui;
+import ajav.controller.GameController;
 
 public class Main {
     public static void main(String[] args) {
@@ -13,23 +14,19 @@ public class Main {
         // final var gui = new SwingGui();
         // gui.show();
 
+		
+
 		startTerminalGame();
     }
 
 	private static void startTerminalGame() {
+
 		final var gui = new TerminalGui();
-		gui.showStart();
 
-		gui.showPrompt("press any key to start, or Q to quit");
-		while (true) {
-			String temp = gui.getInput();
+		final var gameController = new GameController(gui);
+		gameController.startGame();
 
-			if (temp.equals("Q") || temp.equals("q"))
-				break;
-
-			gui.showPrompt(temp);
-		}
-		gui.showError("game over");
+		
 	}
 
 

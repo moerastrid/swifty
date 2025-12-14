@@ -1,11 +1,13 @@
 package ajav.view;
 
 public interface GameView {
-    void showStart();
+    public void showStart();
 
-    void showGame();
+    public void showGame();
 
-    void showPrompt(String prompt);
+    public void showPrompt(String prompt);
 
-    void showError(String error);
+    public void showError(String error);
+
+	public String getInput();
 }

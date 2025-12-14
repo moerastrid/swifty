@@ -208,4 +208,9 @@ public class SwingGui implements GameView {
     public void showError(String errorMessage) {
         this.errorLabel.setText(errorMessage);
     }
+
+	public String getInput() {
+        // placeholder
+		return ("input");
+    }
 }
