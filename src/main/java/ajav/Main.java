@@ -2,18 +2,37 @@ package ajav;
 
 import ajav.model.GameMap;
 import ajav.view.swing.SwingGui;
-
+import ajav.view.terminal.TerminalGui;
 
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello and welcome!");
 
-        tryMaps();
+        // tryMaps();
 
-        final var gui = new SwingGui();
-        gui.show();
+        // final var gui = new SwingGui();
+        // gui.show();
 
+		startTerminalGame();
     }
+
+	private static void startTerminalGame() {
+		final var gui = new TerminalGui();
+		gui.showStart();
+
+		gui.showPrompt("press any key to start, or Q to quit");
+		while (true) {
+			String temp = gui.getInput();
+
+			if (temp.equals("Q") || temp.equals("q"))
+				break;
+
+			gui.showPrompt(temp);
+		}
+		gui.showError("game over");
+	}
+
+
 
     private static void tryMaps() {
         final var bear = HeroFactory.getInstance().newHero("BEAR", "Rico");
