@@ -16,20 +16,25 @@ public class Main {
 
 		
 
-		startTerminalGame();
+		// startTerminalGame();
+		startSwingGame();
     }
 
 	private static void startTerminalGame() {
 
 		final var gui = new TerminalGui();
-
 		final var gameController = new GameController(gui);
-		gameController.startGame();
 
-		
+		gameController.startGame();
 	}
 
+	private static void startSwingGame() {
+		
+		final var gui = new SwingGui();
+		final var gameController = new GameController(gui);
 
+		gameController.startGame();
+	}
 
     private static void tryMaps() {
         final var bear = HeroFactory.getInstance().newHero("BEAR", "Rico");

@@ -159,7 +159,7 @@ public class SwingGui implements GameView {
         button.setBackground(ThemeColor.PURPLE);
         button.setFont(fontInput);
         button.setForeground(ThemeColor.YELLOW);
-        button.addActionListener(e -> {
+        button.addActionListener(event -> {
             frame.remove(startPanel);
             frame.add(gamePanel, BorderLayout.CENTER);
             frame.revalidate();
@@ -210,6 +210,7 @@ public class SwingGui implements GameView {
     }
 
 	public String getInput() {
+		newTextField.getActionListeners();
         // placeholder
 		return ("input");
     }

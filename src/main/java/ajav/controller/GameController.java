@@ -13,6 +13,7 @@ public class GameController {
 
 	public void startGame() {
 		gui.showStart();
+		
 
 		gui.showPrompt("press any key to start, or Q to quit");
 		while (true) {
