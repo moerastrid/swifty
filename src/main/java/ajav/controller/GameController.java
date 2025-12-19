@@ -1,5 +1,7 @@
 package ajav.controller;
 
+import ajav.exception.FatalErrorException;
+import ajav.exception.UnexpectedErrorException;
 import ajav.view.GameView;
 
 public class GameController {
@@ -13,18 +15,26 @@ public class GameController {
 
 	public void startGame() {
 		gui.showStart();
-		
 
 		gui.showPrompt("press any key to start, or Q to quit");
 		while (true) {
-			String temp = gui.getInput();
+			try {
+				String temp = gui.getInput();
 
-			if (temp.equals("Q") || temp.equals("q"))
+				if (temp.equals("Q") || temp.equals("q")) {
+					gui.showError("Q is for Quitters");
+					break;
+				}
+
+				gui.showPrompt(temp);
+
+			} catch (UnexpectedErrorException e) {
+				gui.showError(e.getMessage());
 				break;
-
-			gui.showPrompt(temp);
+			} catch (FatalErrorException e) {
+				break;
+			}
 		}
-		gui.showError("game over");
 
 		gui.stop();
 	}
