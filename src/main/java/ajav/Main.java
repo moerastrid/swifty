@@ -1,9 +1,10 @@
 package ajav;
 
+import ajav.controller.GameController;
+import ajav.exception.FatalErrorException;
 import ajav.model.GameMap;
 import ajav.view.swing.SwingGui;
 import ajav.view.terminal.TerminalGui;
-import ajav.controller.GameController;
 
 public class Main {
     public static void main(String[] args) {
@@ -15,9 +16,9 @@ public class Main {
         // gui.show();
 
 		
-
-		// startTerminalGame();
-		startSwingGame();
+		startTerminalGame();
+		
+			// startSwingGame();
     }
 
 	private static void startTerminalGame() {
@@ -25,7 +26,12 @@ public class Main {
 		final var gui = new TerminalGui();
 		final var gameController = new GameController(gui);
 
-		gameController.startGame();
+		try {
+			gameController.startGame();
+		} catch (FatalErrorException e) {
+			gui.showError(e.getMessage());
+			gui.stop();
+		}
 	}
 
 	private static void startSwingGame() {

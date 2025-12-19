@@ -210,8 +210,12 @@ public class SwingGui implements GameView {
     }
 
 	public String getInput() {
-		newTextField.getActionListeners();
+		// newTextField.getActionListeners();
         // placeholder
 		return ("input");
     }
+
+	public void stop() {
+		// placeholder
+	}
 }

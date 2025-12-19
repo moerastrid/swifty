@@ -25,6 +25,8 @@ public class GameController {
 			gui.showPrompt(temp);
 		}
 		gui.showError("game over");
+
+		gui.stop();
 	}
 
     // public void getUserInput(String input) {

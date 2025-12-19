@@ -10,4 +10,6 @@ public interface GameView {
     public void showError(String error);
 
 	public String getInput();
+
+	public void stop();
 }
