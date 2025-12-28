@@ -3,7 +3,7 @@ package ajav.view.terminal;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-import ajav.exception.UnexpectedErrorException;
+import ajav.exception.UnexpectedException;
 import ajav.view.GameView;
 
 public class TerminalGui implements GameView {
@@ -41,7 +41,7 @@ public class TerminalGui implements GameView {
 			String s = in.nextLine();
 			return s;
 		} catch (NoSuchElementException e) {
-			throw new UnexpectedErrorException("user entered ^D in terminal?", e);
+			throw new UnexpectedException("user entered ^C or ^D in terminal?", e);
 		}
 	}
 

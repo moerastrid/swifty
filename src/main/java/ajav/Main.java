@@ -14,7 +14,6 @@ public class Main {
         // final var gui = new SwingGui();
         // gui.show();
 
-		
 		startTerminalGame();
 		
 			// startSwingGame();
