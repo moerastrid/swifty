@@ -90,7 +90,7 @@ public class GameController {
 	}
 
     public boolean setup() { 
-		final var prompt = "Awesome! What would you like to do next?\n"
+		final String prompt = "Awesome! What would you like to do next?\n"
 			+ "[N] start a New game\n"
 			+ "[L] Load a saved game\n";
 		gui.showPrompt(prompt);
