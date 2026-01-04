@@ -7,6 +7,7 @@ public final class InputConstants {
 	public static final Set<String> INTRO_OPTIONS = Set.of("C", "CONTINUE");
 	public static final Set<String> SETUP_OPTIONS = Set.of("N", "NEW", "L", "LOAD");
 	public static final Set<String> QUIT_OPTIONS = Set.of("Q", "Quit");
+	public static final Set<String> MAP_OPTIONS = Set.of("U", "UP", "D", "DOWN", "L", "LEFT", "R", "RIGHT");
 
 	public static final String QUIT_PROMPT = """
 
@@ -48,7 +49,7 @@ public final class InputConstants {
 		Name your fighter:
 	""" + QUIT_PROMPT;
 
-	public static String load_game_prompt(String options)
+	public String load_game_prompt(String options)
 	{
 		return """
 			Load a game...

@@ -1,6 +1,7 @@
 package ajav.controller;
 
 import ajav.HeroFactory;
+import static ajav.controller.InputConstants.QUIT_INFO;
 import ajav.exception.FatalException;
 import ajav.exception.InvalidInputException;
 import ajav.exception.UnexpectedException;
@@ -10,12 +11,14 @@ import ajav.view.GameView;
 public class GameController {
     private GameView gui;
 	private final HeroFactory heroFactory = HeroFactory.getInstance();
+	private InputValidator inputValidator;
 
 	private GameController() {
 	}
 
-	public GameController(GameView gui) {
+	public GameController(GameView gui, InputValidator inputValidator) {
 		this.gui = gui;
+		this.inputValidator = inputValidator;
 	}
 
 	public void startGame() {
@@ -29,14 +32,14 @@ public class GameController {
 
 		while (true) {
 			try {
-				String temp = gui.getInput();
+				String input = gui.getInput();
 
-				if (temp.equals("Q") || temp.equals("q")) {
-					gui.showError("Q is for Quitters");
+				if (inputValidator.isQuit(QUIT_INFO)) {
+					gui.showError(input);
 					break;
 				}
 
-				gui.showPrompt(temp);
+				gui.showPrompt(input);
 
 			} catch (InvalidInputException e) {
 				gui.showError(e.getMessage());
