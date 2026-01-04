@@ -1,22 +1,24 @@
 package ajav.controller;
 
+import ajav.HeroFactory;
 import ajav.exception.FatalException;
-import ajav.exception.UnexpectedException;
 import ajav.exception.InvalidInputException;
+import ajav.exception.UnexpectedException;
+import ajav.model.hero.Hero;
 import ajav.view.GameView;
 
 public class GameController {
     private GameView gui;
+	private final HeroFactory heroFactory = HeroFactory.getInstance();
 
-	private GameController() {}
+	private GameController() {
+	}
 
 	public GameController(GameView gui) {
 		this.gui = gui;
 	}
 
 	public void startGame() {
-
-		
 
 		gui.showStart();
 
@@ -74,7 +76,7 @@ public class GameController {
 				default:
 					gui.showError("Invalid input: " + temp);
 					// throw new InvalidInputException ??
-					return introduction();
+					return this.introduction();
 			}
 		} catch (InvalidInputException e) {
 			gui.showError(e.getMessage());
@@ -108,7 +110,7 @@ public class GameController {
 				default:
 					gui.showError("Invalid input: " + temp);
 					// throw new InvalidInputException ??
-					return this.introduction();
+					return this.setup();
 			}
 		} catch (InvalidInputException e) {
 			gui.showError(e.getMessage());
@@ -123,6 +125,10 @@ public class GameController {
 
 	public boolean newGame() {
 		gui.showPrompt("starting a new game...");
+
+		final var hero = this.createHero();
+		gui.showPrompt("Hi there! This is you:\n%s".formatted(hero.toString()));
+
 		return true;
 	}
 
@@ -130,5 +136,69 @@ public class GameController {
 		gui.showPrompt("No games to load yet...");
 		this.newGame();
 		return true;
+	}
+
+	public Hero createHero() {
+		String heroType = chooseHeroType();
+		String heroName = nameHero();
+
+		return heroFactory.newHero(heroType, heroName);
+	}
+
+
+	public String chooseHeroType() {
+		final var prompt = """
+			Choose your fighter:
+			[PENGUIN]	🐧
+			[FROG]		🐸
+			[BEAR]		🐻
+			[HARE]		🐰
+			[TURTLE]	🐢
+			""";
+		gui.showPrompt(prompt);
+
+		String input = gui.getInput().toUpperCase();
+
+		switch(input) {
+			case "PENGUIN", "FROG", "BEAR", "HARE", "TURTLE" -> {
+                return input;
+            }
+			case "Q" -> {
+				gui.stop();
+				return null;
+			}
+			default -> {
+				gui.showError("Invalid input: " + input);
+				// throw new InvalidInputException ??
+				return this.chooseHeroType();
+			}
+		}
+	}
+
+	public String nameHero() {
+		gui.showPrompt("Name your fighter");
+
+		String input = gui.getInput().toUpperCase();
+		if (input == null || input.isEmpty() || input.isBlank())
+			return nameHero();
+		return input;		
+		// String prompt = """
+		// 	Are you sure you want to be called [%s]
+		// 	[Y] yes
+		// 	[N] no
+		// 	""".formatted(input);
+
+		// gui.showPrompt(prompt);
+
+		// String conformation = gui.getInput().toUpperCase();
+		
+		// switch(conformation) {
+		// 	case "Y" -> {
+        //         return input;
+        //     }
+		// 	default -> {
+		// 		return this.chooseHeroType();
+		// 	}
+		// }
 	}
 }

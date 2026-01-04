@@ -1,7 +1,11 @@
 package ajav;
 
+import ajav.model.hero.Bear;
+import ajav.model.hero.Frog;
+import ajav.model.hero.Hare;
 import ajav.model.hero.Hero;
 import ajav.model.hero.Penguin;
+import ajav.model.hero.Turtle;
 
 public class HeroFactory {
     private static final HeroFactory instance = new HeroFactory();
@@ -18,10 +22,10 @@ public class HeroFactory {
         }
         return switch (type.toUpperCase()) {
             case "PENGUIN" -> new Penguin(name);
-            case "FROG" -> new ajav.model.hero.Frog(name);
-            case "BEAR" -> new ajav.model.hero.Bear(name);
-            case "HARE" -> new ajav.model.hero.Hare(name);
-            case "TURTLE" -> new ajav.model.hero.Turtle(name);
+            case "FROG" -> new Frog(name);
+            case "BEAR" -> new Bear(name);
+            case "HARE" -> new Hare(name);
+            case "TURTLE" -> new Turtle(name);
             default -> throw new IllegalArgumentException("Invalid hero type");
         };
     }

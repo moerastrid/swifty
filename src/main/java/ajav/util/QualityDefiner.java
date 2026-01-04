@@ -1,8 +1,8 @@
 package ajav.util;
 
-import ajav.model.Quality;
-
 import java.util.Random;
+
+import ajav.model.Quality;
 
 public final class QualityDefiner {
     private static Random random = new Random();
