@@ -4,7 +4,6 @@ import java.util.Set;
 
 public final class InputConstants {
 	public static final Set<String> HERO_TYPES = Set.of("P", "PENGUIN", "F", "FROG", "B", "BEAR", "H", "HARE", "T", "TURTLE");
-
 	public static final Set<String> INTRO_OPTIONS = Set.of("C", "CONTINUE");
 	public static final Set<String> SETUP_OPTIONS = Set.of("N", "NEW", "L", "LOAD");
 	public static final Set<String> QUIT_OPTIONS = Set.of("Q", "Quit");
@@ -58,6 +57,10 @@ public final class InputConstants {
 		""".formatted(options);
 	}
 
+	public static final String QUIT_INFO = """
+		Q is for Quitters
+	""";
+
 	public static final String NEW_GAME_INFO = """
 		Starting a new game...
 	""";
@@ -65,5 +68,4 @@ public final class InputConstants {
 	public static final String NO_LOAD_GAME_INFO = """
 		No games to load yet...
 	""";
-
 }
