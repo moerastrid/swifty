@@ -27,13 +27,13 @@ public class Main {
 		gameController.startGame();
 	}
 
-	private static void startSwingGame() {
+	// private static void startSwingGame() {
 		
-		final var gui = new SwingGui();
-		final var gameController = new GameController(gui);
+	// 	final var gui = new SwingGui();
+	// 	final var gameController = new GameController(gui);
 
-		gameController.startGame();
-	}
+	// 	gameController.startGame();
+	// }
 
     private static void tryMaps() {
         final var bear = HeroFactory.getInstance().newHero("BEAR", "Rico");

@@ -13,7 +13,9 @@ public class GameController {
 	private final HeroFactory heroFactory = HeroFactory.getInstance();
 	private InputValidator inputValidator;
 
-	private GameController() {
+	public GameController(GameView gui) {
+		this.gui = gui;
+		this.inputValidator = new InputValidator();
 	}
 
 	public GameController(GameView gui, InputValidator inputValidator) {
