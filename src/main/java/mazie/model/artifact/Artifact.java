@@ -1,7 +1,7 @@
-package ajav.model.artifact;
+package mazie.model.artifact;
 
-import ajav.model.Quality;
-import ajav.util.QualityDefiner;
+import mazie.model.Quality;
+import mazie.model.util.QualityDefiner;
 
 public abstract class Artifact {
     protected String name;

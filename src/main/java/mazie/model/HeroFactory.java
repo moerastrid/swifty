@@ -1,11 +1,11 @@
-package ajav;
+package mazie.model;
 
-import ajav.model.hero.Bear;
-import ajav.model.hero.Frog;
-import ajav.model.hero.Hare;
-import ajav.model.hero.Hero;
-import ajav.model.hero.Penguin;
-import ajav.model.hero.Turtle;
+import mazie.model.hero.Bear;
+import mazie.model.hero.Frog;
+import mazie.model.hero.Hare;
+import mazie.model.hero.Hero;
+import mazie.model.hero.Penguin;
+import mazie.model.hero.Turtle;
 
 public class HeroFactory {
     private static final HeroFactory instance = new HeroFactory();

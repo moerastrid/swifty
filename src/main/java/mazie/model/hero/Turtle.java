@@ -1,4 +1,4 @@
-package ajav.model.hero;
+package mazie.model.hero;
 
 public class Turtle extends Hero {
 

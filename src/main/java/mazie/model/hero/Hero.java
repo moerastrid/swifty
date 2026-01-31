@@ -1,8 +1,8 @@
-package ajav.model.hero;
+package mazie.model.hero;
 
-import ajav.model.artifact.Armor;
-import ajav.model.artifact.Helm;
-import ajav.model.artifact.Weapon;
+import mazie.model.artifact.Armor;
+import mazie.model.artifact.Helm;
+import mazie.model.artifact.Weapon;
 
 public abstract class Hero {
     protected String name;

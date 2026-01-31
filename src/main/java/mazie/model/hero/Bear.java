@@ -1,4 +1,4 @@
-package ajav.model.hero;
+package mazie.model.hero;
 
 public class Bear extends Hero{
 

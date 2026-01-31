@@ -1,4 +1,4 @@
-package ajav.model;
+package mazie.model;
 
 public enum CellType {
     EMPTY,

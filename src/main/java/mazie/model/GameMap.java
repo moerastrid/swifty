@@ -1,9 +1,9 @@
-package ajav.model;
-
-import ajav.model.hero.Hero;
-import ajav.model.hero.HeroType;
+package mazie.model;
 
 import java.util.Random;
+
+import mazie.model.hero.Hero;
+import mazie.model.hero.HeroType;
 
 public class GameMap {
     private final int size;

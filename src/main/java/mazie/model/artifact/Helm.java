@@ -1,4 +1,4 @@
-package ajav.model.artifact;
+package mazie.model.artifact;
 
 public class Helm extends Artifact {
 

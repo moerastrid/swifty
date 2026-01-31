@@ -1,11 +1,11 @@
-package ajav.util;
+package mazie.model.util;
 
 import java.util.Random;
 
-import ajav.model.Quality;
+import mazie.model.Quality;
 
 public final class QualityDefiner {
-    private static Random random = new Random();
+    private static final Random random = new Random();
 
     private QualityDefiner() {}
 
