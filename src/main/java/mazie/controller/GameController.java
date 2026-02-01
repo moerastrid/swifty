@@ -4,13 +4,13 @@ import mazie.view.GameView;
 import mazie.view.console.ConsoleView;
 
 public class GameController {
-	private static GameView view;
+	private GameView view;
 
 	public GameController() {
 		view = new ConsoleView();
 	}
 
-	public static void startGame() {
+	public void startGame() {
 		view.startView();
 		view.showTitle();
 	}
