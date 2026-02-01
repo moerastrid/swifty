@@ -2,17 +2,17 @@ package mazie;
 
 import mazie.controller.GameController;
 import mazie.view.console.ConsoleView;
-import mazie.controller.GameValidator;
 
 public class Main {
 
     public static void main(String[] args) {
         System.out.println("new new new");
 
-        final var view = new ConsoleView();
-        final var validator = new GameValidator(view);
 
-		final var controller = new GameController(view, validator);
+        final var view = new ConsoleView();
+        
+
+		final var controller = new GameController(view);
 
         try {
     		controller.startGame();

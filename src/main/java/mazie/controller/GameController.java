@@ -6,11 +6,9 @@ import mazie.view.GameView;
 
 public class GameController {
 	private GameView view;
-	private GameValidator validator;
 
-	public GameController(GameView view, GameValidator validator) {
+	public GameController(GameView view) {
 		this.view = view;
-		this.validator = validator;
 	}
 
 	public void startGame() {
@@ -21,7 +19,7 @@ public class GameController {
 			final String input = view.getInput(); 
 
 			try {
-				validator.validate(input);
+				GameValidator.validate(view, input);
 				view.showPrompt(input);
 			} catch (InvalidInputException e) {
 				view.showError(e.getMessage());
@@ -30,10 +28,21 @@ public class GameController {
 		}
 	}
 
-	public void setView(GameView view) {
-		if (view == null)
+	public void setView(GameView newView) {
+		if (newView == null)
 			throw new FatalException("Error in GameController.setView(): View cannot be null");
-		if (!this.view.getClass().equals(view.getClass()))
-			this.view = view;
+
+		if (this.view == null) {
+			this.view = newView;
+			this.view.startView();
+			return;
+		}
+
+		if (this.view == newView || this.view.getClass() == newView.getClass())
+			return;
+
+		this.view.stopView();
+		this.view = newView;
+		this.view.startView();
 	}
 }
