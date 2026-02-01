@@ -1,5 +1,6 @@
 package mazie.controller;
 
+import mazie.exception.FatalException;
 import mazie.exception.InvalidInputException;
 import mazie.view.GameView;
 
@@ -30,6 +31,8 @@ public class GameController {
 	}
 
 	public void setView(GameView view) {
+		if (view == null)
+			throw new FatalException("Error in GameController.setView(): View cannot be null");
 		if (!this.view.getClass().equals(view.getClass()))
 			this.view = view;
 	}
