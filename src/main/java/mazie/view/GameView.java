@@ -1,5 +1,7 @@
 package mazie.view;
 
+import jakarta.validation.constraints.NotEmpty;
+
 public interface GameView {
 	public void startView();
 
@@ -13,5 +15,6 @@ public interface GameView {
 
 	public void showError(String error);
 
+	@NotEmpty
 	public String getInput();
 }

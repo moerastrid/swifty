@@ -1,16 +1,24 @@
 package mazie;
 
 import mazie.controller.GameController;
+import mazie.view.console.ConsoleView;
+import mazie.controller.GameValidator;
 
 public class Main {
-	
 
     public static void main(String[] args) {
         System.out.println("new new new");
 
-		final var controller = new GameController();
+        final var view = new ConsoleView();
+        final var validator = new GameValidator(view);
 
-		controller.startGame();
+		final var controller = new GameController(view, validator);
+
+        try {
+    		controller.startGame();
+        } catch (Throwable t) {
+            System.err.println("Fatal error: " + t.getMessage());
+        }
 
         // tryMaps();
 
