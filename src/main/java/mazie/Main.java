@@ -8,9 +8,7 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("new new new");
 
-
         final var view = new ConsoleView();
-        
 
 		final var controller = new GameController(view);
 
@@ -21,7 +19,6 @@ public class Main {
         }
 
         // tryMaps();
-
     }
 
     // private static void tryMaps() {

@@ -1,8 +1,11 @@
-package ajav.controller;
+package mazie.controller;
 
 import java.util.Set;
 
-public final class InputConstants {
+public final class Prompts {
+
+	private Prompts() {}
+
 	public static final Set<String> HERO_TYPES = Set.of("P", "PENGUIN", "F", "FROG", "B", "BEAR", "H", "HARE", "T", "TURTLE");
 	public static final Set<String> INTRO_OPTIONS = Set.of("C", "CONTINUE");
 	public static final Set<String> SETUP_OPTIONS = Set.of("N", "NEW", "L", "LOAD");
@@ -35,22 +38,19 @@ public final class InputConstants {
 		[L] Load a saved game
 	""" + QUIT_PROMPT;
 
-	public static final String CHOOSE_HERO_PROMPT = """
-		Choose your fighter:
+	public static final String choose_hero_prompt(String options) { 
+		return """
+			Choose your fighter:
 
-		[PENGUIN]	🐧
-		[FROG]		🐸
-		[BEAR]		🐻
-		[HARE]		🐰
-		[TURTLE]	🐢
-	""" + QUIT_PROMPT;
+		""" + QUIT_PROMPT;
+	}
+
 
 	public static final String NAME_HERO_PROMPT = """
 		Name your fighter:
 	""" + QUIT_PROMPT;
 
-	public static final String load_game_prompt(String options)
-	{
+	public static final String load_game_prompt(String options) {
 		return """
 			Load a game...
 			Choose a game to load:
