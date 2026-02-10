@@ -3,6 +3,7 @@ package mazie.controller;
 import mazie.controller.Prompts;
 import mazie.exception.FatalException;
 import mazie.exception.InvalidInputException;
+import mazie.exception.QuitException;
 import mazie.model.hero.Hero;
 import mazie.view.GameView;
 
@@ -19,8 +20,14 @@ public class GameController {
 	public void startGame() {
 		this.setView(view);
 
-		this.showTitle();
-		this.showMenu();
+		try {
+			this.showTitle();
+			this.showMenu();
+		} catch (QuitException e) {
+			view.showError(e.getMessage());
+			this.view.stopView();
+			System.exit(0);
+		}
 
 		// while (true) {
 		// 	final String input = view.getInput(); 
@@ -43,20 +50,20 @@ public class GameController {
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-		view.showPrompt("Press any key to start");
+		view.showPrompt("Press enter to start");
 		view.getInput();
 		// GameValidator.validate(view, input); -> no validation because of 'any key'
 	}
 
 	public void showMenu() {
 
-		view.showPrompt(Prompts.INTRO_PROMPT);
+		view.showPrompt(Prompts.INTRO);
 
 		while (true) {
 			final String input = view.getInput();
 
 			try {
-				GameValidator.validate(view, input);
+				GameValidator.validate(view, input, Options.INTRO);
 				view.showPrompt(input);
 			} catch (InvalidInputException e) {
 				view.showError(e.getMessage());
