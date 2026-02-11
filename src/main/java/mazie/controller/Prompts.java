@@ -12,30 +12,27 @@ public final class Prompts {
 	}
 
 	public static final String QUIT = """
-
-																				... or [Q] to quit.
+															... or [Q] to quit.
 	""";
 
 	public static final String INTRO = """
 		Welcome to Mazie!
 		- An a-maze-ing RPG -
 
-		To play the game, please enter commands in the console.
-		Possible commands will be shown in the prompt, between brackets [HERE].
-		For example, to move up, enter the command 'up', shown as [UP].
-		You can always quit the game by entering 'Q' or 'q'.
+		To play the game, enter commands in the console.
+		It speaks for itself.
 
-		Let's get started and try your first command!
-	""" + INPUT_OPTIONS(Options.INTRO) + QUIT;
+		Prepare yourzelf to enter the maze ...
+	""" + INPUT_OPTIONS(Options.INTRO);
 
 	public static final String SETUP = """
-		Awesome! What now?
-	""" + INPUT_OPTIONS(Options.SETUP) + QUIT;
+		Play a new game, or load an existing one?
+	""" + INPUT_OPTIONS(Options.SETUP);
 
 	public static final String SELECT_HERO(String options) {
 		return """
 			Choose your fighter:
-		""" + INPUT_OPTIONS(Options.SELECT_HERO) + QUIT;
+		""" + INPUT_OPTIONS(Options.SELECT_HERO);
 	}
 
 	public static final String NAME_HERO = """
@@ -74,7 +71,7 @@ public final class Prompts {
 
 	public static final String INPUT_OPTIONS(Set<String> options) {
 	return """
-	
+
 		Available commands: [%s]
 	""".formatted(String.join("], [", options)) + QUIT;
 	}

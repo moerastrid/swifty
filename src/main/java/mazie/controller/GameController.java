@@ -22,7 +22,8 @@ public class GameController {
 
 		try {
 			this.showTitle();
-			this.showMenu();
+			this.showIntro();
+			this.showSetup();
 		} catch (QuitException e) {
 			view.showError(e.getMessage());
 			this.view.stopView();
@@ -43,33 +44,54 @@ public class GameController {
 	}
 
 	public void showTitle() {
-
 		view.showTitle();
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
 		}
-		view.showPrompt("Press enter to start");
+		view.showPrompt("Ready when you are 👀");
 		view.getInput();
-		// GameValidator.validate(view, input); -> no validation because of 'any key'
 	}
 
-	public void showMenu() {
-
+	public void showIntro() {
 		view.showPrompt(Prompts.INTRO);
 
-		while (true) {
-			final String input = view.getInput();
-
-			try {
-				GameValidator.validate(view, input, Options.INTRO);
-				view.showPrompt(input);
-			} catch (InvalidInputException e) {
-				view.showError(e.getMessage());
-				continue;
-			}
+		final String input = view.getInput();
+		try {
+			GameValidator.validate(view, input, Options.INTRO);
+		} catch (InvalidInputException e) {
+			view.showError(e.getMessage());
+			this.showIntro();
 		}
+	}
+
+	public void showSetup() {
+		view.showPrompt(Prompts.SETUP);
+
+		final var input = view.getInput();
+		try {
+			final var option = GameValidator.validate(view, input, Options.SETUP);
+			switch (option) {
+				case "N", "NEW" -> this.newGame();
+				case "L", "LOAD" -> this.loadGame();
+				default -> this.showSetup();
+			}
+		} catch (InvalidInputException e) {
+			view.showError(e.getMessage());
+			this.showSetup();
+		}
+	}
+
+	public void newGame() {
+		view.showPrompt(Prompts.NEW_GAME_INFO);
+
+		
+	}
+
+	public void loadGame() {
+		view.showPrompt(Prompts.NO_LOAD_GAME_INFO);
+		this.newGame();
 	}
 
 	public void setView(GameView newView) {
