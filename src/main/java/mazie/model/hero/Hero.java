@@ -74,6 +74,10 @@ public abstract class Hero {
         this.weapon = weapon;
     }
 
+	public void setName(String name) {
+		this.name = name;
+	}
+
     @Override
     public String toString() {
         return "%s%s(lvl %d): - HP: %d, Attack: %d, Defense: %d, EXP: %d".formatted(

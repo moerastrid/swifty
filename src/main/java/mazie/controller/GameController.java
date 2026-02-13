@@ -5,30 +5,28 @@ import mazie.exception.FatalException;
 import mazie.exception.InvalidInputException;
 import mazie.exception.QuitException;
 import mazie.model.hero.Hero;
+import mazie.model.HeroFactory;
 import mazie.view.GameView;
 
 import java.lang.Thread;
+import java.util.List;
+import java.util.ArrayList;
 
 public class GameController {
 	private GameView view = null;
+	private HeroFactory heroFactory = HeroFactory.getInstance();
 
 	public GameController(GameView view) {
 		this.view = view;
 		view.startView();
 	}
 
-	public void startGame() {
+	public void start() {
 		this.setView(view);
 
-		try {
-			this.showTitle();
-			this.showIntro();
-			this.showSetup();
-		} catch (QuitException e) {
-			view.showError(e.getMessage());
-			this.view.stopView();
-			System.exit(0);
-		}
+		final var hero = this.selectHero();
+
+		System.out.println("yay\n\n this you:%s".formatted(hero.toString()));
 
 		// while (true) {
 		// 	final String input = view.getInput(); 
@@ -41,6 +39,19 @@ public class GameController {
 		// 		continue;
 		// 	}
 		// }
+	}
+
+	public Hero selectHero() {
+		try {
+			this.showTitle();
+			this.showIntro();
+			return this.showSetup();
+		} catch (QuitException e) {
+			view.showError(e.getMessage());
+			this.view.stopView();
+			System.exit(0);
+		}
+		return this.selectHero();
 	}
 
 	public void showTitle() {
@@ -66,32 +77,80 @@ public class GameController {
 		}
 	}
 
-	public void showSetup() {
+	public Hero showSetup() {
 		view.showPrompt(Prompts.SETUP);
 
 		final var input = view.getInput();
 		try {
 			final var option = GameValidator.validate(view, input, Options.SETUP);
-			switch (option) {
+			return switch (option) {
 				case "N", "NEW" -> this.newGame();
 				case "L", "LOAD" -> this.loadGame();
 				default -> this.showSetup();
-			}
+			};
 		} catch (InvalidInputException e) {
 			view.showError(e.getMessage());
-			this.showSetup();
+			return this.showSetup();
 		}
 	}
 
-	public void newGame() {
+	public Hero newGame() {
 		view.showPrompt(Prompts.NEW_GAME_INFO);
 
-		
+		final var hero = this.selectHeroType();
+		final var name = this.nameHero();
+
+		hero.setName(name);
+
+		return(hero);
 	}
 
-	public void loadGame() {
+	public Hero selectHeroType() {
+
+		final List<Hero> heroes = new ArrayList<Hero>();
+		
+		heroes.add(heroFactory.newHero("P", "[PENGUIN]"));
+		heroes.add(heroFactory.newHero("F", "[FROG]"));
+		heroes.add(heroFactory.newHero("B", "[BEAR]"));
+		heroes.add(heroFactory.newHero("H", "[HARE]"));
+		heroes.add(heroFactory.newHero("T", "[TURTLE]"));
+		
+		view.showPrompt(Prompts.SELECT_HERO(heroes));
+
+		try {
+			final var input = view.getInput();
+			final var validInput = GameValidator.validate(view, input, Options.SELECT_HERO);
+			
+			return switch (validInput) {
+				case "P", "PENGUIN" -> heroes.get(0);
+				case "F", "FROG" -> heroes.get(1);
+				case "B", "BEAR" -> heroes.get(2);
+				case "H", "HARE" -> heroes.get(3);
+				case "T", "TURTLE" -> heroes.get(4);
+				default -> throw new RuntimeException("??? input should have been valid ???");
+			};
+
+		} catch (InvalidInputException e) {
+			view.showError(e.getMessage());
+			return this.selectHeroType();
+		}
+	}
+
+	public String nameHero() {
+		view.showPrompt(Prompts.NAME_HERO);
+
+		try {
+			final var input = view.getInput();
+			return GameValidator.validate(view, input);
+		} catch (InvalidInputException e) {
+			view.showError(e.getMessage());
+			return this.nameHero();
+		}
+	}
+
+	public Hero loadGame() {
 		view.showPrompt(Prompts.NO_LOAD_GAME_INFO);
-		this.newGame();
+		return this.newGame();
 	}
 
 	public void setView(GameView newView) {

@@ -13,7 +13,7 @@ public class Main {
 		final var controller = new GameController(view);
 
         try {
-    		controller.startGame();
+    		controller.start();
         } catch (Throwable t) {
             System.err.println("Fatal error: " + t.getMessage());
         }

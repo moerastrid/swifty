@@ -21,11 +21,11 @@ public class HeroFactory {
             throw new IllegalArgumentException("Hero type cannot be null");
         }
         return switch (type.toUpperCase()) {
-            case "PENGUIN" -> new Penguin(name);
-            case "FROG" -> new Frog(name);
-            case "BEAR" -> new Bear(name);
-            case "HARE" -> new Hare(name);
-            case "TURTLE" -> new Turtle(name);
+            case "P", "PENGUIN" -> new Penguin(name);
+            case "F", "FROG" -> new Frog(name);
+            case "B", "BEAR" -> new Bear(name);
+            case "H", "HARE" -> new Hare(name);
+            case "T", "TURTLE" -> new Turtle(name);
             default -> throw new IllegalArgumentException("Invalid hero type");
         };
     }

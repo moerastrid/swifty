@@ -17,7 +17,7 @@ public final class GameValidator {
 	private static final Method method = resolveMethod();
 
 	public static String validate(GameView view, String input) throws InvalidInputException {
-		final var cleanInput = input.trim().toUpperCase();
+		final var cleanInput = input.trim();
 		final var violations = validator.validateReturnValue(view, method, cleanInput);
 
 		if (!violations.isEmpty()) {

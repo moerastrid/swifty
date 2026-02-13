@@ -1,6 +1,7 @@
 package mazie.controller;
 
 import java.util.Set;
+import java.util.List;
 
 import jakarta.validation.ConstraintViolation;
 import mazie.model.hero.Hero;
@@ -29,10 +30,13 @@ public final class Prompts {
 		Play a new game, or load an existing one?
 	""" + INPUT_OPTIONS(Options.SETUP);
 
-	public static final String SELECT_HERO(String options) {
+	public static final String SELECT_HERO(List<Hero> heroes) {
 		return """
 			Choose your fighter:
-		""" + INPUT_OPTIONS(Options.SELECT_HERO);
+
+			%s
+		""".formatted(String.join("\n", heroes.stream().map(h -> h.toString()).toList())) 
+		+ INPUT_OPTIONS(Options.SELECT_HERO);
 	}
 
 	public static final String NAME_HERO = """
