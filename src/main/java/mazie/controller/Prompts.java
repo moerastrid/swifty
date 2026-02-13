@@ -35,13 +35,13 @@ public final class Prompts {
 			Choose your fighter:
 
 			%s
-		""".formatted(String.join("\n", heroes.stream().map(h -> h.toString()).toList())) 
+		""".formatted(String.join("\n\t", heroes.stream().map(h -> h.toString()).toList())) 
 		+ INPUT_OPTIONS(Options.SELECT_HERO);
 	}
 
 	public static final String NAME_HERO = """
 			Name your fighter:
-		""" + QUIT;
+		""";
 
 	public static final String LOAD_GAME_PROMPT(String options) {
 		return """
