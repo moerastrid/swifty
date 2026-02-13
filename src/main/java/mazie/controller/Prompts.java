@@ -23,7 +23,7 @@ public final class Prompts {
 		To play the game, enter commands in the console.
 		It speaks for itself.
 
-		Prepare yourzelf to enter the maze ...
+		Prepare yourself to enter the maze ...
 	""" + INPUT_OPTIONS(Options.INTRO);
 
 	public static final String SETUP = """
