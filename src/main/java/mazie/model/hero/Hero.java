@@ -12,9 +12,9 @@ public abstract class Hero {
     protected int attack = 10;
     protected int defense = 10;
     protected int hp = 100;
-    protected Armor armor;
-    protected Helm helm;
-    protected Weapon weapon;
+    // protected Armor armor;
+    // protected Helm helm;
+    // protected Weapon weapon;
 
     protected Hero(String name) {
         this.name = name;
@@ -50,28 +50,32 @@ public abstract class Hero {
         return hp;
     }
 
-    public Armor getArmor() {
-        return armor;
-    }
+    // public Armor getArmor() {
+    //     return armor;
+    // }
 
-    public Helm getHelm() {
-        return helm;
-    }
+    // public Helm getHelm() {
+    //     return helm;
+    // }
 
-    public Weapon getWeapon() {
-        return weapon;
-    }
+    // public Weapon getWeapon() {
+    //     return weapon;
+    // }
 
-    public void setArmor(Armor armor) {
-        this.armor = armor;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setHelm(Helm helm) {
-        this.helm = helm;
-    }
+    // public void setArmor(Armor armor) {
+    //     this.armor = armor;
+    // }
 
-    public void setWeapon(Weapon weapon) {
-        this.weapon = weapon;
+    // public void setHelm(Helm helm) {
+    //     this.helm = helm;
+    // }
+
+    // public void setWeapon(Weapon weapon) {
+    //     this.weapon = weapon;
     }
 
 	public void setName(String name) {
