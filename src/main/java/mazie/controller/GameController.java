@@ -1,16 +1,14 @@
 package mazie.controller;
 
-import mazie.controller.Prompts;
+import java.util.ArrayList;
+import java.util.List;
+
 import mazie.exception.FatalException;
 import mazie.exception.InvalidInputException;
 import mazie.exception.QuitException;
-import mazie.model.hero.Hero;
 import mazie.model.HeroFactory;
+import mazie.model.hero.Hero;
 import mazie.view.GameView;
-
-import java.lang.Thread;
-import java.util.List;
-import java.util.ArrayList;
 
 public class GameController {
 	private GameView view = null;
@@ -107,7 +105,7 @@ public class GameController {
 
 	public Hero selectHeroType() {
 
-		final List<Hero> heroes = new ArrayList<Hero>();
+		final List<Hero> heroes = new ArrayList<>();
 		
 		heroes.add(heroFactory.newHero("P", "[PENGUIN]"));
 		heroes.add(heroFactory.newHero("F", "[FROG]"));
