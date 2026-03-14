@@ -1,11 +1,7 @@
 package mazie.model;
 
-import mazie.model.hero.Bear;
-import mazie.model.hero.Frog;
-import mazie.model.hero.Hare;
 import mazie.model.hero.Hero;
-import mazie.model.hero.Penguin;
-import mazie.model.hero.Turtle;
+import mazie.model.hero.HeroType;
 
 public class HeroFactory {
     private static final HeroFactory instance = new HeroFactory();
@@ -21,11 +17,11 @@ public class HeroFactory {
             throw new IllegalArgumentException("Hero type cannot be null");
         }
         return switch (type.toUpperCase()) {
-            case "P", "PENGUIN" -> new Penguin(name);
-            case "F", "FROG" -> new Frog(name);
-            case "B", "BEAR" -> new Bear(name);
-            case "H", "HARE" -> new Hare(name);
-            case "T", "TURTLE" -> new Turtle(name);
+            case "P", "PENGUIN" -> new Hero(name, HeroType.PENGUIN);
+            case "F", "FROG" -> new Hero(name, HeroType.FROG);
+            case "B", "BEAR" -> new Hero(name, HeroType.BEAR);
+            case "H", "HARE" -> new Hero(name, HeroType.HARE);
+            case "T", "TURTLE" -> new Hero(name, HeroType.TURTLE);
             default -> throw new IllegalArgumentException("Invalid hero type");
         };
     }
