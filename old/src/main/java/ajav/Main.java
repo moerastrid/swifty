@@ -9,12 +9,12 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Hello and welcome!");
 
-        // tryMaps();
+        tryMaps();
 
         // final var gui = new SwingGui();
         // gui.show();
 
-		startTerminalGame();
+		// startTerminalGame();
 		
 			// startSwingGame();
     }

@@ -1,8 +1,10 @@
 package mazie.controller;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import mazie.database.HeroDao;
 import mazie.exception.FatalException;
 import mazie.exception.InvalidInputException;
 import mazie.exception.QuitException;
@@ -12,7 +14,7 @@ import mazie.view.GameView;
 
 public class GameController {
 	private GameView view = null;
-	private HeroFactory heroFactory = HeroFactory.getInstance();
+	private final HeroFactory heroFactory = HeroFactory.getInstance();
 
 	public GameController(GameView view) {
 		this.view = view;
@@ -26,6 +28,16 @@ public class GameController {
 
 		System.out.println("yay\n\n this you:%s".formatted(hero.toString()));
 
+		HeroDao heroDao = new HeroDao();
+		try {
+			heroDao.save(hero);
+			System.out.println("success");
+		} catch (SQLException e) {
+			System.err.println("Failed to save hero to database");
+			e.printStackTrace();
+		}
+
+		
 		// while (true) {
 		// 	final String input = view.getInput(); 
 
