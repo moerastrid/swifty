@@ -3,19 +3,19 @@ package mazie;
 public class Main {
 
     public static void main(String[] args) {
-        // System.out.println("new new new");
+        System.out.println("new new new");
 
-        // final var view = new ConsoleView();
+        final var view = new ConsoleView();
 
-		// final var controller = new GameController(view);
+		final var controller = new GameController(view);
 
-        // try {
-    	// 	controller.start();
-        // } catch (Throwable t) {
-        //     System.err.println("Fatal error: " + t.getMessage());
-        // }
+        try {
+    		controller.start();
+        } catch (Throwable t) {
+            System.err.println("Fatal error: " + t.getMessage());
+        }
 
-        tryMaps();
+        // tryMaps();
     }
 
     private static void tryMaps() {
