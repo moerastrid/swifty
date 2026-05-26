@@ -1,12 +1,16 @@
 package mazie.model;
 
 public class Artifact {
-	private int id;
+	private int id = 0;
 	private String name;
 	private ArtifactType type;
-	private int value;
+	private int value = 0;
 
-	public Artifact() {
+	private Artifact() {};
+
+	public Artifact(String name, ArtifactType type) {
+		this.name = name;
+		this.type = type;
 	}
 
 	public int getId() {
@@ -41,4 +45,9 @@ public class Artifact {
 		this.value = value;
 	}
 
+	@Override
+	public String toString() {
+		return String.format("%s, id:%d, type:%s, value:%d",
+		this.name, this.id, this.type, this.value);
+	}
 }
