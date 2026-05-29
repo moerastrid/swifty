@@ -2,6 +2,6 @@ package mazie.model;
 
 public enum ArtifactType {
 	WEAPON,
-	ARMOR,
+	ARMOUR,
 	HELMET
 }

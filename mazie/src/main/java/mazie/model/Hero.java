@@ -13,7 +13,9 @@ public class Hero {
     private int attack = 10;
     private int defence = 10;
     private int hp = 100;
-    private List<Artifact> artifacts = new ArrayList<>();
+    private Artifact weapon = null;
+    private Artifact armour = null;
+    private Artifact helmet = null;
 
     private Hero() {
     }
@@ -87,36 +89,65 @@ public class Hero {
         this.hp = hp;
     }
 
+    public Artifact getWeapon() {
+        return this.weapon;
+    }
+
+    public void setWeapon(Artifact weapon) {
+        this.weapon = weapon;
+    }
+
+    public Artifact getArmour() {
+        return this.armour;
+    }
+
+    public void setArmour(Artifact armour) {
+        this.armour = armour;
+    }
+
+    public Artifact getHelmet() {
+        return this.helmet;
+    }
+
+    public void setHelmet(Artifact helmet) {
+        this.helmet = helmet;
+    }
+
     public List<Artifact> getArtifacts() {
-        return this.artifacts;
+        final var artifacts = new ArrayList<Artifact>();
+        artifacts.add(this.weapon);
+        artifacts.add(this.armour);
+        artifacts.add(this.helmet);
+        return artifacts;
     }
 
-    public void setArtifacts(List<Artifact> artifacts) {
-        this.artifacts = artifacts;
+    public void setArtifact(Artifact artifact) {
+        switch (artifact.getType()) {
+            case WEAPON: 
+                this.setWeapon(artifact);
+            case ARMOUR:
+                this.setArmour(artifact);
+            case HELMET:
+                this.setHelmet(artifact);
+        }
     }
 
-    public Artifact getArtifact(int index) {
-        return this.artifacts.get(index);
-    }
 
-    public void addArtifact(Artifact artifact) {
-        this.artifacts.add(artifact);
-    }
 
-    public void removeArtifact(Artifact artifact) {
-        this.artifacts.remove(artifact);
-    }
+
 
     @Override
     public String toString() {
         // return String.format("id:%d, name:%s, type:%s, level:%d, xp:%d, attack:%d, defence:%d, hp:%d, artifacts:%s", 
         // this.id, this.name, this.type, this.level, this.xp, this.attack, this.defence, this.hp, this.artifacts);
 
+        final var artifacts = this.getArtifacts();
+
         StringBuilder sb = new StringBuilder(String.format(
                 """
 				Hero(#%d) %s identifies as a %s,
 				lvl:%d, xp:%d, attack:%d, defence:%d, hp:%d,
-				is carrying: 
+				is wearing: 
 					""",                
 				this.id, this.name, this.type, this.level, this.xp, this.attack, this.defence, this.hp
 				// this.artifacts.stream().map(artifact -> artifact.toString()).collect(Collectors.joining())
@@ -125,8 +156,10 @@ public class Hero {
 		if (artifacts.isEmpty()) {
 			sb.append("\t- nothing.");
 		} else {
- 			this.artifacts.stream().forEach(artifact -> 
-				sb.append("\t-").append(artifact.toString()).append("\n"));
+ 			artifacts.stream().forEach(artifact -> {
+                if (artifact != null)
+    				sb.append("\t-").append(artifact.toString()).append("\n");
+            });
 		}
 
 		return sb.toString();

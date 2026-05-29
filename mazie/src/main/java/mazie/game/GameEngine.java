@@ -23,11 +23,11 @@ public class GameEngine {
         System.out.println(this.hero.toString());
 
         Artifact artifactOne = new Artifact("a little hat", ArtifactType.HELMET);
-        Artifact artifactTwo = new Artifact("a glitterlegging", ArtifactType.ARMOR);
+        Artifact artifactTwo = new Artifact("a glitterlegging", ArtifactType.ARMOUR);
         artifactTwo.setValue(6);
 
-        hero.addArtifact(artifactOne);
-        hero.addArtifact(artifactTwo);
+        hero.setArtifact(artifactOne);
+        hero.setArtifact(artifactTwo);
 
         System.out.println(this.hero.toString());
 
