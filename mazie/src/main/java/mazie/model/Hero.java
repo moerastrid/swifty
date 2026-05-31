@@ -6,8 +6,8 @@ import java.util.List;
 public class Hero {
 
     private int id = 0;
-    private String name;
-    private HeroType type;
+    private String name = "default";
+    private HeroType type = null;
     private int level = 1;
     private int xp = 0;
     private int attack = 10;
@@ -17,7 +17,7 @@ public class Hero {
     private Artifact armour = null;
     private Artifact helmet = null;
 
-    private Hero() {
+    public Hero() {
     }
 
     public Hero(String name, HeroType type) {

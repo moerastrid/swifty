@@ -2,11 +2,11 @@ package mazie.model;
 
 public class Artifact {
 	private int id = 0;
-	private String name;
-	private ArtifactType type;
+	private String name = "default";
+	private ArtifactType type = null;
 	private int value = 0;
 
-	private Artifact() {};
+	public Artifact() {};
 
 	public Artifact(String name, ArtifactType type) {
 		this.name = name;
