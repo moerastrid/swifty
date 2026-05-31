@@ -2,16 +2,16 @@ package mazie.model;
 
 import java.util.Random;
 
-public class Map {
+public class GameMap {
     private final int size;
     private final Monster[][] monsters;
     private final Random random;
     private int heroX = 0;
     private int heroY = 0;
 
-    // private Map() {};
+    // private GameMap() {};
 
-    public Map(int heroLevel) {
+    public GameMap(int heroLevel) {
         this.random = new Random();
         this.size = (heroLevel - 1) * 5 + 10 - (heroLevel % 2);
         this.heroX = size / 2;
@@ -28,16 +28,8 @@ public class Map {
         return this.heroX;
     }
 
-    private void setHeroX(int heroX) {
-        this.heroX = heroX;
-    }
-
     public int getHeroY() {
         return this.heroY;
-    }
-
-    private void setHeroY(int heroY) {
-        this.heroY = heroY;
     }
 
     public Monster[][] getMonsters() {
@@ -48,9 +40,17 @@ public class Map {
         return (monsters[x][y]);
     }
 
+    public void removeMonster(int x, int y) {
+        monsters[x][y] = null;
+    }
+
     public void moveHero(Direction direction) {
         this.heroX += direction.dx;
         this.heroY += direction.dy;
+    }
+
+    public boolean isHeroOnEdge() {
+        return isEdge(this.heroX, this.heroY);
     }
 
     private void generateMonsters(Random random, int heroLevel) {
@@ -104,10 +104,6 @@ public class Map {
         return (monsters[x][y] != null);
     }
 
-    private boolean isHeroOnEdge() {
-        return isEdge(this.heroX, this.heroY);
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -123,6 +119,7 @@ public class Map {
                 else
                     sb.append(". ");
             }
+            sb.append("\n");
         }
         return sb.toString();
     }
