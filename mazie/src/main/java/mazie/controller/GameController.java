@@ -3,24 +3,89 @@ package mazie.controller;
 import mazie.game.GameEngine;
 import mazie.model.Artifact;
 import mazie.model.ArtifactType;
+import mazie.model.Direction;
 import mazie.model.GameMap;
 import mazie.model.Hero;
 import mazie.model.HeroType;
 import mazie.view.GameView;
 
 public class GameController {
-    private final GameEngine engine;
+    // private GameEngine engine;
     private GameView view;
 
-    public GameController(GameEngine engine, GameView view) {
-        this.engine = engine;
+    public GameController(GameView view) {
         this.view = view;
     }
 
     public void start() {
-        this.tryOutHeroes();
+         
+
+        this.startGamePlay(new Hero("Papa Bear", HeroType.BEAR));
+
+        // this.tryOutHeroes();
+
         // this.tryOutLogic();
     }
+
+    private void startGamePlay(Hero hero) {
+        final var engine = new GameEngine(hero);
+
+        System.out.println(hero.toString());
+
+        System.out.println(engine.getMapString());
+
+        var gameLoop = true;
+
+        while (gameLoop) {
+
+            var monster = engine.move(Direction.NORTH);
+
+            // move + get monster
+            if (monster != null) {
+                System.out.println(monster.toString());
+
+            } else {
+                monster = engine.move(Direction.WEST);
+                if (monster != null)
+                    System.out.println(monster.toString());
+                
+            }
+
+            // if monster now ?
+            if (monster == null) {
+                System.out.println("hero moved!");
+                System.out.println(engine.getMapString());
+                if (engine.win()) {
+                    System.out.println("  congrtz you won.  ");
+                    gameLoop = false;
+                }
+            } else {
+                // run ?
+                System.out.println("Do we fight the monster? NO RUN!");
+
+                if (engine.runAway() == true) {
+                    System.out.println("...running...");
+                } else {
+                    System.out.println("Let's start a fight!");
+                    if (engine.fight()) {
+                        System.out.println("you won the fight");
+                    } else {
+                        System.out.println("you lost :(");
+                        gameLoop = false;
+                    }
+                }
+            }
+
+            // System.out.println(engine.getMapString());
+
+
+            
+        }
+        // engine.play();
+    }
+
+
+
 
     public void tryOutHeroes() {
         final var leo = new Hero("Leonardo", HeroType.FROG);
@@ -40,7 +105,6 @@ public class GameController {
         raph.setArtifact(hat);
         raph.setArtifact(legging);
 
-
         System.out.println(leo);
         GameMap leoMap = new GameMap(leo.getLevel());
         System.out.println(leoMap.toString());
@@ -56,6 +120,11 @@ public class GameController {
         System.out.println(mikey);
         GameMap mikeyMap = new GameMap(mikey.getLevel());
         System.out.println(mikeyMap.toString());
+        
+        
+    }
+
+    public void tryOutLogic(Hero hero) {
 
     }
 

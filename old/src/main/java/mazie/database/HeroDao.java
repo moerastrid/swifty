@@ -35,7 +35,6 @@ public class HeroDao {
 		}
 	}
 
-
 	private void createTables() throws SQLException {
 		String createHeroTable = """
 				CREATE TABLE IF NOT EXISTS heroes (

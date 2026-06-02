@@ -40,18 +40,36 @@ public class GameMap {
         return (monsters[x][y]);
     }
 
+    public Monster getMonsterInDirection(Direction dir) {
+        final var x = this.getHeroX() + dir.dx;
+        final var y = this.getHeroY() + dir.dy;
+
+        return (monsters[x][y]);
+    }
+
     public void removeMonster(int x, int y) {
         monsters[x][y] = null;
     }
 
-    public void moveHero(Direction direction) {
-        this.heroX += direction.dx;
-        this.heroY += direction.dy;
+    public void removeMonster(Direction dir) {
+        final var x = this.getHeroX() + dir.dx;
+        final var y = this.getHeroY() + dir.dy;
+        
+        monsters[x][y] = null;
+    }
+
+    public void moveHero(Direction dir) {
+        this.heroX += dir.dx;
+        this.heroY += dir.dy;
     }
 
     public boolean isHeroOnEdge() {
         return isEdge(this.heroX, this.heroY);
     }
+
+    // public boolean isHeroNextToMonster(Direction dir) {
+    //     return isMonster(this.heroX + dir.dx, this.heroY + dir.dy);
+    // }
 
     private void generateMonsters(Random random, int heroLevel) {
         final int total = size * size;

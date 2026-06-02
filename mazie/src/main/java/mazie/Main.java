@@ -15,10 +15,9 @@ public class Main {
 	public static void main(String[] args) {
 		System.out.println("hoi :)");
 
-		var engine = new GameEngine();
 		var view = new TerminalView();
 
-		var controller = new GameController(engine, view);
+		var controller = new GameController(view);
 
 		controller.start();
 

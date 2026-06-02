@@ -3,6 +3,7 @@ package mazie.view.terminal;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import mazie.model.Direction;
 import mazie.view.GameView;
 
 
@@ -33,5 +34,11 @@ public class TerminalView implements GameView {
 			System.err.println("?user entered ^C or ^D in terminal?\n" + e);
 			return null;
 		}
+	}
+
+	@Override
+	public Direction getDirection() {
+		// #ToDo: implement.
+		return Direction.SOUTH;
 	}
 }

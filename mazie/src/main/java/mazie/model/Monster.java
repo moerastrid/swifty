@@ -26,31 +26,34 @@ public class Monster {
 
     public static Monster easy(int heroLevel) {
         final var val = (heroLevel / 1) + 1;
-        return new Monster("(easy) " + randomEasyName(), val, val, val * 10, val * 100);
+        return new Monster("(easy) " + randomEasyName(), val + 8, val, val * 10, val * 100);
     }
 
     public static Monster medium(int heroLevel) {
         final var val = (heroLevel / 2) + 1;
-        return new Monster("(medium) " + randomMediumName(), val, val, val * 10, val * 100);
+        return new Monster("(medium) " + randomMediumName(), val + 10, val, val * 10, val * 100);
     }
 
     public static Monster hard(int heroLevel) {
         final var val = (heroLevel) + 1;
-        return new Monster("(hard) " + randomHardName(), val, val, val * 10, val * 200);
+        return new Monster("(hard) " + randomHardName(), val + 15, val, val * 10, val * 200);
     }
 
     private static String randomEasyName() {
-        String[] names = {"bookstore", "garden", "birthday party", "coffee bistro", "home office"};
+        String[] names = {"butterfly", "fish", "hamster"};
+        // String[] names = {"bookstore", "garden", "birthday party", "coffee bistro", "home office"};
         return names[random.nextInt(0, names.length -1)];
     }
 
     private static String randomMediumName() {
-        String[] names = {"supermarket", "public park", "club night", "cozy restaurant", "bullpen"};
+        String[] names = {"cat", "mosquito", "cow"};
+        // String[] names = {"supermarket", "public park", "club night", "cozy restaurant", "kantoortuin"};
         return names[random.nextInt(0, names.length -1)];
     }
 
     private static String randomHardName() {
-        String[] names = {"black friday sale", "garden", "boiler room", "all you can eat buffet", "networking event"};
+        String[] names = {"tiger", "shark", "capibara"};
+        // String[] names = {"black friday sale", "garden", "boiler room", "all you can eat buffet", "networking event"};
         return names[random.nextInt(0, names.length -1)];
     }
 
@@ -93,4 +96,15 @@ public class Monster {
     public void setXpReward(int xpReward) {
         this.xpReward = xpReward;
     }
+
+    @Override
+    public String toString() {
+        return String.format(
+            """
+            Evil %s
+             attack:%d, defence:%d, hp:%d
+            """, this.name, this.attack, this.defence, this.hp
+        );
+    }
+
 }

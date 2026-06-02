@@ -61,6 +61,8 @@ public class Hero {
     }
 
     public void setType(HeroType type) {
+        if (type == null)
+            throw new RuntimeException("that aint my type :(");
         this.type = type;
     }
 
@@ -84,6 +86,10 @@ public class Hero {
         return this.attack;
     }
 
+    public int getTotalAttack() {
+        return (this.weapon == null) ? this.attack : this.attack + this.weapon.getValue();
+    }
+
     public void setAttack(int attack) {
         this.attack = attack;
     }
@@ -92,12 +98,20 @@ public class Hero {
         return this.defence;
     }
 
+    public int getTotalDefence() {
+        return (this.armour == null) ? this.defence : this.defence + this.armour.getValue();
+    }
+
     public void setDefence(int defence) {
         this.defence = defence;
     }
 
     public int getHp() {
         return this.hp;
+    }
+
+    public int getTotalHp() {
+        return (this.helmet == null) ? this.hp : this.hp + this.helmet.getValue();
     }
 
     public void setHp(int hp) {
@@ -109,6 +123,8 @@ public class Hero {
     }
 
     public void setWeapon(Artifact weapon) {
+        if (weapon == null || weapon.getType() != ArtifactType.WEAPON)
+            throw new RuntimeException("thats no weapon :(");
         this.weapon = weapon;
     }
 
@@ -117,8 +133,9 @@ public class Hero {
     }
 
     public void setArmour(Artifact armour) {
-        if (armour != null && armour.getType() == ArtifactType.ARMOUR)
-            this.armour = armour;
+        if (armour == null || armour.getType() != ArtifactType.ARMOUR)
+            throw new RuntimeException("thats no armour :(");
+        this.armour = armour;
     }
 
     public Artifact getHelmet() {
@@ -126,6 +143,8 @@ public class Hero {
     }
 
     public void setHelmet(Artifact helmet) {
+        if (helmet == null || helmet.getType() != ArtifactType.HELMET)
+            throw new RuntimeException("thats no helmet :(");
         this.helmet = helmet;
     }
 
@@ -144,6 +163,9 @@ public class Hero {
     }
 
     public void setArtifact(Artifact artifact) {
+        if (artifact == null)
+            throw new RuntimeException("thats null :(");
+
         switch (artifact.getType()) {
             case WEAPON ->
                 this.setWeapon(artifact);
@@ -159,7 +181,7 @@ public class Hero {
 
         final var artifacts = this.getArtifacts();
 
-        StringBuilder sb = new StringBuilder(String.format(
+        final var sb = new StringBuilder(String.format(
             """
             Hero(#%d) %s identifies as a %s,
              lvl:%d, xp:%d, attack:%d, defence:%d, hp:%d,
