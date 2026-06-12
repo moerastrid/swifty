@@ -8,7 +8,11 @@ public class Monster {
     private int defence = 2;
     private int hp = 100;
     private int xpReward = 100;
-    private static Random random = new Random();
+
+    private static final Random RANDOM = new Random();
+    private static final String[] EASY_NAMES = {"butterfly", "fish", "hamster"};
+    private static final String[] MEDIUM_NAMES = {"cat", "mosquito", "cow", "seal"};
+    private static final String[] HARD_NAMES = {"tiger", "shark", "capibara"};
 
     private Monster() {};
 
@@ -26,35 +30,21 @@ public class Monster {
 
     public static Monster easy(int heroLevel) {
         final var val = (heroLevel / 1) + 1;
-        return new Monster("(easy) " + randomEasyName(), val + 8, val, val * 10, val * 100);
+        String name = EASY_NAMES[RANDOM.nextInt(EASY_NAMES.length)];
+        return new Monster("(easy) " + name, val + 8, val, val * 10, val *80);
     }
 
     public static Monster medium(int heroLevel) {
         final var val = (heroLevel / 2) + 1;
-        return new Monster("(medium) " + randomMediumName(), val + 10, val, val * 10, val * 100);
+        String name = MEDIUM_NAMES[RANDOM.nextInt(MEDIUM_NAMES.length)];
+        return new Monster("(medium) " +name, val + 10, val, val * 10, val * 100);
     }
 
     public static Monster hard(int heroLevel) {
         final var val = (heroLevel) + 1;
-        return new Monster("(hard) " + randomHardName(), val + 15, val, val * 10, val * 200);
-    }
 
-    private static String randomEasyName() {
-        String[] names = {"butterfly", "fish", "hamster"};
-        // String[] names = {"bookstore", "garden", "birthday party", "coffee bistro", "home office"};
-        return names[random.nextInt(0, names.length -1)];
-    }
-
-    private static String randomMediumName() {
-        String[] names = {"cat", "mosquito", "cow"};
-        // String[] names = {"supermarket", "public park", "club night", "cozy restaurant", "kantoortuin"};
-        return names[random.nextInt(0, names.length -1)];
-    }
-
-    private static String randomHardName() {
-        String[] names = {"tiger", "shark", "capibara"};
-        // String[] names = {"black friday sale", "garden", "boiler room", "all you can eat buffet", "networking event"};
-        return names[random.nextInt(0, names.length -1)];
+        String name = HARD_NAMES[RANDOM.nextInt(HARD_NAMES.length)];
+        return new Monster("(hard) " + name, val + 15, val, val * 10, val * 200);
     }
 
     public String getName() {

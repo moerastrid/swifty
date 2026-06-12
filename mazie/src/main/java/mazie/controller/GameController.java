@@ -2,7 +2,6 @@ package mazie.controller;
 
 import mazie.game.GameEngine;
 import mazie.model.Artifact;
-import mazie.model.ArtifactType;
 import mazie.model.Direction;
 import mazie.model.GameMap;
 import mazie.model.Hero;
@@ -22,7 +21,7 @@ public class GameController {
 
         this.startGamePlay(new Hero("Papa Bear", HeroType.BEAR));
 
-        // this.tryOutHeroes();
+        this.tryOutHeroes();
 
         // this.tryOutLogic();
     }
@@ -67,8 +66,15 @@ public class GameController {
                     System.out.println("...running...");
                 } else {
                     System.out.println("Let's start a fight!");
-                    if (engine.fight()) {
+                    final var result = engine.fight();
+                    if (result.win()) {
                         System.out.println("you won the fight");
+                        if (result.levelup()) {
+                            System.out.println("you level up!");
+                        }
+                        if (result.drop() != null) {
+                            System.out.println("You gain artifact: " + result.drop());
+                        }
                     } else {
                         System.out.println("you lost :(");
                         gameLoop = false;
@@ -91,19 +97,16 @@ public class GameController {
         final var leo = new Hero("Leonardo", HeroType.FROG);
         final var donnie = new Hero("Dontello", HeroType.HARE);
         final var raph = new Hero("Raphael", HeroType.BEAR);
-        final var mikey = new Hero("Michaelangelo", HeroType.TURTLE);
 
-        mikey.gainXp(1500);
-        mikey.levelUp();
+        if (leo.gainXp(1500))
+            System.out.println("lvl up!");
 
-        Artifact hat = new Artifact("a little hat", ArtifactType.HELMET);
-        Artifact legging = new Artifact("a glitterlegging", ArtifactType.ARMOUR);
-        
-        hat.setValue(6);
-        donnie.setArtifact(hat);
-        hat.setValue(7);
-        raph.setArtifact(hat);
-        raph.setArtifact(legging);
+        Artifact helmet = Artifact.helmet(6);
+        Artifact armour = Artifact.armour(7);
+
+        donnie.setArtifact(helmet);
+        raph.setArtifact(helmet);
+        raph.setArtifact(armour);
 
         System.out.println(leo);
         GameMap leoMap = new GameMap(leo.getLevel());
@@ -117,10 +120,6 @@ public class GameController {
         GameMap raphMap = new GameMap(raph.getLevel());
         System.out.println(raphMap.toString());
 
-        System.out.println(mikey);
-        GameMap mikeyMap = new GameMap(mikey.getLevel());
-        System.out.println(mikeyMap.toString());
-        
         
     }
 

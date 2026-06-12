@@ -3,34 +3,53 @@ package mazie.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class Hero {
 
     private int id = 0;
+
+    @NotNull(message = "Heroes need names")
+    @Size(min = 2, max = 30)
     private String name = "default";
-    private HeroType type = null;
+
+    @NotNull(message = "You can't just be a 'hero'")
+    private HeroType type;
+
+    @Min(1)
     private int level = 1;
+
+    @Min(0)
     private int xp = 0;
-    private int attack = 10;
+
+    private int attack = 10;    
     private int defence = 10;
     private int hp = 100;
+
     private Artifact weapon = null;
     private Artifact armour = null;
     private Artifact helmet = null;
 
-    public Hero() {
-    }
+
+    private Hero() {}
 
     public Hero(String name, HeroType type) {
         this.name = name;
         this.type = type;
+        this.attack = type.baseAttack;
+        this.defence = type.baseDefence;
+        this.hp = type.baseHp;
     }
 
-    public void gainXp(int xp) {
-        this.xp += xp;
-    }
-
-    public boolean levelUp() {
+    /*
+        returns true if lvlUp = true.
+    */
+    public boolean gainXp(int xp) {
         final var xpNeed = (this.level * 1000) + ((level - 1) * (level - 1)) * 450;
+
+        this.xp += xp;
 
         if (this.xp > xpNeed) {
             this.level += 1;
@@ -87,7 +106,7 @@ public class Hero {
     }
 
     public int getTotalAttack() {
-        return (this.weapon == null) ? this.attack : this.attack + this.weapon.getValue();
+        return (this.weapon == null) ? this.attack : this.attack + this.weapon.value();
     }
 
     public void setAttack(int attack) {
@@ -99,7 +118,7 @@ public class Hero {
     }
 
     public int getTotalDefence() {
-        return (this.armour == null) ? this.defence : this.defence + this.armour.getValue();
+        return (this.armour == null) ? this.defence : this.defence + this.armour.value();
     }
 
     public void setDefence(int defence) {
@@ -111,7 +130,7 @@ public class Hero {
     }
 
     public int getTotalHp() {
-        return (this.helmet == null) ? this.hp : this.hp + this.helmet.getValue();
+        return (this.helmet == null) ? this.hp : this.hp + this.helmet.value();
     }
 
     public void setHp(int hp) {
@@ -123,7 +142,7 @@ public class Hero {
     }
 
     public void setWeapon(Artifact weapon) {
-        if (weapon == null || weapon.getType() != ArtifactType.WEAPON)
+        if (weapon == null || weapon.type() != ArtifactType.WEAPON)
             throw new RuntimeException("thats no weapon :(");
         this.weapon = weapon;
     }
@@ -133,7 +152,7 @@ public class Hero {
     }
 
     public void setArmour(Artifact armour) {
-        if (armour == null || armour.getType() != ArtifactType.ARMOUR)
+        if (armour == null || armour.type() != ArtifactType.ARMOUR)
             throw new RuntimeException("thats no armour :(");
         this.armour = armour;
     }
@@ -143,7 +162,7 @@ public class Hero {
     }
 
     public void setHelmet(Artifact helmet) {
-        if (helmet == null || helmet.getType() != ArtifactType.HELMET)
+        if (helmet == null || helmet.type() != ArtifactType.HELMET)
             throw new RuntimeException("thats no helmet :(");
         this.helmet = helmet;
     }
@@ -166,7 +185,7 @@ public class Hero {
         if (artifact == null)
             throw new RuntimeException("thats null :(");
 
-        switch (artifact.getType()) {
+        switch (artifact.type()) {
             case WEAPON ->
                 this.setWeapon(artifact);
             case ARMOUR ->

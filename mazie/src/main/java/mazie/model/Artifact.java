@@ -1,53 +1,44 @@
 package mazie.model;
 
-public class Artifact {
-	private int id = 0;
-	private String name = "default";
-	private ArtifactType type = null;
-	private int value = 0;
+public record Artifact(
+	String name,
+	ArtifactType type,
+	int value
+) {
+	private static final String[] WEAPONS = {"a knife", "a fork", "a spoon"};
+	private static final String[] ARMOURS = {"a glitterlegging", "a dress"};
+	private static final String[] HELMETS = {"a colander", "a carton box", "a little hat", "a yankee with no brim"};
 
-	public Artifact() {};
+	public static Artifact weapon(final int value) {
+		final int time = getTimeAsInt();
+		final String name = WEAPONS[getTimeAsInt() % WEAPONS.length];
 
-	public Artifact(String name, ArtifactType type) {
-		this.name = name;
-		this.type = type;
+		return new Artifact(name, ArtifactType.WEAPON, value);
 	}
 
-	public int getId() {
-		return this.id;
+	public static Artifact armour(final int value) {
+		final String name = ARMOURS[getTimeAsInt() % ARMOURS.length];
+
+		return new Artifact(name, ArtifactType.ARMOUR, value);
 	}
 
-	public void setId(int id) {
-		this.id = id;
-	}
-	
-	public String getName() {
-		return this.name;
+	public static Artifact helmet(final int value) {
+		final String name = HELMETS[getTimeAsInt() % HELMETS.length];
+
+		return new Artifact(name, ArtifactType.HELMET, value);
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public ArtifactType getType() {
-		return this.type;
-	}
-
-	public void setType(ArtifactType type) {
-		this.type = type;
-	}
-
-	public int getValue() {
-		return this.value;
-	}
-
-	public void setValue(int value) {
-		this.value = value;
+	private static int getTimeAsInt() {
+		int time = (int) System.currentTimeMillis();
+		if (time < 0) {
+			time = time * -1;
+		}
+		return time;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("%s, id:%d, type:%s, value:%d",
-		this.name, this.id, this.type, this.value);
+		return String.format("%s, type:%s, value:%d",
+		this.name, this.type, this.value);
 	}
 }

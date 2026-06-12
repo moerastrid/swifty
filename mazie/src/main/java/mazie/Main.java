@@ -1,7 +1,6 @@
 package mazie;
 
 import mazie.controller.GameController;
-import mazie.game.GameEngine;
 import mazie.view.terminal.TerminalView;
 
 public class Main {
