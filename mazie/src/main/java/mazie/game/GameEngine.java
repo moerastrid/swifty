@@ -11,7 +11,7 @@ import mazie.model.Monster;
 public class GameEngine {
     private final Hero hero;
     private final GameMap map;
-    private final static Random RANDOM = new Random(System.currentTimeMillis());
+    private final Random random = new Random(System.currentTimeMillis());
     private Direction currentDir = null;
 
     public GameEngine(Hero hero) {
@@ -38,7 +38,7 @@ public class GameEngine {
     }
 
     public boolean runAway() {
-        return this.RANDOM.nextBoolean();
+        return this.random.nextBoolean();
     }
 
     public boolean win() {
@@ -81,7 +81,7 @@ public class GameEngine {
         final int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
 
         // monster 50% chance attacks hero
-        if (RANDOM.nextBoolean() || damageToHero <= 0) {
+        if (random.nextBoolean() || damageToHero <= 0) {
             return;
         }
 
@@ -91,7 +91,7 @@ public class GameEngine {
 
     private Artifact dropArtifact(int xpReward) {
         final int value = xpReward / 10 - 2;
-        final var drop = RANDOM.nextInt(4);
+        final var drop = random.nextInt(4);
         return switch (drop) {
             case 0 -> Artifact.weapon(value);
             case 1 -> Artifact.armour(value);
@@ -151,7 +151,7 @@ public class GameEngine {
     //     System.out.println(monster.getName() + " attacks");
     //     final int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
 
-    //     if (RANDOM.nextBoolean() || damageToHero <= 0) {
+    //     if (random.nextBoolean() || damageToHero <= 0) {
     //         System.out.println("... but nothing happens");
     //         return;
     //     }
