@@ -62,19 +62,49 @@ java -jar target/mazie.jar gui
 - `GameEngine.java`: `fight()` returns `FightResult`, no System.out.println, `dropArtifact()` implemented
 - `pom.xml`: Hibernate Validator + SQLite present, jar config correct
 
-### 🔄 Fase 2 — GameView interface (IN PROGRESS)
+### ✅ Fase 2 — GameView interface (DONE)
 
-Current `GameView.java` is work in progress.
+- `GameView.java`: 14 methods covering full game flow (welcome, create/select hero, ask direction, fight/run, level-up, artifact drop, end game)
+- `showFightSummary(String, int)`: takes a pre-formatted string + xp gained — kept simple for now, may revisit during controller implementation when concrete needs become clear
+- `askKeepArtifact(Artifact, Hero)`: hero is passed so view can show current artifacts for context
 
 ### ❌ Fase 3 — Persistence (NOT STARTED)
 
-### ❌ Fase 4 — TerminalView (NOT STARTED)
+### 🔄 Fase 4 — TerminalView (IN PROGRESS)
+
+Done:
+
+- `AnsiColor`: converted to typesafe `enum` with `toString()` returning the ANSI escape code
+- Helpers: `colorPrint(AnsiColor, String)`, `scanNextLine()` (catches `NoSuchElementException` for Ctrl+C/D)
+- `showError`, `showWelcome` (loads `mazie-icon-ascii.txt` from classpath via `getResourceAsStream`)
+- `askNewGame`: y/n/yes/no via switch expression, recursive retry on invalid
+- `createHero`: type loop (b/f/h or full name), name loop, returns `new Hero(name, type)` — but **without Validator yet** and with a manual length check that should go away
+- ASCII art copied from `oldold/src/main/resources/` to `mazie/src/main/resources/`
+
+Open for next session — see priorities at bottom of this section.
+
+Still to implement (skeletons present, return placeholder values):
+
+- `selectHero`, `confirmHero`, `showHeroStats`, `showStartGame`, `askDirection`, `askFightMonster`, `showRunSuccess`, `showEndGame`, `showFightSummary`, `showLevelUp`, `askKeepArtifact`
 
 ### ❌ Fase 5 — GameController (NOT STARTED)
 
 ### ❌ Fase 6 — SwingView (NOT STARTED)
 
 ### ❌ Fase 7 — Main + args (NOT STARTED)
+
+---
+
+## Next-session priorities (top of stack)
+
+1. **Make `scanNextLine()` return `""` instead of `null`** on Ctrl+D — one-line change in `TerminalView`, removes null-checks in every caller and lets empty input fall naturally into `default` cases. Currently `askNewGame()` would NPE on Ctrl+D because `answer.toLowerCase()` runs on a `null` result.
+2. **Integrate Hibernate Validator into `createHero()`** — this is a **mandatory subject requirement** that is not yet wired up:
+   - Add `private final Validator validator` field, initialized once in constructor via `Validation.buildDefaultValidatorFactory().getValidator()` (factory creation is expensive, do it once)
+   - After `new Hero(name, type)`: call `validator.validate(hero)` → `Set<ConstraintViolation<Hero>>`
+   - If non-empty: loop through violations, call `showError(v.getMessage())`, ask the user again
+   - Remove the manual `length >= 2 && length <= 30` check on the name — `@Size` on `Hero.name` already covers it (avoid double validation)
+   - Remove the manual empty-name check too — `@NotBlank` covers it (and `@NotBlank` rejects whitespace-only, which the current check does not)
+3. **Decide loop style consistency** — `askNewGame` uses recursion, `createHero` uses while-loops. Pick one for the rest of the methods (and ideally normalize the existing two).
 
 ---
 
@@ -114,13 +144,24 @@ Implement all `GameView` methods in `mazie/src/main/java/mazie/view/terminal/Ter
 
 **Per-method intent:**
 
-- `createHero()`: ask name via Scanner, ask type (numbered list), construct a Hero, validate, loop on violations showing each error message
+- `createHero()`: ask name via Scanner, ask type, construct a Hero, validate, loop on violations showing each error message **(skeleton done, Validator integration pending — see Next-session priorities)**
 - `selectHero(List<Hero>)`: print numbered list, read int, return the chosen hero, loop on invalid input
 - `confirmHero(Hero)`: print hero stats + ask `y/n`
 - `askDirection()`: read `n/e/s/w`, loop until valid, return `Direction` enum
 - `askFightMonster(Monster)`: show monster stats, read `f` or `r`
-- `askKeepArtifact(Artifact)`: show artifact, read `y/n`
-- All `show*` methods: print to `System.out`, use `AnsiColor` constants for color
+- `askKeepArtifact(Artifact, Hero)`: show artifact + current hero (so user has context), read `y/n`
+- All `show*` methods: print to `System.out`, use `AnsiColor` enum constants for color
+
+**Helper-method strategy (Rule of Three):**
+
+- Already extracted: `colorPrint(AnsiColor, String)`, `scanNextLine()`
+- Likely candidate after 2–3 more methods: `readChoice(prompt, validInputs)` for the y/n / f-or-r / n-e-s-w pattern. Don't extract pre-emptively — wait until the third occurrence to confirm the shape.
+
+**Ctrl+C / Ctrl+D handling:**
+
+- `Scanner.nextLine()` throws `NoSuchElementException` when stdin closes (Ctrl+D on Unix) — caught in `scanNextLine()`
+- Plan: have `scanNextLine()` return `""` on EOF so callers don't need null-checks; empty input naturally falls into the `default` case of any `switch` and triggers a re-prompt
+- Ctrl+C terminates the JVM; nothing to do beyond letting the OS handle it
 
 **Hibernate Validator usage in `createHero()`:**
 
