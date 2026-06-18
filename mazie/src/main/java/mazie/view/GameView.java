@@ -2,42 +2,57 @@ package mazie.view;
 
 import java.util.List;
 
+import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.Monster;
 
 public interface GameView {
-    // default bedacht:
 
-    public void showPrompt(String prompt);
-
+    // in case of error (invalid input for example)
     public void showError(String error);
 
-    public String getInput();
-
-    // nodig vanuit draw io:
-
+    // welcome screen (image or ascii art, depending on view)
     public void showWelcome();
 
-    public boolean aksNewGame();
+    // ask if the user wants to start a new game or load existing one. only prompted if existing heroes are present
+    public boolean askNewGame();
 
+    // create new hero
     public Hero createHero();
 
+    // select existing hero from list (only prompted if list is not empty)
     public Hero selectHero(List<Hero> heroes);
 
+    // show stats of selected hero, confirm choice
     public boolean confirmHero(Hero hero);
 
+    // show stats of selected hero
+    public void showHeroStats(Hero hero);
+
+    // show that the game is starting
     public void showStartGame();
 
+    // get direction player wants to go
     public Direction askDirection();
 
-    public void showMonster(Monster monster);
+    // show monster, ask if user wants to fight or run
+    public boolean askFightMonster(Monster monster);
 
-    public boolean askFightMonster();
+    // show if run attempt from monster was succesfull
+    public void showRunSuccess(Monster monster, boolean success);
 
-    public boolean askRunFromMonster();
+    // show that the game ended, because either user is at map edge (win) or defeated by a monster (dead)
+    public void showEndGame(boolean win);
+
+    // fightsummary has a string with what happened during the fight + how much xp was gained. only called when user won.
+    public void showFightSummary(String fightSummary, int xpGained);
+
+    // show hero stats + congratz blabla
+    public void showLevelUp(Hero hero);
+
+    // show artifact, ask if user wants to keep it, show current hero (+ artifacts) too so user can make choise
+    public boolean askKeepArtifact(Artifact artifact, Hero hero);
 
     
-
-
 }
