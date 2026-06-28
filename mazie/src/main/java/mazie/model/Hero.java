@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
@@ -11,7 +12,7 @@ public class Hero {
 
     private int id = 0;
 
-    @NotNull(message = "Heroes need names")
+    @NotBlank(message = "Heroes need names")
     @Size(min = 2, max = 30)
     private String name = "default";
 
@@ -24,7 +25,7 @@ public class Hero {
     @Min(0)
     private int xp = 0;
 
-    private int attack = 10;    
+    private int attack = 10;
     private int defence = 10;
     private int hp = 100;
 
@@ -32,8 +33,8 @@ public class Hero {
     private Artifact armour = null;
     private Artifact helmet = null;
 
-
-    private Hero() {}
+    private Hero() {
+    }
 
     public Hero(String name, HeroType type) {
         this.name = name;
@@ -45,7 +46,7 @@ public class Hero {
 
     /*
         returns true if lvlUp = true.
-    */
+     */
     public boolean gainXp(int xp) {
         final var xpNeed = (this.level * 1000) + ((level - 1) * (level - 1)) * 450;
 
@@ -80,8 +81,9 @@ public class Hero {
     }
 
     public void setType(HeroType type) {
-        if (type == null)
+        if (type == null) {
             throw new RuntimeException("that aint my type :(");
+        }
         this.type = type;
     }
 
@@ -142,8 +144,9 @@ public class Hero {
     }
 
     public void setWeapon(Artifact weapon) {
-        if (weapon == null || weapon.type() != ArtifactType.WEAPON)
+        if (weapon == null || weapon.type() != ArtifactType.WEAPON) {
             throw new RuntimeException("thats no weapon :(");
+        }
         this.weapon = weapon;
     }
 
@@ -152,8 +155,9 @@ public class Hero {
     }
 
     public void setArmour(Artifact armour) {
-        if (armour == null || armour.type() != ArtifactType.ARMOUR)
+        if (armour == null || armour.type() != ArtifactType.ARMOUR) {
             throw new RuntimeException("thats no armour :(");
+        }
         this.armour = armour;
     }
 
@@ -162,8 +166,9 @@ public class Hero {
     }
 
     public void setHelmet(Artifact helmet) {
-        if (helmet == null || helmet.type() != ArtifactType.HELMET)
+        if (helmet == null || helmet.type() != ArtifactType.HELMET) {
             throw new RuntimeException("thats no helmet :(");
+        }
         this.helmet = helmet;
     }
 
@@ -182,8 +187,9 @@ public class Hero {
     }
 
     public void setArtifact(Artifact artifact) {
-        if (artifact == null)
+        if (artifact == null) {
             throw new RuntimeException("thats null :(");
+        }
 
         switch (artifact.type()) {
             case WEAPON ->
@@ -197,27 +203,7 @@ public class Hero {
 
     @Override
     public String toString() {
-
-        final var artifacts = this.getArtifacts();
-
-        final var sb = new StringBuilder(String.format(
-            """
-            Hero(#%d) %s identifies as a %s,
-             lvl:%d, xp:%d, attack:%d, defence:%d, hp:%d,
-             and is wearing:
-            """,
-        this.id, this.name, this.type, this.level, this.xp, this.attack, this.defence, this.hp));
-
-        if (artifacts.isEmpty()) {
-            sb.append("\t- nothing.");
-        } else {
-            artifacts.stream().forEach(artifact -> {
-                if (artifact != null) {
-                    sb.append("\t-").append(artifact.toString()).append("\n");
-                }
-            });
-        }
-
-        return sb.toString();
+        return "Hero(#%d) %s %s, lvl:%d, xp:%d, attack:%d, defence:%d, hp:%d, artifacts:%s"
+                .formatted(this.id, this.name, this.type, this.level, this.xp, this.attack, this.defence, this.hp, this.getArtifacts());
     }
 }

@@ -1,8 +1,13 @@
 package mazie.controller;
 
-import mazie.game.GameEngine;
+import java.util.Collections;
+
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
+
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import mazie.exception.QuitException;
 import mazie.model.Artifact;
-import mazie.model.Direction;
 import mazie.model.GameMap;
 import mazie.model.Hero;
 import mazie.model.HeroType;
@@ -11,84 +16,83 @@ import mazie.view.GameView;
 public class GameController {
     // private GameEngine engine;
     private GameView view;
+    private final Validator validator = Validation.byDefaultProvider()
+                .configure()
+                .messageInterpolator(new ParameterMessageInterpolator())
+                .buildValidatorFactory()
+                .getValidator();
 
     public GameController(GameView view) {
         this.view = view;
     }
 
     public void start() {
-         
 
-        this.startGamePlay(new Hero("Papa Bear", HeroType.BEAR));
+        view.showWelcome();
 
-        this.tryOutHeroes();
+        try {
+            Hero hero = setup();
+            
+            gameLoop();
+        } catch(QuitException e) {
+            view.showError("You're such a Quitter");
+        } finally {
+            // #todo repository.save of iets dergelijks?
+        }
+        
+
+        // this.startGamePlay(new Hero("Papa Bear", HeroType.BEAR));
+
+        // this.tryOutHeroes();
 
         // this.tryOutLogic();
     }
 
-    private void startGamePlay(Hero hero) {
-        final var engine = new GameEngine(hero);
+    private Hero setup() {
+        
+        // #todo: alleen als er helden zijn om te laten, vragen of user een nieuwe game wil beginnen. Nu geen repo dus altijd true?
+        boolean newGame = true;
+        Hero hero = null;
 
-        System.out.println(hero.toString());
-
-        System.out.println(engine.getMapString());
-
-        var gameLoop = true;
-
-        while (gameLoop) {
-
-            var monster = engine.move(Direction.NORTH);
-
-            // move + get monster
-            if (monster != null) {
-                System.out.println(monster.toString());
-
-            } else {
-                monster = engine.move(Direction.WEST);
-                if (monster != null)
-                    System.out.println(monster.toString());
-                
-            }
-
-            // if monster now ?
-            if (monster == null) {
-                System.out.println("hero moved!");
-                System.out.println(engine.getMapString());
-                if (engine.win()) {
-                    System.out.println("  congrtz you won.  ");
-                    gameLoop = false;
-                }
-            } else {
-                // run ?
-                System.out.println("Do we fight the monster? NO RUN!");
-
-                if (engine.runAway() == true) {
-                    System.out.println("...running...");
-                } else {
-                    System.out.println("Let's start a fight!");
-                    final var result = engine.fight();
-                    if (result.win()) {
-                        System.out.println("you won the fight");
-                        if (result.levelup()) {
-                            System.out.println("you level up!");
-                        }
-                        if (result.drop() != null) {
-                            System.out.println("You gain artifact: " + result.drop());
-                        }
-                    } else {
-                        System.out.println("you lost :(");
-                        gameLoop = false;
-                    }
-                }
-            }
-
-            // System.out.println(engine.getMapString());
-
-
-            
+        if (!newGame) {
+            newGame = view.askNewGame();
         }
-        // engine.play();
+
+        if (!newGame) {
+            hero = view.selectHero(Collections.emptyList());
+        } 
+
+        if (hero == null) {
+            hero = createValidHero();
+        }
+
+        view.showHeroStats(hero);
+
+        if (view.confirmHero(hero) == true) {
+            System.out.println("the chosen one:");
+            System.out.println(hero);
+            return hero;
+        } else {
+            return setup();
+        }
     }
+
+    private Hero createValidHero() {
+        Hero hero = view.createHero();
+        
+        final var violations = validator.validate(hero);
+        if (violations.isEmpty()) {
+            return hero;
+        }
+        
+        view.showError(String.join(", ", violations.stream().map(v -> v.getMessage()).toList()));
+        return createValidHero();
+    }
+
+    private void gameLoop() {
+        // #todo implement
+    }
+
 
 
 
