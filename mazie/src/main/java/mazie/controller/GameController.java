@@ -7,6 +7,7 @@ import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import mazie.exception.QuitException;
+import mazie.game.GameEngine;
 import mazie.model.Artifact;
 import mazie.model.GameMap;
 import mazie.model.Hero;
@@ -14,6 +15,7 @@ import mazie.model.HeroType;
 import mazie.view.GameView;
 
 public class GameController {
+
     // private GameEngine engine;
     private GameView view;
     private final Validator validator = Validation.byDefaultProvider()
@@ -32,8 +34,7 @@ public class GameController {
 
         try {
             Hero hero = setup();
-            
-            gameLoop();
+            gameLoop(hero);
         } catch(QuitException e) {
             view.showError("You're such a Quitter");
         } finally {
@@ -89,13 +90,73 @@ public class GameController {
         return createValidHero();
     }
 
-    private void gameLoop() {
-        // #todo implement
+    private void gameLoop(Hero hero) {
+
+        final var engine = new GameEngine(hero);
+        var playing = true;
+
+        view.showStartGame();
+
+        while (playing) {
+            
+            System.out.println("current map:\n" + engine.getMapString());
+
+            playing = turn(engine, hero);
+
+            if (engine.win()) {
+                view.showEndGame(true);
+                playing = false;
+                // #todo safe hero?
+            }
+
+            System.out.println("this is hero:");
+            view.showHeroStats(hero);
+        }
+
+
     }
 
+    private boolean turn(GameEngine engine, Hero hero) {
+        final var dir = view.askDirection();
+        final var monster = engine.move(dir);
+        if (monster == null) {
+            view.showEmptyStep();
+            return true;
+        }
 
+        final boolean feelingAgressive = view.askFightMonster(monster);
+        var running = false;
+        if (!feelingAgressive) {
+            running = engine.runAway();
+            view.showRunSuccess(monster, running);
+        }
+        if (running) {
+            return true;
+        }
+        
+        final var result = engine.fight();
+        System.out.println("fight result\nwin: %s\nlvlup: %s\ndrop: %s".formatted(result.win(), result.levelup(), result.drop()));
 
+        if(!result.win()) {
+            view.showEndGame(false);
+            // #todo delete hero?
+            return false;
+        }
 
+        view.showFightSummary("the fight ended", monster.getXpReward());
+
+        if(result.levelup()) {
+            view.showLevelUp(hero);
+        }
+
+        if(result.drop() != null) {
+            final var keep = view.askKeepArtifact(result.drop(), hero);
+            if (keep) {
+                hero.setArtifact(result.drop());
+            }
+        }
+        return true;
+    }
 
     public void tryOutHeroes() {
         final var leo = new Hero("Leonardo", HeroType.FROG);

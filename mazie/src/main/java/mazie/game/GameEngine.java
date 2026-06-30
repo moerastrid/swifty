@@ -52,22 +52,27 @@ public class GameEngine {
             fightRound(monster);
         }
 
-        boolean win = false;
+        // no win
         if (this.hero.getTotalHp() <= 0) {
             return new FightResult(false, false, null);
         }
 
-        boolean levelUp = hero.gainXp(monster.getXpReward());
+        // yes win
+        final var levelUp = hero.gainXp(monster.getXpReward());
+        final var drop = dropArtifact(monster.getXpReward());
 
-        Artifact drop = dropArtifact(monster.getXpReward());
+        map.removeMonster(currentDir);
+        map.moveHero(currentDir);
+        currentDir = null;
 
-        return new FightResult(win, levelUp, drop);
+        return new FightResult(true, levelUp, drop);
     }
 
     private void fightRound(Monster monster) {
 
         // hero attacks monster
         final int damageToMonster = this.hero.getTotalAttack() - monster.getDefence();
+        System.out.println("damage to monster: " + damageToMonster);
 
         if (damageToMonster > 0) {
             final var newMonsterHp = monster.getHp() - damageToMonster;
@@ -79,6 +84,7 @@ public class GameEngine {
 
         // monster attacks hero
         final int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
+        System.out.println("damage to hero: " + damageToHero);
 
         // monster 50% chance attacks hero
         if (random.nextBoolean() || damageToHero <= 0) {
@@ -87,6 +93,7 @@ public class GameEngine {
 
         final var newHp = this.hero.getHp() - damageToHero;
         this.hero.setHp(newHp);
+        
     }
 
     private Artifact dropArtifact(int xpReward) {

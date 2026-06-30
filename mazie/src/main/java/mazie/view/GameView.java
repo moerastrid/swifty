@@ -36,6 +36,9 @@ public interface GameView {
     // get direction player wants to go
     public Direction askDirection();
 
+    // if no monster, show user took a step
+    public void showEmptyStep();
+
     // show monster, ask if user wants to fight or run
     public boolean askFightMonster(Monster monster);
 
