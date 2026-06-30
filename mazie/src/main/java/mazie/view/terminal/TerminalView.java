@@ -76,16 +76,16 @@ public class TerminalView implements GameView {
 
     @Override
     public Hero selectHero(List<Hero> heroes) {
-		if (heroes.isEmpty()) {
-			return null;
-		}
-		final var prompt = "choose your fighter!\n(id/name)";
-		final var options = new HashMap<String, Hero>();
-		heroes.stream().forEach(hero -> {
-			showHeroStats(hero);
-			options.put(hero.getName(), hero);
-			// #todo when persistent options.put(Integer.toString(hero.getId()), hero);
-		});
+        if (heroes.isEmpty()) {
+            return null;
+        }
+        final var prompt = "choose your fighter!\n(id/name)";
+        final var options = new HashMap<String, Hero>();
+        heroes.stream().forEach(hero -> {
+            showHeroStats(hero);
+            options.put(hero.getName(), hero);
+            // #todo when persistent options.put(Integer.toString(hero.getId()), hero);
+        });
 
         return choose(prompt, options);
     }
@@ -110,13 +110,13 @@ public class TerminalView implements GameView {
 			  hp      :%d  (total %d)
 			and is wearing:
 			- %s
-			""".formatted(hero.getId(), hero.getName(), hero.getType().toString().toLowerCase(), 
-			hero.getLevel(), 
-			hero.getXp(),
-			hero.getAttack(), hero.getTotalAttack(),
-			hero.getDefence(), hero.getTotalDefence(),
-			hero.getHp(), hero.getTotalHp(),
-			artifacts);
+			""".formatted(hero.getId(), hero.getName(), hero.getType().toString().toLowerCase(),
+                hero.getLevel(),
+                hero.getXp(),
+                hero.getAttack(), hero.getTotalAttack(),
+                hero.getDefence(), hero.getTotalDefence(),
+                hero.getHp(), hero.getTotalHp(),
+                artifacts);
 
         colorPrint(AnsiColor.PURPLE, stats);
     }
@@ -124,6 +124,7 @@ public class TerminalView implements GameView {
     @Override
     public void showStartGame() {
         final var prompt = """
+        
         ╔═╝╔═ ═╔╝╔═╝╔═║  ═╔╝║ ║╔═╝  ╔╔ ╔═║══║╝╔═╝
         ╔═╝║ ║ ║ ╔═╝╔╔╝   ║ ╔═║╔═╝  ║║║╔═║╔╝ ║╔═╝
         ══╝╝ ╝ ╝ ══╝╝ ╝   ╝ ╝ ╝══╝  ╝╝╝╝ ╝══╝╝══╝
@@ -181,6 +182,7 @@ public class TerminalView implements GameView {
 
         if (win) {
             prompt = """
+
              ▄         ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄ 
             ▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░░▌      ▐░▌
             ▐░▌       ▐░▌ ▀▀▀▀█░█▀▀▀▀ ▐░▌░▌     ▐░▌
@@ -195,6 +197,7 @@ public class TerminalView implements GameView {
 			""";
         } else {
             prompt = """
+
              ▄▀▀▀▀▄    ▄▀▀█▄   ▄▀▀▄ ▄▀▄  ▄▀▀█▄▄▄▄  
             █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐  
             █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄   
@@ -226,6 +229,7 @@ public class TerminalView implements GameView {
     @Override
     public void showLevelUp(Hero hero) {
         final var prompt = """
+
          ██▓    ▓█████ ██▒   █▓▓█████  ██▓        █    ██  ██▓███  
         ▓██▒    ▓█   ▀▓██░   █▒▓█   ▀ ▓██▒        ██  ▓██▒▓██░  ██▒
         ▒██░    ▒███   ▓██  █▒░▒███   ▒██░       ▓██  ▒██░▓██░ ██▓▒
@@ -264,10 +268,14 @@ public class TerminalView implements GameView {
 
     private String scanNextLine() throws QuitException {
         try {
-            String s = scanner.nextLine();
-            return s.strip().toLowerCase();
+            final var line = scanner.nextLine();
+            final var answer = line.strip().toLowerCase();
+            if (answer.equals("q") || answer.equals("quit") || answer.equals("exit")) {
+                throw new QuitException("user is a quitter\ndeveloper is disappointed");
+            }
+            return answer;
         } catch (NoSuchElementException e) {
-            showError("?user entered ^C or ^D in terminal?" + e);
+            showError("?user entered ^C or ^D in terminal?");
             throw new QuitException("?user entered ^C or ^D in terminal?", e);
         }
     }

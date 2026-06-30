@@ -53,11 +53,19 @@ public class Hero {
         this.xp += xp;
 
         if (this.xp > xpNeed) {
-            this.level += 1;
             this.xp -= xpNeed;
-            return true;
+            return lvlUp();
         }
         return false;
+    }
+
+    private boolean lvlUp() {
+        this.level += 1;
+        this.hp = type.baseHp + ((this.level - 1) * type.baseHp / 10);
+        this.attack = type.baseAttack + ((this.level - 1) * type.baseAttack / 10);
+        this.defence = type.baseDefence + ((this.level - 1) * type.baseDefence / 10);
+
+        return true;
     }
 
     public int getId() {

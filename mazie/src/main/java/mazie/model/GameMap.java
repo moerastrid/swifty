@@ -3,6 +3,7 @@ package mazie.model;
 import java.util.Random;
 
 public class GameMap {
+
     private final int size;
     private final Monster[][] monsters;
     private final Random random;
@@ -10,7 +11,6 @@ public class GameMap {
     private int heroY = 0;
 
     // private GameMap() {};
-
     public GameMap(int heroLevel) {
         this.random = new Random();
         this.size = (heroLevel - 1) * 5 + 10 - (heroLevel % 2);
@@ -54,7 +54,7 @@ public class GameMap {
     public void removeMonster(Direction dir) {
         final var x = this.getHeroX() + dir.dx;
         final var y = this.getHeroY() + dir.dy;
-        
+
         monsters[x][y] = null;
     }
 
@@ -70,18 +70,17 @@ public class GameMap {
     // public boolean isHeroNextToMonster(Direction dir) {
     //     return isMonster(this.heroX + dir.dx, this.heroY + dir.dy);
     // }
-
     private void generateMonsters(Random random, int heroLevel) {
         final int total = size * size;
-        
+
         final int hardCount = total / 27;
         final int mediumCount = total / 12;
         final int easyCount = total / 9;
 
-        for(int i = 0; i < easyCount; i++) {
+        for (int i = 0; i < easyCount; i++) {
             this.generateMonster(random, Monster.easy(heroLevel));
         }
-        for(int i = 0; i < mediumCount; i++) {
+        for (int i = 0; i < mediumCount; i++) {
             this.generateMonster(random, Monster.medium(heroLevel));
         }
         for (int i = 0; i < hardCount; i++) {
@@ -101,12 +100,13 @@ public class GameMap {
     }
 
     private boolean isAvailable(int x, int y) {
-        if (isHeroPos(x, y))
+        if (isHeroPos(x, y)) {
             return false;
-        else if (isEdge(x, y))
+        } else if (isEdge(x, y)) {
             return false;
-        else if (isMonster(x, y))
+        } else if (isMonster(x, y)) {
             return false;
+        }
         return true;
     }
 
@@ -126,21 +126,20 @@ public class GameMap {
     public String toString() {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < size; i++){
+        for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (isHeroPos(j, i))
+                if (isHeroPos(j, i)) {
                     sb.append("H ");
-                else if (isMonster(j, i))
+                } else if (isMonster(j, i)) {
                     sb.append("M ");
-                else if (isEdge(j, i))
+                } else if (isEdge(j, i)) {
                     sb.append("~ ");
-                else
+                } else {
                     sb.append(". ");
+                }
             }
             sb.append("\n");
         }
         return sb.toString();
     }
 }
-
-

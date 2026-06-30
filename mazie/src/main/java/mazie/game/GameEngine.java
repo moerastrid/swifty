@@ -9,6 +9,7 @@ import mazie.model.Hero;
 import mazie.model.Monster;
 
 public class GameEngine {
+
     private final Hero hero;
     private final GameMap map;
     private final Random random = new Random(System.currentTimeMillis());
@@ -27,7 +28,7 @@ public class GameEngine {
         this.currentDir = dir;
 
         final var monster = map.getMonsterInDirection(dir);
-    
+
         if (monster == null) {
             map.moveHero(dir);
             this.currentDir = null;
@@ -38,7 +39,11 @@ public class GameEngine {
     }
 
     public boolean runAway() {
-        return this.random.nextBoolean();
+        final var escaped = this.random.nextBoolean();
+        if (escaped) {
+            currentDir = null;
+        }
+        return escaped;
     }
 
     public boolean win() {
@@ -48,7 +53,7 @@ public class GameEngine {
     public FightResult fight() {
         final var monster = this.map.getMonsterInDirection(this.currentDir);
 
-        while(this.hero.getTotalHp() > 0 && monster.getHp() > 0) {
+        while (this.hero.getTotalHp() > 0 && monster.getHp() > 0) {
             fightRound(monster);
         }
 
@@ -78,96 +83,88 @@ public class GameEngine {
             final var newMonsterHp = monster.getHp() - damageToMonster;
             monster.setHp(newMonsterHp);
 
-            if (monster.getHp() <= 0)
+            if (monster.getHp() <= 0) {
                 return;
+            }
         }
 
         // monster attacks hero
         final int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
-        System.out.println("damage to hero: " + damageToHero);
 
         // monster 50% chance attacks hero
         if (random.nextBoolean() || damageToHero <= 0) {
+            System.out.println("monster misses");
             return;
         }
+        System.out.println("damage to hero: " + damageToHero);
 
         final var newHp = this.hero.getHp() - damageToHero;
         this.hero.setHp(newHp);
-        
+
     }
 
     private Artifact dropArtifact(int xpReward) {
-        final int value = xpReward / 10 - 2;
+        var value = xpReward / 20 - 4;
+        if (value < 3) {
+            value = 3;
+        }
         final var drop = random.nextInt(4);
         return switch (drop) {
-            case 0 -> Artifact.weapon(value);
-            case 1 -> Artifact.armour(value);
-            case 2 -> Artifact.helmet(value);
-            default -> null;
+            case 0 ->
+                Artifact.weapon(value);
+            case 1 ->
+                Artifact.armour(value);
+            case 2 ->
+                Artifact.helmet(value);
+            default ->
+                null;
         };
     }
 
     // public boolean fought() {
     //     final var monster = this.map.getMonsterInDirection(this.currentDir);
     //     var won = false;
-
     //     while(this.hero.getHp() > 0 && monster.getHp() > 0) {
-
     //         simulateFightRound(monster);
-
     //         System.out.println("--- STATS ---");
     //         System.out.println(hero.toString());
     //         System.out.println(monster.toString());
     //         System.out.println("-------------");
-
     //     }
-
     //     if (monster.getHp() <= 0 && this.hero.getTotalHp() != 0) {
     //         won = true;
     //     }
-
     //     if (won == true) {
     //         this.map.removeMonster(this.currentDir);
     //         this.move(this.currentDir);
     //     }
-
     //     return won;
     // }
-
     // private void simulateFightRound(Monster monster) {
-        
     //     // hero attacks monster
     //     System.out.println(hero.getName() + " attacks");
     //     final int damageToMonster = this.hero.getTotalAttack() - monster.getDefence();
-
     //     if (damageToMonster <= 0) {
     //         System.out.println("... but nothing happens");
     //     } else {
     //         System.out.println("hero does damage to monster: " + damageToMonster);
     //         final var newHp = monster.getHp() - damageToMonster;
     //         monster.setHp(newHp);
-
     //         if (monster.getHp() < 0) {
     //             System.out.println("monster died");
     //             this.hero.gainXp(monster.getXpReward());
     //             return;
     //         }
     //     }
-
     //     // monster 50% chance attacks hero
     //     System.out.println(monster.getName() + " attacks");
     //     final int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
-
     //     if (random.nextBoolean() || damageToHero <= 0) {
     //         System.out.println("... but nothing happens");
     //         return;
     //     }
-
     //     System.out.println("monster does damage to hero: " + damageToHero);
     //     final var newHp = this.hero.getHp() - damageToHero;
     //     this.hero.setHp(newHp);
-
-
     // }
-
 }

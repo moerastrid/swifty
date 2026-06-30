@@ -57,5 +57,4 @@ public interface GameView {
     // show artifact, ask if user wants to keep it, show current hero (+ artifacts) too so user can make choise
     public boolean askKeepArtifact(Artifact artifact, Hero hero);
 
-    
 }
