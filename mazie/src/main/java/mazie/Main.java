@@ -2,6 +2,7 @@ package mazie;
 
 import mazie.controller.GameController;
 import mazie.exception.ParseException;
+import mazie.repository.SQLiteHeroRepository;
 import mazie.view.GameView;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
@@ -25,7 +26,9 @@ public class Main {
             view = new GuiView();
         }
 
-        var controller = new GameController(view);
+        final var repository = new SQLiteHeroRepository();
+
+        var controller = new GameController(view, repository);
 
         controller.start();
     }

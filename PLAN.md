@@ -68,7 +68,27 @@ java -jar target/mazie.jar gui
 - `showFightSummary(String, int)`: takes a pre-formatted string + xp gained — kept simple for now, may revisit during controller implementation when concrete needs become clear
 - `askKeepArtifact(Artifact, Hero)`: hero is passed so view can show current artifacts for context
 
-### ❌ Fase 3 — Persistence (NOT STARTED)
+### 🔄 Fase 3 — Persistence (IN PROGRESS)
+
+Decision: **SQLite database** (bonus) instead of text file — subject allows this as a replacement.
+
+Done:
+
+- `HeroRepository.java` interface in `mazie.repository` with 4 methods: `loadAllHeroes()`, `save(Hero)`, `update(Hero)`, `delete(Hero)`.
+- `SQLiteHeroRepository.java` skeleton: connection setup, `createTables()` fully implemented.
+  - Two tables: `hero` + `artifact` with CHECK constraints and FOREIGN KEY
+  - `PRAGMA foreign_keys = ON` enabled
+  - try-with-resources on Statement
+  - `ArtifactType.valueOf(string)` is the pattern for reconstructing enums from DB strings
+
+Still to do:
+
+- `save(Hero hero)`: INSERT into `hero`, then INSERT each non-null artifact into `artifact`. Use `PreparedStatement`. After INSERT, read back the generated id with `getGeneratedKeys()` and set it on the hero via `hero.setId()`.
+- `update(Hero hero)`: UPDATE `hero` row + DELETE old artifacts for this hero + INSERT current artifacts fresh. Simpler than trying to diff.
+- `delete(Hero hero)`: DELETE from `artifact WHERE hero_id = ?`, then DELETE from `hero WHERE id = ?`. Artifacts first (FK constraint).
+- `loadAllHeroes()`: Two-query approach — `SELECT * FROM hero`, build Hero objects, then per hero `SELECT * FROM artifact WHERE hero_id = ?`. Use `hero.setArtifact(artifact)` to place artifacts (already handles routing to weapon/armour/helmet slot). Skip null-check — only call `setArtifact` if artifact row exists.
+- Wire into `GameController`: constructor takes `HeroRepository`, `setup()` calls `loadAllHeroes()`, `start()` finally-block calls `update(hero)`, `save(hero)` after `createValidHero()`.
+- Update `Main` to instantiate `new SQLiteHeroRepository()` and pass to controller.
 
 ### ✅ Fase 4 — TerminalView (DONE)
 
@@ -117,123 +137,47 @@ Still to do (waiting on other phases):
 
 ## Next-session priorities (top of stack)
 
-1. **Fase 3 — Persistence**: `HeroRepository` interface + `TextFileHeroRepository` (subject V.2: heroes saved to text file on exit, loaded on start). Then wire into `setup()` and the `finally` block in `start()`, and fix `selectHero`'s id-key.
-2. **Fase 6 — SwingView**: implement all `GameView` methods in `GuiView`. The stub already compiles. See Fase 6 plan for threading approach.
-3. **Submission hygiene**: remove `System.out.println` debug lines + `tryOutHeroes()` / `tryOutLogic()` from `GameController`; remove the debug println in `setup()`; decide on SQLite dependency (remove if DB bonus is not done).
-4. **Verify level-up boundary**: `Hero.gainXp()` uses `this.xp > xpNeed`; the subject says level up when you *reach* the next-level XP — double-check whether `>=` is intended.
+1. **Fase 3 — `save(Hero)`**: INSERT hero row + artifact rows. Use `PreparedStatement`. Read back generated id with `getGeneratedKeys()` and call `hero.setId()`. Then wire `save()` into controller after `createValidHero()`.
+2. **Fase 3 — `update(Hero)` + `delete(Hero)`**: update is DELETE old artifacts + UPDATE hero row + INSERT fresh artifacts. Delete is artifacts first, then hero (FK order).
+3. **Fase 3 — `loadAllHeroes()`**: two queries (heroes, then artifacts per hero). Use `hero.setArtifact()` to place artifacts. Wire into `setup()`.
+4. **Fase 3 — wire controller**: constructor takes `HeroRepository`; `setup()` uses loaded list to gate `askNewGame`; `finally` calls `update(hero)`.
+5. **Fase 6 — SwingView**: only after persistence is fully wired and end-to-end works.
+6. **Submission hygiene**: remove debug printlns + `tryOutHeroes()`/`tryOutLogic()`; verify `>=` vs `>` in `gainXp()`.
 
 ---
 
 ## Fase 3 — Persistence plan
 
-New package: `mazie.persistence`
+Package: `mazie.repository`. Chosen approach: **SQLite** (bonus — replaces text file requirement).
 
-Files to create:
+**Files:**
 
-- `HeroRepository.java` — interface with two methods:
-  - `loadAll()` returns `List<Hero>`
-  - `saveAll(List<Hero>)` returns `void`
-- `TextFileHeroRepository.java` — implements the interface, reads/writes `heroes.txt`
+- `HeroRepository.java` — interface: `loadAllHeroes()`, `save(Hero)`, `update(Hero)`, `delete(Hero)` ✅
+- `SQLiteHeroRepository.java` — implements interface, connection + createTables() done ✅
 
-**Data contract — one hero per line, pipe-separated:**
+**Schema:**
 
-```java
-name|type|level|xp|attack|defence|hp|weapon_name|weapon_val|armour_name|armour_val|helmet_name|helmet_val
+```sql
+hero(id, name, type, level, xp, attack, defence, hp)
+artifact(id, name, type, value, hero_id → hero.id)
 ```
 
-- Empty artifact slots: empty string for name, 0 for value
-- File location: `heroes.txt` next to the jar (working directory)
+- `hero.type` CHECK: `'FROG'`, `'HARE'`, `'BEAR'`
+- `artifact.type` CHECK: `'WEAPON'`, `'ARMOUR'`, `'HELMET'`
+- `PRAGMA foreign_keys = ON` enabled in `createTables()`
 
-**Key conventions to look up:**
+**Key patterns to use:**
 
-- `try-with-resources` for file I/O
-- `java.nio.file.Files` (read/write) vs old `FileReader` — prefer NIO
-- `String.split("\\|", -1)` — the `-1` keeps trailing empty fields (important for empty artifact slots)
+- `PreparedStatement` for all INSERT/UPDATE/DELETE (prevents SQL injection)
+- `statement.getGeneratedKeys()` after INSERT to get the auto-generated id → `hero.setId(id)`
+- `HeroType.valueOf(rs.getString("type"))` and `ArtifactType.valueOf(rs.getString("type"))` to reconstruct enums
+- `hero.setArtifact(artifact)` already routes to the right slot (weapon/armour/helmet) — use this in `loadAllHeroes()`
+- Do NOT call `setWeapon/setArmour/setHelmet` with null — only call `setArtifact` if an artifact row exists
+- Do NOT run Hibernate Validator when loading from DB — validation is only for fresh user input
 
-**Important rule:** when loading from file, do NOT run Hibernate Validator. Validation is only for fresh user input. Loading uses the private no-args constructor + setters so the type-stat override in the main constructor doesn't fire.
+**update() strategy:** DELETE old artifacts for hero_id + UPDATE hero row + INSERT fresh artifacts. Simpler than diffing.
 
----
-
-## Fase 4 — TerminalView plan
-
-Implement all `GameView` methods in `mazie/src/main/java/mazie/view/terminal/TerminalView.java`.
-
-**Per-method intent:**
-
-- `createHero()`: ask type (via `choose`) + name via Scanner, construct a Hero, return it. **No validation here** — the view stays dumb; the controller's `createValidHero()` runs the Validator and re-asks on violations.
-- `selectHero(List<Hero>)`: print numbered list, read int, return the chosen hero, loop on invalid input
-- `confirmHero(Hero)`: print hero stats + ask `y/n`
-- `askDirection()`: read `n/e/s/w`, loop until valid, return `Direction` enum
-- `askFightMonster(Monster)`: show monster stats, read `f` or `r`
-- `askKeepArtifact(Artifact, Hero)`: show artifact + current hero (so user has context), read `y/n`
-- All `show*` methods: print to `System.out`, use `AnsiColor` enum constants for color
-
-**Helper-method strategy (Rule of Three):**
-
-- Already extracted: `colorPrint(AnsiColor, String)`, `scanNextLine()`
-- Likely candidate after 2–3 more methods: `readChoice(prompt, validInputs)` for the y/n / f-or-r / n-e-s-w pattern. Don't extract pre-emptively — wait until the third occurrence to confirm the shape.
-
-**Ctrl+C / Ctrl+D handling:**
-
-- `Scanner.nextLine()` throws `NoSuchElementException` when stdin closes (Ctrl+D on Unix) — caught in `scanNextLine()`
-- Implemented: `scanNextLine()` now throws `QuitException` on EOF instead of returning a fallback string/null. This avoids infinite re-prompt loops when stdin is closed.
-- Next: catch `QuitException` at controller level (or top-level flow) to save heroes and exit cleanly.
-- Ctrl+C terminates the JVM; nothing to do beyond letting the OS handle it
-
-**Hibernate Validator usage (now in the controller, not the view):**
-
-- Validation lives in `GameController.createValidHero()`, not in `createHero()` — the view only collects input.
-- `Validator` is a controller field built via `ParameterMessageInterpolator` (no EL dependency).
-- `validator.validate(hero)` returns a `Set<ConstraintViolation<Hero>>`; on non-empty, show the joined `getMessage()`s and re-ask; on empty, return the hero.
-
-**Conventions to look up:**
-
-- `Scanner.nextLine()` vs `Scanner.next()` — prefer `nextLine()` to avoid leftover newline issues
-- Closing `Scanner` on `System.in` — don't, it closes `System.in` permanently. Keep one Scanner field for the view's lifetime.
-
----
-
-## Fase 5 — GameController plan
-
-Constructor takes a `GameView` and a `HeroRepository`. Both are interfaces — the controller doesn't know if it's terminal/Swing or text/SQL.
-
-**Setup phase (before game loop):**
-
-1. Load all saved heroes from the repository
-2. Show welcome
-3. If no saved heroes: go straight to create hero
-4. If saved heroes exist: ask new-or-existing, then either create or select
-5. Show stats + confirm — if rejected, loop back to step 3
-6. Show start-game message, build the `GameEngine`
-
-**Game loop (per turn) — follows `Mazie.drawio`:**
-
-1. Show hero stats
-2. Ask direction
-3. Move via the engine — returns the monster on the new square, or `null`
-4. If a monster is there:
-   - Ask fight-or-run
-   - If run: call the engine's run-away, show the result. If succeeded → next turn. If failed → fall through to fight.
-   - Fight: get the `FightResult` from the engine
-     - If lost → show game over, exit loop
-     - If won → show battle result; if level-up show that; if artifact dropped ask keep, apply if yes
-5. If hero reached the border → show win, exit loop
-
-**After game loop:** save all heroes to the repository.
-
-**Subject-required scaling (must be reflected in `GameEngine`, not in the controller):**
-
-- XP gained on win must scale with the monster's strength (subject: *"Experience points, based on the villain power"*). Already in `Monster.xpReward`.
-- Dropped artifact's value must scale with the monster's strength (subject: *"the quality of the artefact also varies depending on the villain's strength"*). Currently `Artifact.weapon(int value)` accepts a value — make sure the engine derives that value from the monster (e.g. `xpReward / N` or `monster.attack`), not from a constant.
-
-**Open question to decide before implementing:**
-
-- On death: remove the dead hero from the saved list, or keep it (level/xp preserved as a memorial)? Subject doesn't specify. Drawio also flags this with "delete hero from database?". Pick one and add it to "Design decisions".
-
-**Conventions to look up:**
-
-- Java labeled `break` / `continue` — useful for cleanly exiting nested loops here
-- Why depending on interfaces (not concrete classes) in the constructor matters — Dependency Inversion Principle
+**delete() order:** DELETE from artifact first (FK), then DELETE from hero.
 
 ---
 
@@ -267,24 +211,6 @@ For the modal dialogs (`askFightMonster`, `askKeepArtifact`, `confirmHero`, `cre
 
 ---
 
-## Fase 7 — Main plan
-
-Responsibilities of `Main.main(String[] args)`:
-
-1. Verify `args.length >= 1`, otherwise print usage to `System.err` and exit with a non-zero status
-2. Based on `args[0]`, instantiate either `TerminalView` or `SwingView`. Unknown value → print error, exit
-3. Instantiate `TextFileHeroRepository("heroes.txt")`
-4. Instantiate the `GameController` with view + repository and call `start()`
-
-**Conventions to look up:**
-
-- Java 14+ `switch` expression with `->` arrows and `yield` — clean way to map a string to an object
-- `System.exit(int)` vs throwing — for a CLI entry point, `exit` is fine
-
-**Future-proofing for the runtime-switch bonus:** if you want to allow switching between console and GUI without restarting, Main should hand the chosen view to the controller, and the controller should accept a way to swap views mid-game. Don't build this now — just don't structure things in a way that makes it impossible.
-
----
-
 ## Design decisions made
 
 | Decision | Rationale |
@@ -292,13 +218,13 @@ Responsibilities of `Main.main(String[] args)`:
 | No map displayed to user | Student's deliberate choice — adds mystery, subject doesn't require it |
 | Artifact names in Artifact.java, not ArtifactType | Simpler, deadline-focused |
 | No MonsterFactory class | Monster.easy/medium/hard() is already Static Factory Method pattern, extra class adds no value |
-| Hero has no `id` field | id is DB concern only, not domain concept |
+| `Hero.id` field present but 0 until DB assigns it | Needed by DB (PRIMARY KEY). Not used by game logic — only the repository reads/writes it. Private constructor + `setId()` used during load. |
 | `gainXp()` returns boolean (levelup) | Cleaner than separate `levelUp()` call |
 | EOF in terminal input throws `QuitException` | `Ctrl+D` closes stdin permanently; bubbling a quit signal avoids infinite retry loops and keeps exit handling centralized |
 | SynchronousQueue for Swing direction input | Standard solution for blocking EDT-to-controller communication |
 | JOptionPane for Swing dialogs | Blocks naturally, no queue needed |
 | Static Factory Methods instead of Builder pattern | Subject *hints* at Builder pattern (Chapter III). Skipped because Hero only has `name + type` as user input (Builder shines for many optional fields), and Monster/Artifact already use Static Factory Methods which are idiomatic for our case. **Be ready to explain this trade-off at peer evaluation** — evaluator may ask where Builder was applied. |
-| SQLite dependency in `pom.xml` | Reserved for the relational-DB bonus. Subject explicitly allows libraries for bonus work *"if explicitly justified and serving only that part"*. **If the DB bonus is not done, remove SQLite from `pom.xml` before submission** to stay within the "no external libraries except javax.validation" mandatory rule. |
+| SQLite dependency in `pom.xml` | Used for the relational-DB bonus (replaces text file requirement). Subject explicitly allows a library for this bonus *"if explicitly justified and serving only that part"*. Justification: SQLite JDBC is the minimal driver needed to implement a relational DB; no ORM or abstraction layer used. |
 | Validation trigger in controller, not view | `createValidHero()` validates; the view only collects input. Keeps the view dumb and makes the same validation reusable for the Swing view. |
 | `ParameterMessageInterpolator` instead of `buildDefaultValidatorFactory()` | Avoids needing a Jakarta EL implementation (e.g. Expressly) on the classpath — one less dependency to justify against the "no external libraries" rule. Handles `{min}`/`{max}` placeholders, which is all we use. |
 | `choose(prompt, Map<String,T>)` generic helper | A `Map` captures *what is valid* (keys) **and** *what it maps to* (values) in one structure, eliminating per-method switches. A `Set` would only validate and force a second switch. |
@@ -311,30 +237,30 @@ Responsibilities of `Main.main(String[] args)`:
 
 > This checklist **is** the subject's mandatory part (V.1 Gameplay, V.2 Features, V.3 Validation) — treat it as the grading rubric. The turn order inside the game loop follows `Mazie.drawio`. Annotations: *engine ready* = model/`GameEngine` logic exists but is not yet wired into a playable `gameLoop`.
 
-- [ ] MVC architecture (Model/View/Controller clearly separated) — *Model + View done; Controller in progress (gameLoop pending)*
-- [ ] Launch with `java -jar mazie.jar console` — *`Main` is still a stub, no arg parsing (Fase 7)*
-- [ ] Launch with `java -jar mazie.jar gui` — *SwingView not started (Fase 6)*
+- [x] MVC architecture (Model/View/Controller clearly separated)
+- [x] Launch with `java -jar mazie.jar console`
+- [ ] Launch with `java -jar mazie.jar gui` — *SwingView stubs only (Fase 6)*
 - [x] Build with `mvn clean package` → produces runnable jar
-- [ ] No external libraries except Hibernate Validator (jakarta.validation) — *SQLite still bundled (bonus); remove if DB bonus dropped*
-- [ ] Hero persistence in text file (load on start, save on exit) — *Fase 3 not started*
+- [x] No external libraries except Hibernate Validator + SQLite (SQLite justified as bonus DB library)
+- [ ] Hero persistence (load on start, save on exit) — *SQLite approach in progress (Fase 3)*
 - [x] Create hero flow
-- [ ] Select existing hero flow — *view method done; needs persistence to supply the list + id-key fix*
+- [ ] Select existing hero flow — *needs Fase 3 complete + selectHero id-key fix*
 - [x] Show hero stats (name, class, level, xp, attack, defence, hp)
-- [x] Square map, size = (level-1)*5+10-(level%2) — *`GameMap`*
-- [ ] Move in 4 directions (N/E/S/W) — *engine `move()` ready; gameLoop wiring pending*
-- [ ] Win by reaching border — *engine `win()` ready; loop pending*
-- [ ] Monsters randomly spread on map — *engine ready; loop pending*
-- [ ] Fight or run choice when meeting monster — *view `askFightMonster` done; loop wiring pending*
-- [ ] Run = 50% chance, fail = must fight — *engine `runAway()` ready; loop pending*
-- [ ] Battle simulation using hero + monster stats — *engine `fight()` ready; loop pending*
-- [ ] Lose battle = game over — *engine ready; loop pending*
-- [ ] Win battle = XP gain, possible artifact drop — *engine `FightResult` ready; loop pending*
-- [x] Level up formula: level*1000 + (level-1)^2* 450 — *verify `>` vs `>=` boundary*
+- [x] Square map, size = (level-1)*5+10-(level%2)
+- [x] Move in 4 directions (N/E/S/W)
+- [x] Win by reaching border
+- [x] Monsters randomly spread on map
+- [x] Fight or run choice when meeting monster
+- [x] Run = 50% chance, fail = must fight
+- [x] Battle simulation using hero + monster stats
+- [x] Lose battle = game over
+- [x] Win battle = XP gain, possible artifact drop
+- [x] Level up formula: level*1000 + (level-1)^2 * 450 — *verify `>` vs `>=` boundary still open*
 - [x] 3 artifact types: Weapon (+attack), Armor (+defence), Helm (+hp)
-- [x] Annotation-based validation (Hibernate Validator) on user input — *in `createValidHero()`*
-- [x] Validation failure highlighted to user — *`showError` in yellow with violation messages*
+- [x] Annotation-based validation (Hibernate Validator) on user input
+- [x] Validation failure highlighted to user
 
 ## Bonus checklist
 
-- [ ] Hero persistence in relational database instead of text file
+- [ ] Hero persistence in relational database instead of text file — *in progress (Fase 3)*
 - [ ] Switch between console/GUI at runtime without closing

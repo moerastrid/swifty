@@ -9,20 +9,23 @@ import jakarta.validation.Validator;
 import mazie.exception.QuitException;
 import mazie.game.GameEngine;
 import mazie.model.Hero;
+import mazie.repository.HeroRepository;
 import mazie.view.GameView;
 
 public class GameController {
 
     // private GameEngine engine;
     private GameView view;
+    private HeroRepository repository;
     private final Validator validator = Validation.byDefaultProvider()
             .configure()
             .messageInterpolator(new ParameterMessageInterpolator())
             .buildValidatorFactory()
             .getValidator();
 
-    public GameController(GameView view) {
+    public GameController(GameView view, HeroRepository repository) {
         this.view = view;
+        this.repository = repository;
     }
 
     public void start() {
