@@ -3,6 +3,7 @@ package mazie;
 import mazie.controller.GameController;
 import mazie.exception.ParseException;
 import mazie.view.GameView;
+import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
 
 public class Main {

@@ -85,37 +85,42 @@ Known open items (TODOs in code):
 
 - `selectHero` uses `hero.getId()` as a `choose` key — every hero has `id = 0` until persistence assigns real ids, so multiple heroes collide on `"0"`. Switch to the list index, or wait for Fase 3 to assign ids. The name-key still works in the meantime.
 
-### 🔄 Fase 5 — GameController (IN PROGRESS)
-
-Done:
+### ✅ Fase 5 — GameController (DONE)
 
 - `setup()`: welcome → ask new/existing → create/select → show stats → confirm → retry on reject. Follows the `Mazie.drawio` GAME SETUP lane.
 - `createValidHero()`: loops `view.createHero()` + `validator.validate(hero)`, shows the joined violation messages via `view.showError(...)` until valid. **Validation trigger lives in the controller; the view stays dumb** (subject V.3: annotation-based validation).
 - `Validator` built once as a field via `ParameterMessageInterpolator` (no EL dependency needed — keeps the dependency tree minimal for the "no external libraries" rule).
 - `QuitException` (EOF) caught in `start()`.
+- `gameLoop(Hero hero)`: while-loop over `turn()`, checks `engine.win()` after each turn, calls `showEndGame(true)` on border reached.
+- `turn()`: direction → move → empty step OR fight/run → FightResult → game-over / level-up / artifact drop. Follows `Mazie.drawio` GAME PLAY lane.
+- `GameView.showEmptyStep()` added to interface + implemented in both `TerminalView` and `GuiView` stub.
 
-Still to do:
+Still to do (waiting on other phases):
 
-- `gameLoop()` is an empty `#todo` — the next big piece. Must follow the `Mazie.drawio` GAME PLAY lane (see Fase 5 plan below).
-- Pass the chosen `hero` into `gameLoop(hero)` (now assigned in `start()` but never read).
-- `setup()` still calls `askNewGame()` unconditionally — gate it on "saved heroes exist" once Fase 3 lands.
-- Remove the leftover experimental `startGamePlay`, `tryOutHeroes`, `tryOutLogic` before submission.
-- Wire `repository.save(...)` into the `finally` block (needs Fase 3).
+- `setup()` still hardcodes `newGame = true` — gate it on "saved heroes exist" once Fase 3 lands.
+- Wire `repository.save(...)` into the `finally` block in `start()` (needs Fase 3).
+- Remove debug `System.out.println`s + `tryOutHeroes()` / `tryOutLogic()` before submission.
+- Hero stats currently shown at END of loop iteration — consider moving to start of turn (before `askDirection`) so player sees state before deciding.
 
-### ❌ Fase 6 — SwingView (NOT STARTED)
+### 🔄 Fase 6 — SwingView (STUB CREATED)
 
-### ❌ Fase 7 — Main + args (NOT STARTED)
+- `GuiView.java` created in `mazie.view.gui`, implements `GameView`, all methods are `#todo` stubs.
+- No logic implemented yet.
+
+### ✅ Fase 7 — Main + args (DONE)
+
+- `parse(String[] args)` implemented: returns `true` for `console`/`c`, `false` for `gui`/`g`, throws `ParseException` on unknown input.
+- `main()` instantiates `TerminalView` or `GuiView` based on `parse()` result, builds `GameController`, calls `start()`.
+- `ParseException` added as a new exception class.
 
 ---
 
 ## Next-session priorities (top of stack)
 
-1. **Fase 5 — `gameLoop()`**: implement the GAME PLAY turn loop following `Mazie.drawio` (show stats → ask direction → move → monster? fight/run → win/lose/level-up/artifact → border = win). The engine methods (`move`, `win`, `runAway`, `fight` → `FightResult`) already exist; this is wiring + view calls. Pass `hero` into `gameLoop(hero)`.
-2. **Fase 3 — Persistence**: `HeroRepository` + `TextFileHeroRepository` (subject V.2: heroes saved to a text file on exit, loaded on start). Then gate `askNewGame()` on a non-empty list and fix `selectHero`'s id-key.
-3. **Fase 7 — `Main` + args**: parse `args[0]` for `console` / `gui`; `Main` is still a `"hoi :)"` stub that hardcodes `TerminalView`. Mandatory: `java -jar mazie.jar console|gui`.
-4. **Fase 6 — `SwingView`**: only after the console flow is fully playable end-to-end.
-5. **Verify level-up boundary**: `Hero.gainXp()` uses `this.xp > xpNeed`; the subject says level up when you *reach* the next-level XP — double-check whether `>=` is intended.
-6. **Submission hygiene**: remove `startGamePlay`/`tryOut*` debug code; decide on the SQLite dependency (remove if the DB bonus is not done).
+1. **Fase 3 — Persistence**: `HeroRepository` interface + `TextFileHeroRepository` (subject V.2: heroes saved to text file on exit, loaded on start). Then wire into `setup()` and the `finally` block in `start()`, and fix `selectHero`'s id-key.
+2. **Fase 6 — SwingView**: implement all `GameView` methods in `GuiView`. The stub already compiles. See Fase 6 plan for threading approach.
+3. **Submission hygiene**: remove `System.out.println` debug lines + `tryOutHeroes()` / `tryOutLogic()` from `GameController`; remove the debug println in `setup()`; decide on SQLite dependency (remove if DB bonus is not done).
+4. **Verify level-up boundary**: `Hero.gainXp()` uses `this.xp > xpNeed`; the subject says level up when you *reach* the next-level XP — double-check whether `>=` is intended.
 
 ---
 
@@ -324,7 +329,7 @@ Responsibilities of `Main.main(String[] args)`:
 - [ ] Battle simulation using hero + monster stats — *engine `fight()` ready; loop pending*
 - [ ] Lose battle = game over — *engine ready; loop pending*
 - [ ] Win battle = XP gain, possible artifact drop — *engine `FightResult` ready; loop pending*
-- [x] Level up formula: level*1000 + (level-1)^2 * 450 — *verify `>` vs `>=` boundary*
+- [x] Level up formula: level*1000 + (level-1)^2* 450 — *verify `>` vs `>=` boundary*
 - [x] 3 artifact types: Weapon (+attack), Armor (+defence), Helm (+hp)
 - [x] Annotation-based validation (Hibernate Validator) on user input — *in `createValidHero()`*
 - [x] Validation failure highlighted to user — *`showError` in yellow with violation messages*

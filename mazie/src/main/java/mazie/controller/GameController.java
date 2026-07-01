@@ -8,10 +8,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import mazie.exception.QuitException;
 import mazie.game.GameEngine;
-import mazie.model.Artifact;
-import mazie.model.GameMap;
 import mazie.model.Hero;
-import mazie.model.HeroType;
 import mazie.view.GameView;
 
 public class GameController {
@@ -41,9 +38,6 @@ public class GameController {
             // #todo repository.save of iets dergelijks?
         }
 
-        // this.startGamePlay(new Hero("Papa Bear", HeroType.BEAR));
-        // this.tryOutHeroes();
-        // this.tryOutLogic();
     }
 
     private Hero setup() {
@@ -66,9 +60,9 @@ public class GameController {
 
         view.showHeroStats(hero);
 
-        if (view.confirmHero(hero) == true) {
-            System.out.println("the chosen one:");
-            System.out.println(hero);
+        if (view.confirmHero(hero)) {
+            System.out.println("the chosen one:"); //#todo remove (debugging)
+            System.out.println(hero); //#todo remove (debugging)
             return hero;
         }
         return setup();
@@ -94,8 +88,10 @@ public class GameController {
         view.showStartGame();
 
         while (playing) {
+            System.out.println("this is hero:"); //#todo remove
+            view.showHeroStats(hero); //#todo removev
 
-            System.out.println("current map:\n" + engine.getMapString());
+            System.out.println("current map:\n" + engine.getMapString()); //#todo remove
 
             playing = turn(engine, hero);
 
@@ -105,8 +101,6 @@ public class GameController {
                 // #todo safe hero?
             }
 
-            System.out.println("this is hero:");
-            view.showHeroStats(hero);
         }
     }
 
@@ -150,40 +144,6 @@ public class GameController {
             }
         }
         return true;
-    }
-
-    public void tryOutHeroes() {
-        final var leo = new Hero("Leonardo", HeroType.FROG);
-        final var donnie = new Hero("Dontello", HeroType.HARE);
-        final var raph = new Hero("Raphael", HeroType.BEAR);
-
-        if (leo.gainXp(1500)) {
-            System.out.println("lvl up!");
-        }
-
-        Artifact helmet = Artifact.helmet(6);
-        Artifact armour = Artifact.armour(7);
-
-        donnie.setArtifact(helmet);
-        raph.setArtifact(helmet);
-        raph.setArtifact(armour);
-
-        System.out.println(leo);
-        GameMap leoMap = new GameMap(leo.getLevel());
-        System.out.println(leoMap.toString());
-
-        System.out.println(donnie);
-        GameMap donnieMap = new GameMap(donnie.getLevel());
-        System.out.println(donnieMap.toString());
-
-        System.out.println(raph);
-        GameMap raphMap = new GameMap(raph.getLevel());
-        System.out.println(raphMap.toString());
-
-    }
-
-    public void tryOutLogic(Hero hero) {
-
     }
 
     public GameView getView() {

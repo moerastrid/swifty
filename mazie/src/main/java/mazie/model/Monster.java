@@ -57,24 +57,12 @@ public class Monster {
         return this.name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public int getAttack() {
         return this.attack;
     }
 
-    public void setAttack(int attack) {
-        this.attack = attack;
-    }
-
     public int getDefence() {
         return this.defence;
-    }
-
-    public void setDefence(int defence) {
-        this.defence = defence;
     }
 
     public int getHp() {
@@ -87,10 +75,6 @@ public class Monster {
 
     public int getXpReward() {
         return this.xpReward;
-    }
-
-    public void setXpReward(int xpReward) {
-        this.xpReward = xpReward;
     }
 
     @Override
