@@ -9,10 +9,6 @@ import mazie.view.terminal.TerminalView;
 
 public class Main {
 
-    String[] input = {
-        "UP", "UP", "DOWN"
-    };
-
     public static void main(final String[] args) {
         final var console = parse(args);
 

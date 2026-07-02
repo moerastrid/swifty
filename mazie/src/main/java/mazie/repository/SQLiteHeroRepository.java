@@ -68,6 +68,14 @@ public class SQLiteHeroRepository implements HeroRepository {
         }
     }
 
+    /*
+    artifact query samenvoegen:
+
+    SELECT h.*, a.slot, a.name, a.value
+    FROM heroes h
+    LEFT JOIN artifacts a ON a.hero_id = h.id
+    */
+
     @Override
     public List<Hero> loadAllHeroes() {
         // #todo implement
