@@ -51,112 +51,63 @@ java -jar target/mazie.jar gui
 
 ---
 
-## Current status per fase
+## Current status
 
-### ✅ Fase 1 — Model & Validatie (DONE)
+Fases 1-5 and 7 (model/validation, `GameView` interface, SQLite persistence layer, `TerminalView`, `GameController` wiring, `Main`/args parsing) are **done**. Console mode (`java -jar target/mazie.jar console`) is fully playable end-to-end: create/select hero → persist → play → win/lose/quit → persist again.
 
-- `Hero.java`: `@NotBlank`, `@Size`, `@NotNull`, `@Min` annotaties; constructor uses `HeroType` stats; `gainXp()` returns `boolean` for level-up
-- `HeroType.java`: enum with `baseAttack`, `baseDefence`, `baseHp` per type (FROG/HARE/BEAR)
-- `Monster.java`: static final name arrays, final Random, off-by-one fixed
-- `Artifact.java`: converted to `record`; static factory methods `weapon()`, `armour()`, `helmet()`; names as static final arrays inside Artifact (deliberate choice)
-- `ArtifactType.java`: empty enum — names live in Artifact (deliberate)
-- `FightResult.java`: `record FightResult(boolean win, boolean levelup, Artifact drop)`
-- `GameEngine.java`: `fight()` returns `FightResult`, no System.out.println, `dropArtifact()` implemented
-- `pom.xml`: Hibernate Validator + SQLite present, jar config correct
+Only **Fase 6 — SwingView** remains, split into sub-phases below.
 
-### ✅ Fase 2 — GameView interface (DONE)
+### 🔄 Fase 6.1 — Static layout (no threading yet)
 
-- `GameView.java`: 14 methods covering full game flow (welcome, create/select hero, ask direction, fight/run, level-up, artifact drop, end game)
-- `showFightSummary(String, int)`: takes a pre-formatted string + xp gained — kept simple for now, may revisit during controller implementation when concrete needs become clear
-- `askKeepArtifact(Artifact, Hero)`: hero is passed so view can show current artifacts for context
+Build the visual skeleton of `mazie/src/main/java/mazie/view/gui/GuiView.java` without solving the blocking-input problem yet. Hardcode/stub return values (e.g. `askDirection()` always returns `Direction.NORTH`) just to get the UI rendering and navigable.
 
-### ✅ Fase 3 — Persistence, repository layer (DONE)
+- `JFrame` with `BorderLayout`
+- Non-editable `JTextArea` (wrapped in `JScrollPane`) for messages/stats
+- Panel with 4 `JButton`s (N/E/S/W), only enabled during `askDirection()`
+- Reusable from `/oldold/src/main/java/ajav/view/swing/`: `ThemeColor.java` (color palette, copy directly) and the font-per-OS logic in `SwingGui.initFonts()` (Windows/Linux/other font fallback) — both are self-contained, no dependency on the old (incompatible) `GameView` interface there.
 
-Decision: **SQLite database** (bonus) instead of text file — subject allows this as a replacement, justified in the design-decisions table below.
+### 🔄 Fase 6.2 — Blocking direction input (the hard part)
 
-Files (package `mazie.repository`):
+Solve the EDT ↔ controller thread hand-off for `askDirection()`. The controller runs on the main thread and calls `view.askDirection()` expecting a synchronous return value; Swing button clicks fire on the EDT and don't return anything to the caller.
 
-- `HeroRepository.java` — interface: `Map<Integer, Hero> loadAllHeroes()`, `save(Hero)`, `update(Hero)`, `delete(Hero)`. Returns a `Map<Integer, Hero>` keyed by hero id, not a `List<Hero>` — see design decisions for why.
-- `SQLiteHeroRepository.java` — fully implemented:
-  - Connection setup with data-dir read/write check, `setAutoCommit(false)` set once in the constructor, `createTables()` (schema + `PRAGMA foreign_keys = ON`)
-  - `save(Hero)`: INSERT hero row, read back generated id via `getGeneratedKeys()` → `hero.setId(...)`, then INSERT each artifact
-  - `update(Hero)`: DELETE old artifacts + UPDATE hero row + INSERT fresh artifacts (full-replace, not diffing — deliberate, see design decisions)
-  - `delete(Hero)`: DELETE artifacts first (FK order), then DELETE hero row
-  - `loadAllHeroes()`: single `LEFT JOIN` query (hero + artifact, aliased columns to avoid name collisions), delegates row→object mapping to `SQLiteHeroMapper`
-  - All writes wrapped in try/catch with `commitConnection()`/`rollbackConnection()` (manual transactions)
-  - All SQL text and error messages extracted to `private static final String` constants
-  - `update()`/`delete()` throw `RepositoryException` if `hero.getId() == 0` (never persisted yet)
-- `SQLiteHeroMapper.java` — extracted row-mapping responsibility: `mapHeroes(ResultSet)` (static, dedups heroes via internal map, guards against heroes with no artifacts to avoid an NPE), `convertHeroType`/`convertArtifactType` (private static switch-expressions). Pulled out of `SQLiteHeroRepository` because this logic needs no `Connection` and changes for a different reason (domain model shape) than the rest of the repository — a genuine SRP-motivated extraction. A generic `Utils` class (holding *all* private methods, static, with `Connection` passed as a parameter) and a separate `HeroSchema` class (schema/DDL only) were both tried and explicitly rejected/reverted — see design decisions for why.
+Approaches to look up and choose between:
 
-**This layer is solid, reviewed line-by-line, no known bugs.** What's NOT done: wiring these calls into `GameController` — that's the actual remaining work, tracked under Fase 5 below.
+- `SynchronousQueue<Direction>` — EDT calls `put(dir)`, controller calls `take()`. Direct hand-off, no buffer.
+- `BlockingQueue<Direction>` with capacity 1 — similar, slightly more forgiving.
+- `CompletableFuture<Direction>` — controller awaits, EDT completes it.
 
-### ✅ Fase 4 — TerminalView (DONE)
+**Note:** `/oldold`'s `SwingGui.getInput()` is a placeholder (`return "input";`) — it does NOT solve this problem, don't expect a shortcut there.
 
-All 15 `GameView` methods implemented in `TerminalView`:
+**EDT safety rule to look up:** all Swing UI updates must run on the EDT. Use `SwingUtilities.invokeLater(...)` from non-EDT threads.
 
-- `AnsiColor`: typesafe `enum`, `toString()` returns the ANSI escape code
-- Helpers: `colorPrint(AnsiColor, String)`, `scanNextLine()` (strips + lowercases input; catches `NoSuchElementException` on EOF and throws `QuitException`)
-- `choose(prompt, Map<String, T>)`: **generic** keuze-helper — replaced the duplicated y/n / f-r / n-e-s-w switches (Rule of Three resolved). Keys must be lowercase; recursion on invalid input.
-- Input flow: `showError`, `showWelcome` (ASCII art from classpath), `askNewGame`, `createHero` (type via `choose`, then name), `selectHero`, `confirmHero`, `askDirection`, `askFightMonster`, `askKeepArtifact`
-- Output flow: `showHeroStats`, `showStartGame`, `showRunSuccess`, `showEndGame`, `showFightSummary`, `showLevelUp`
-- Presentation moved out of the model: `Hero.toString()` is now a short debug string; the player-facing stats layout lives in `showHeroStats` (MVC: view owns presentation — directly supports the subject's MVC requirement)
+### 🔄 Fase 6.3 — Modal dialogs
 
-Known open items (TODOs in code):
+For `askFightMonster`, `askKeepArtifact`, `confirmHero`, `createHero`, `askNewGame`, `selectHero`: use `JOptionPane.showXxxDialog(...)`, which already blocks the calling thread — no queue needed for these.
 
-- `selectHero` uses `hero.getId()` as a `choose` key — every hero has `id = 0` until persistence assigns real ids, so multiple heroes collide on `"0"`. Switch to the list index, or wait for Fase 3 to assign ids. The name-key still works in the meantime.
+### 🔄 Fase 6.4 — Wire in + end-to-end test
 
-### 🔄 Fase 5 — GameController (repository still not wired in)
+- Confirm `GameController` needs zero changes — it only calls `view.askDirection()` etc. and shouldn't know it's talking to Swing. The threading complexity from Fase 6.2 stays fully hidden inside `GuiView`.
+- `java -jar target/mazie.jar gui` should run the full game: create/select hero → persist → play → win/lose/quit → persist again.
+- Manually test the same scenarios already verified for `TerminalView`.
 
-The gameplay logic matches the `Mazie.drawio` flow well. **The repository is not wired in at all yet** — that's the remaining work.
-
-**What's implemented and conceptually working:**
-
-- `setup()`: welcome → ask new/existing → create/select → show stats → confirm → retry on reject. Follows the `Mazie.drawio` GAME SETUP lane.
-- `createValidHero()`: loops `view.createHero()` + `validator.validate(hero)`, shows the joined violation messages via `view.showError(...)` until valid. **Validation trigger lives in the controller; the view stays dumb** (subject V.3: annotation-based validation).
-- `Validator` built once as a field via `ParameterMessageInterpolator` (no EL dependency needed — keeps the dependency tree minimal for the "no external libraries" rule).
-- `QuitException` (EOF / Ctrl+D) caught in `start()`.
-- `gameLoop(Hero hero)`: while-loop over `turn()`, checks `engine.win()` after each turn, calls `showEndGame(true)` on border reached.
-- `turn()`: direction → move → empty step OR fight/run → FightResult → game-over / level-up / artifact drop. Follows `Mazie.drawio` GAME PLAY lane.
-- `GameView.showEmptyStep()` added to interface + implemented in both `TerminalView` and `GuiView` stub.
-
-**Still to do — this is now the priority:**
-
-- `setup()` still hardcodes `newGame = true`, and calls `view.selectHero(Collections.emptyMap())` with a hardcoded empty map instead of real data. The `repository` field is stored in the constructor but **still never read anywhere in the class** (confirmed: compiler flags it as "never read"). Needs: call `repository.loadAllHeroes()` once, gate `askNewGame()` on whether that map is non-empty, pass the loaded `Map<Integer, Hero>` into `view.selectHero(...)` instead of the empty-map placeholder.
-- Call `repository.save(hero)` right after `createValidHero()` returns (brand-new hero, never persisted).
-- Call `repository.update(hero)` when the game ends. Recommended: put it in `start()`'s `finally` block (currently just `// #todo`) so it runs unconditionally — covers win, loss, *and* quit-via-`QuitException` in one place.
-- Open design question (also written directly on the drawio itself — see review below): when a hero dies in battle, should `repository.delete(hero)` be called, or should the hero just stay in the DB at last-saved stats so the player can try again with a fresh hero? Not decided yet — resolves the `// #todo delete hero?` comment in `turn()`.
-- Remove debug `System.out.println`s scattered through `setup()`, `gameLoop()`, `turn()` before submission.
-- Hero stats currently shown at END of loop iteration — consider moving to start of turn (before `askDirection`) so player sees state before deciding.
-
-### 🔄 Fase 6 — SwingView (STUB CREATED)
-
-- `GuiView.java` created in `mazie.view.gui`, implements `GameView`, all methods are `#todo` stubs.
-- No logic implemented yet.
-
-### ✅ Fase 7 — Main + args (DONE)
-
-- `parse(String[] args)` implemented: returns `true` for `console`/`c`, `false` for `gui`/`g`, throws `ParseException` on unknown input.
-- `main()` instantiates `TerminalView` or `GuiView` based on `parse()` result, builds `GameController`, calls `start()`.
-- `ParseException` added as a new exception class.
+New file for all of this: `mazie/src/main/java/mazie/view/gui/GuiView.java` (stub already exists), implements `GameView`.
 
 ---
 
 ## Next-session priorities (top of stack)
 
-1. **Wire `HeroRepository` into `GameController`** (the repository itself is done, see Fase 3):
-   - `setup()`: call `repository.loadAllHeroes()`, gate `askNewGame()` on whether it's non-empty, pass the map into `selectHero(...)` instead of the current hardcoded `Collections.emptyMap()`.
-   - Call `repository.save(hero)` right after a brand-new hero passes `createValidHero()`.
-   - Call `repository.update(hero)` in `start()`'s `finally` block (covers win, loss, and quit in one place).
-   - Decide + implement: does losing a battle call `repository.delete(hero)`, or just leave the hero at last-saved stats? (open question, also flagged on the drawio itself)
-2. **Submission hygiene**: remove debug `System.out.println`s in `GameController` (`setup()`, `gameLoop()`, `turn()`); verify `>` vs `>=` boundary in `Hero.gainXp()`.
-3. **Fase 6 — SwingView**: only after the above is done and console mode works fully end-to-end (create → play → persist → reload).
-4. **Open from the drawio's own "MY CURRENT QUESTIONS" box**: how to handle Ctrl+C (SIGINT) mid-game — currently only EOF (Ctrl+D) is caught via `QuitException`; SIGINT isn't handled at all and will kill the JVM without persisting. Decide if a `Runtime.getRuntime().addShutdownHook(...)` is worth adding, or leave out of scope.
+1. **Submission hygiene** in `GameController`: remove debug `System.out.println`s in `setup()`, `gameLoop()`, `turn()`; verify `>` vs `>=` boundary in `Hero.gainXp()`.
+2. **Manually test the full persistence loop end-to-end** (console mode): create → confirm → play → win/lose/quit → relaunch → confirm the hero shows up correctly (or is gone, if deleted on loss) in `selectHero`.
+3. **Fase 6.1 — SwingView static layout**: build the visual skeleton first, no threading yet (see Fase 6.1 below).
+4. **Fase 6.2 — blocking direction input**: solve the EDT-to-controller hand-off (see Fase 6.2 below) — the hardest remaining piece of the whole project.
+5. **Fase 6.3 & 6.4**: modal dialogs, then wire in and test end-to-end in GUI mode.
+6. **Ctrl+C (SIGINT) mid-game**: currently only EOF (Ctrl+D) is caught via `QuitException`; SIGINT isn't handled at all and will kill the JVM without persisting. Decide if a `Runtime.getRuntime().addShutdownHook(...)` is worth adding, or leave out of scope.
 
 ---
 
 ## Fase 3 — Persistence, final implementation reference
 
-Package: `mazie.repository`. Chosen approach: **SQLite** (bonus — replaces text file requirement). Status: **done** (repository layer only — controller wiring is separate, see Fase 5).
+Package: `mazie.repository`. Chosen approach: **SQLite** (bonus — replaces text file requirement). Status: **done**, including controller wiring (Fase 5).
 
 **Files:**
 
@@ -188,37 +139,7 @@ artifact(id, name, type, value, hero_id → hero.id)
 
 **`delete()` order:** DELETE from `artifact` first (FK constraint), then DELETE from `hero`.
 
-**No known bugs in this layer.** The only remaining persistence-related work is calling these methods from `GameController` (Fase 5).
-
----
-
-## Fase 6 — SwingView plan
-
-New file: `mazie/src/main/java/mazie/view/swing/SwingView.java`, implements `GameView`.
-
-**Layout idea (one option, not mandatory):**
-
-- `JFrame` with `BorderLayout`
-- A non-editable `JTextArea` (wrapped in `JScrollPane`) for messages and stats
-- A panel with 4 `JButton`s (N/E/S/W) for direction — only enabled during `askDirection()`
-
-**The hard part — blocking input from buttons:**
-
-The controller runs on the main thread and calls `view.askDirection()` expecting a return value. But Swing button clicks happen on the EDT (Event Dispatch Thread) and don't return anything to the caller. You need a way for the EDT to *hand a value back* to the controller thread, and for the controller to *wait* until that happens.
-
-Approaches to look up and choose between:
-
-- `SynchronousQueue<Direction>` — EDT calls `put(dir)`, controller calls `take()`. Direct hand-off, no buffer.
-- `BlockingQueue<Direction>` with capacity 1 — similar, slightly more forgiving
-- `CompletableFuture<Direction>` — controller awaits, EDT completes it
-
-For the modal dialogs (`askFightMonster`, `askKeepArtifact`, `confirmHero`, `createHero`), `JOptionPane.showXxxDialog(...)` already blocks the calling thread — no queue needed.
-
-**EDT safety rule to look up:**
-
-- All Swing UI updates must run on the EDT. Use `SwingUtilities.invokeLater(...)` from non-EDT threads.
-
-**Important:** the controller does NOT need to know it's talking to Swing. It just calls `view.askDirection()` and gets a `Direction` back. The threading complexity is fully hidden inside `SwingView`.
+**No known bugs in this layer.**
 
 ---
 
@@ -249,16 +170,16 @@ For the modal dialogs (`askFightMonster`, `askKeepArtifact`, `confirmHero`, `cre
 
 ## Mandatory requirements checklist (from subject)
 
-> This checklist **is** the subject's mandatory part (V.1 Gameplay, V.2 Features, V.3 Validation) — treat it as the grading rubric. The turn order inside the game loop follows `Mazie.drawio`. Annotations: *engine ready* = model/`GameEngine` logic exists but is not yet wired into a playable `gameLoop`.
+> This checklist **is** the subject's mandatory part (V.1 Gameplay, V.2 Features, V.3 Validation) — treat it as the grading rubric. The turn order inside the game loop follows `Mazie.drawio`.
 
 - [x] MVC architecture (Model/View/Controller clearly separated)
 - [x] Launch with `java -jar mazie.jar console`
 - [ ] Launch with `java -jar mazie.jar gui` — *SwingView stubs only (Fase 6)*
 - [x] Build with `mvn clean package` → produces runnable jar
 - [x] No external libraries except Hibernate Validator + SQLite (SQLite justified as bonus DB library)
-- [ ] Hero persistence (load on start, save on exit) — *repository layer done (Fase 3); `GameController` wiring still missing (Fase 5)*
+- [x] Hero persistence (load on start, save on exit) — *wired in Fase 5, per-path saves matching the drawio*
 - [x] Create hero flow
-- [ ] Select existing hero flow — *repository + view side (`Map<Integer,Hero>`) done; blocked on the same `GameController` wiring*
+- [x] Select existing hero flow
 - [x] Show hero stats (name, class, level, xp, attack, defence, hp)
 - [x] Square map, size = (level-1)*5+10-(level%2)
 - [x] Move in 4 directions (N/E/S/W)
@@ -276,19 +197,13 @@ For the modal dialogs (`askFightMonster`, `askKeepArtifact`, `confirmHero`, `cre
 
 ## Bonus checklist
 
-- [ ] Hero persistence in relational database instead of text file — *repository layer done; not yet wired into `GameController`, so not playable/verifiable end-to-end (Fase 5)*
+- [x] Hero persistence in relational database instead of text file — *fully wired into `GameController` (Fase 5), playable end-to-end*
 - [ ] Switch between console/GUI at runtime without closing
 
 ---
 
 ## Drawio review (2026-07-03)
 
-Re-read `Mazie.drawio` end to end and compared it against the subject and the current code. **Conclusion: the diagram still matches the intended design well — no redraw needed.** Details:
+`Mazie.drawio` still matches the intended design well — no redraw needed. One deliberate deviation from the literal diagram, worth knowing before touching persistence code again: the diagram shows a dashed "save hero with new xp" arrow after the border-of-map win check, plus a *separate* "save artifact" step after "keep?". The implementation simplifies this to a single `repository.update(hero)` call per event (win, or end of a won fight) instead of saving incrementally at every sub-step — acceptable since the subject has no mid-game crash-durability requirement.
 
-- **GAME SETUP lane** (start game menu → welcome → new/existing decision → create hero / select existing hero → view hero stats → "ok?" confirm/retry loop) matches `GameController.setup()` 1:1, including the "Hero DB" node feeding into "select existing hero" and "view hero stats" — this is exactly the `repository.loadAllHeroes()` call that's still missing (see Fase 5).
-- **GAME PLAY lane** (create map, sized/seeded by hero level → direction input → border-of-map win check → villain encounter → fight/run → battle simulation → win/lose → XP/level-up/artifact-drop) matches `GameEngine`/`GameController.turn()` well.
-- The diagram shows a dashed "save hero with new xp" arrow back to the Hero DB right after the border-of-map win check, and a separate "save artifact" step after "keep?". The current implementation plan deliberately simplifies this to **one `repository.update(hero)` call** at the very end of the game (in `start()`'s `finally`), covering hero stats + all current artifacts at once, rather than saving incrementally at every event. This is a reasonable simplification (no mid-game crash-durability requirement in the subject) but is a deviation from the literal diagram — flagging it here so it's a conscious choice, not an oversight.
-- The diagram has a "MY CURRENT QUESTIONS" box with two open questions, written by the student, still relevant:
-  - *"What to do after 'stop'?"* — now understood: persist final state via `update()`, then the program just ends (`main()` returns). Not yet implemented (see Fase 5).
-  - *"How to let user quit midway? ^C?"* — **still genuinely unresolved.** `QuitException` currently only catches EOF/Ctrl+D (via `NoSuchElementException` from `Scanner`). Ctrl+C sends SIGINT, which is not caught anywhere and will kill the JVM immediately without running any persistence/cleanup code. Needs a decision: add a `Runtime.getRuntime().addShutdownHook(...)`, or explicitly accept this as out of scope for the project.
-- No structural changes to the diagram are needed — the two open questions above are implementation decisions, not drawing errors.
+Remaining open question from the diagram's own "MY CURRENT QUESTIONS" box: how to handle Ctrl+C (SIGINT) mid-game — see next-session priority #4 above.

@@ -1,7 +1,5 @@
 package mazie.controller;
 
-import java.util.Collections;
-
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 import jakarta.validation.Validation;
@@ -16,7 +14,7 @@ public class GameController {
 
     // private GameEngine engine;
     private GameView view;
-    private HeroRepository repository;
+    private final HeroRepository repository;
     private final Validator validator = Validation.byDefaultProvider()
             .configure()
             .messageInterpolator(new ParameterMessageInterpolator())
@@ -32,21 +30,35 @@ public class GameController {
 
         view.showWelcome();
 
+        Hero hero = null;
+
         try {
-            Hero hero = setup();
+            hero = setup();
             gameLoop(hero);
         } catch (QuitException e) {
             view.showError("You're such a Quitter");
-        } finally {
-            // #todo repository.save of iets dergelijks?
-        }
+            if (hero == null) {
+                return;
+            }
 
+            if (hero.getId() == 0) {
+                repository.save(hero);
+            } else {
+                repository.update(hero);
+            }
+        }
     }
 
     private Hero setup() {
 
         // #todo: alleen als er helden zijn om te laten, vragen of user een nieuwe game wil beginnen. Nu geen repo dus altijd true?
-        boolean newGame = true;
+        final var heroes = repository.loadAllHeroes();
+
+        boolean newGame = false;
+        if (heroes == null || heroes.isEmpty()) {
+            newGame = true;
+        }
+
         Hero hero = null;
 
         if (!newGame) {
@@ -54,7 +66,7 @@ public class GameController {
         }
 
         if (!newGame) {
-            hero = view.selectHero(Collections.emptyMap());
+            hero = view.selectHero(heroes);
         }
 
         if (hero == null) {
@@ -66,6 +78,9 @@ public class GameController {
         if (view.confirmHero(hero)) {
             System.out.println("the chosen one:"); //#todo remove (debugging)
             System.out.println(hero); //#todo remove (debugging)
+            if (hero.getId() == 0) {
+                repository.save(hero);
+            }
             return hero;
         }
         return setup();
@@ -92,18 +107,17 @@ public class GameController {
 
         while (playing) {
             System.out.println("this is hero:"); //#todo remove
-            view.showHeroStats(hero); //#todo removev
+            view.showHeroStats(hero); //#todo remove
 
             System.out.println("current map:\n" + engine.getMapString()); //#todo remove
 
             playing = turn(engine, hero);
 
             if (engine.win()) {
-                view.showEndGame(true);
                 playing = false;
-                // #todo safe hero?
+                repository.update(hero);
+                view.showEndGame(true);
             }
-
         }
     }
 
@@ -130,7 +144,7 @@ public class GameController {
 
         if (!result.win()) {
             view.showEndGame(false);
-            // #todo delete hero?
+            repository.delete(hero);
             return false;
         }
 
@@ -146,6 +160,7 @@ public class GameController {
                 hero.setArtifact(result.drop());
             }
         }
+        repository.update(hero);
         return true;
     }
 
