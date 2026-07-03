@@ -2,7 +2,6 @@ package mazie.view.terminal;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -75,16 +74,17 @@ public class TerminalView implements GameView {
     }
 
     @Override
-    public Hero selectHero(List<Hero> heroes) {
-        if (heroes.isEmpty()) {
+    public Hero selectHero(Map<Integer, Hero> heroes) {
+        if (heroes == null || heroes.isEmpty()) {
             return null;
         }
-        final var prompt = "choose your fighter!\n(id/name)";
+        final var prompt = "choose your fighter!\n(id)";
+
         final var options = new HashMap<String, Hero>();
-        heroes.stream().forEach(hero -> {
+
+        heroes.forEach((i, hero) -> {
             showHeroStats(hero);
-            options.put(hero.getName(), hero);
-            // #todo when persistent options.put(Integer.toString(hero.getId()), hero);
+            options.put(i.toString(), hero);
         });
 
         return choose(prompt, options);

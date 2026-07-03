@@ -54,7 +54,7 @@ public class GameController {
         }
 
         if (!newGame) {
-            hero = view.selectHero(Collections.emptyList());
+            hero = view.selectHero(Collections.emptyMap());
         }
 
         if (hero == null) {

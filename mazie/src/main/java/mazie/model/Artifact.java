@@ -11,7 +11,6 @@ public record Artifact(
     private static final String[] HELMETS = {"a colander", "a carton box", "a little hat", "a yankee with no brim"};
 
     public static Artifact weapon(final int value) {
-        final int time = getTimeAsInt();
         final String name = WEAPONS[getTimeAsInt() % WEAPONS.length];
 
         return new Artifact(name, ArtifactType.WEAPON, value);

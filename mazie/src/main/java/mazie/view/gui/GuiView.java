@@ -1,6 +1,6 @@
 package mazie.view.gui;
 
-import java.util.List;
+import java.util.Map;
 
 import mazie.model.Artifact;
 import mazie.model.Direction;
@@ -38,7 +38,7 @@ public class GuiView implements GameView {
 
     // select existing hero from list (only prompted if list is not empty)
     @Override
-    public Hero selectHero(List<Hero> heroes) {
+    public Hero selectHero(Map<Integer, Hero> heroes) {
         // #todo implement
         return null;
     }

@@ -1,17 +1,16 @@
 package mazie.repository;
 
-import java.util.List;
+import java.util.Map;
 
 import mazie.model.Hero;
 
 public interface HeroRepository {
 
-    List<Hero> loadAllHeroes();
+    Map<Integer, Hero> loadAllHeroes();
 
     void save(Hero hero);
-
+    
     void update(Hero hero);
 
     void delete(Hero hero);
-
 }

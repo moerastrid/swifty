@@ -44,6 +44,17 @@ public class Hero {
         this.hp = type.baseHp;
     }
 
+    public Hero(int id, String name, HeroType type, int level, int xp, int attack, int defence, int hp) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.level = level;
+        this.xp = xp;
+        this.attack = attack;
+        this.defence = defence;
+        this.hp = hp;
+    }
+
     /*
         returns true if lvlUp = true.
      */

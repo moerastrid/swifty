@@ -1,6 +1,6 @@
 package mazie.view;
 
-import java.util.List;
+import java.util.Map;
 
 import mazie.model.Artifact;
 import mazie.model.Direction;
@@ -22,7 +22,7 @@ public interface GameView {
     public Hero createHero();
 
     // select existing hero from list (only prompted if list is not empty)
-    public Hero selectHero(List<Hero> heroes);
+    public Hero selectHero(Map<Integer, Hero> heroes);
 
     // show stats of selected hero, confirm choice
     public boolean confirmHero(Hero hero);
