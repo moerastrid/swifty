@@ -51,7 +51,7 @@ public class GamePanel extends JPanel {
         this.repaint();
     }
 
-    public void setDirectionPanel(BlockingQueue queue) {
+    public void setDirectionPanel(BlockingQueue<Direction> queue) {
         this.removeAll();
         this.add(this.directionPanel(queue));
         this.revalidate();

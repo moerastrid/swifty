@@ -29,12 +29,8 @@ public class GuiView implements GameView {
         frame = initFrame();
         frame.getContentPane().add(panel);
 
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                frame.setVisible(true);
-            }
-        });
+        SwingUtilities.invokeLater(()
+                -> frame.setVisible(true));
     }
 
     private JFrame initFrame() {
@@ -43,6 +39,7 @@ public class GuiView implements GameView {
         fr.setSize(800, 600);
         fr.setLayout(new BorderLayout(10, 10));
         fr.setLocationRelativeTo(null);
+
         final var path = getClass().getResource("/mazie-icon.png");
         final var icon = new ImageIcon(path);
 
@@ -113,7 +110,6 @@ public class GuiView implements GameView {
         // #todo implement
     }
 
-    // get direction player wants to go
     @Override
     public Direction askDirection() {
         final var queue = new LinkedBlockingQueue<Direction>();

@@ -209,7 +209,7 @@ artifact(id, name, type, value, hero_id → hero.id)
 - [x] Battle simulation using hero + monster stats
 - [x] Lose battle = game over
 - [x] Win battle = XP gain, possible artifact drop
-- [x] Level up formula: level*1000 + (level-1)^2 * 450 — *verify `>` vs `>=` boundary still open*
+- [x] Level up formula: level*1000 + (level-1)^2* 450 — *verify `>` vs `>=` boundary still open*
 - [x] 3 artifact types: Weapon (+attack), Armor (+defence), Helm (+hp)
 - [x] Annotation-based validation (Hibernate Validator) on user input
 - [x] Validation failure highlighted to user
