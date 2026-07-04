@@ -72,7 +72,9 @@ public class Hero {
 
     private boolean lvlUp() {
         this.level += 1;
-        this.hp = type.baseHp + ((this.level - 1) * type.baseHp / 10);
+        final int hpMax = type.baseHp + ((this.level - 1) * type.baseHp / 10);
+        final int newHp = this.hp + (hpMax / 2);
+        this.hp = (newHp > hpMax) ? hpMax : newHp;
         this.attack = type.baseAttack + ((this.level - 1) * type.baseAttack / 10);
         this.defence = type.baseDefence + ((this.level - 1) * type.baseDefence / 10);
 

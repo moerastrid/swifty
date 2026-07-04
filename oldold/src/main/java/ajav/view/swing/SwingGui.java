@@ -1,22 +1,22 @@
 package ajav.view.swing;
 
-import ajav.view.GameView;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.BorderFactory;
-import javax.swing.JLabel;
-import javax.swing.ImageIcon;
-import javax.swing.JTextField;
-import javax.swing.JButton;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.util.Locale;
 
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import static javax.swing.SwingConstants.CENTER;
 import static javax.swing.WindowConstants.DISPOSE_ON_CLOSE;
+
+import ajav.view.GameView;
 
 public class SwingGui implements GameView {
     private static final String TITLE = "Mazie - an a-maze-ing RPG";

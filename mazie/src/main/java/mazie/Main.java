@@ -31,7 +31,7 @@ public class Main {
 
     public static boolean parse(final String[] args) {
         if (args.length == 0) {
-            return true;
+            return false;
         }
 
         if (args.length > 1) {

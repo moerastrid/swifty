@@ -25,31 +25,31 @@ public class Monster {
 
     public static Monster easy(int heroLevel) {
         final var name = EASY_NAMES[RANDOM.nextInt(EASY_NAMES.length)];
-        final var val = (heroLevel / 2) + heroLevel;
-        final var attack = (val + 8) * 2;
-        final var defence = (int) (val * 2.2);
-        final var hp = val * 20;
-        final var xp = val * 180;
+        
+        final var attack = 11 + heroLevel;
+        final var defence = 1 + heroLevel / 2;
+        final var hp = 15 + heroLevel * 4;
+        final var xp = 60 + (heroLevel / 2 + heroLevel) * 95;
         return new Monster("(easy) " + name, attack, defence, hp, xp);
     }
 
     public static Monster medium(int heroLevel) {
         String name = MEDIUM_NAMES[RANDOM.nextInt(MEDIUM_NAMES.length)];
-        final var val = (heroLevel / 2) + heroLevel;
-        final var attack = (val + 10) * 2;
-        final var defence = (int) (val * 2.6);
-        final var hp = val * 25;
-        final var xp = val * 240;
+        
+        final var attack = 17 + (heroLevel * 12) / 10;
+        final var defence = 2 + (heroLevel * 8) / 10;
+        final var hp = 20 + heroLevel * 6;
+        final var xp = 95 + (heroLevel / 2 + heroLevel) * 125;
         return new Monster("(medium) " + name, attack, defence, hp, xp);
     }
 
     public static Monster hard(int heroLevel) {
         String name = HARD_NAMES[RANDOM.nextInt(HARD_NAMES.length)];
-        final var val = (heroLevel / 2) + heroLevel;
-        final var attack = (val + 15) * 2;
-        final var defence = (int) (val * 3.2);
-        final var hp = val * 32;
-        final var xp = val * 300;
+        
+        final var attack = 24 + (heroLevel * 14) / 10;
+        final var defence = 3 + (heroLevel * 11) / 10;
+        final var hp = 25 + heroLevel * 9;
+        final var xp = 170 + (heroLevel / 2 + heroLevel) * 160;
         return new Monster("(hard) " + name, attack, defence, hp, xp);
     }
 

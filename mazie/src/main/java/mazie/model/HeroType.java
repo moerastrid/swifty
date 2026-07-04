@@ -3,7 +3,7 @@ package mazie.model;
 public enum HeroType {
     FROG(10, 10, 100),
     HARE(15, 6, 90),
-    BEAR(7, 12, 120);
+    BEAR(8, 12, 120);
 
     public final int baseAttack;
     public final int baseDefence;

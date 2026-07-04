@@ -12,7 +12,7 @@ public class GameEngine {
 
     private final Hero hero;
     private final GameMap map;
-    private final Random random = new Random(System.currentTimeMillis());
+    private final Random random = new Random();
     private Direction currentDir = null;
 
     public GameEngine(Hero hero) {
@@ -64,7 +64,7 @@ public class GameEngine {
 
         // yes win
         final var levelUp = hero.gainXp(monster.getXpReward());
-        final var drop = dropArtifact(monster.getXpReward());
+        final var drop = dropArtifact(monster);
 
         map.removeMonster(currentDir);
         map.moveHero(currentDir);
@@ -76,8 +76,12 @@ public class GameEngine {
     private void fightRound(Monster monster) {
 
         // hero attacks monster
-        final int damageToMonster = this.hero.getTotalAttack() - monster.getDefence();
+        int damageToMonster = this.hero.getTotalAttack() - monster.getDefence();
         System.out.println("damage to monster: " + damageToMonster); //#todo remove (debugging)
+
+        if (damageToMonster <= 0) {
+            damageToMonster = 1;
+        }
 
         if (damageToMonster > 0) {
             final var newMonsterHp = monster.getHp() - damageToMonster;
@@ -89,10 +93,14 @@ public class GameEngine {
         }
 
         // monster attacks hero
-        final int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
+        int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
+
+        if (damageToHero <= 0) {
+            damageToHero = 1;
+        }
 
         // monster 50% chance attacks hero
-        if (random.nextBoolean() || damageToHero <= 0) {
+        if (random.nextBoolean()) {
             System.out.println("monster misses"); //#todo remove (debugging)
             return;
         }
@@ -103,12 +111,12 @@ public class GameEngine {
 
     }
 
-    private Artifact dropArtifact(int xpReward) {
-        var value = xpReward / 20 - 4;
-        if (value < 3) {
-            value = 3;
+    private Artifact dropArtifact(Monster monster) {
+        int value = (monster.getAttack() + monster.getDefence()) / 4;
+        if (value < 1) {
+            value = 1;
         }
-        final var drop = random.nextInt(4);
+        final var drop = random.nextInt(5);
         return switch (drop) {
             case 0 ->
                 Artifact.weapon(value);

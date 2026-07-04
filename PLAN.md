@@ -6,7 +6,7 @@
 - **Flowchart**: `Mazie.drawio` in the root — student's own design, used to derive the GameView interface. Open with draw.io desktop or diagrams.net.
 - **This file**: current plan, to be updated as work progresses.
 
-**Last full review: 2026-07-03** — re-read subject PDF, `Mazie.drawio`, and the actual current codebase (not just this file) to verify everything below is still accurate. See "Drawio review" section further down for details.
+**Last full review: 2026-07-04** — re-read subject PDF, `Mazie.drawio`, and the actual current codebase (not just this file) to verify everything below is still accurate. See "Drawio review" section further down for details.
 
 ---
 
@@ -55,20 +55,38 @@ java -jar target/mazie.jar gui
 
 Fases 1-5 and 7 (model/validation, `GameView` interface, SQLite persistence layer, `TerminalView`, `GameController` wiring, `Main`/args parsing) are **done**. Console mode (`java -jar target/mazie.jar console`) is fully playable end-to-end: create/select hero → persist → play → win/lose/quit → persist again.
 
+**2026-07-04 session note:** `Monster.java`'s easy/medium/hard stat formulas were hand-tuned via a throwaway simulation tool (since removed from `Main.java` again) to get sensible death-level distribution (roughly: safe before level 5, gets dangerous around level 8, risky at level 10+). The student experimented with additional per-`HeroType` mechanics (an xp-gain multiplier, asymmetric base HP, combat variance) to fine-tune this further, then **deliberately reverted those experiments** in `HeroType.java`, `Hero.java`, and `Main.java` to keep writing the balance logic themselves — `Monster.java`'s tuned values are the only lasting change from that session. This is fine and expected; don't reintroduce the reverted mechanics without the student asking again.
+
+**⚠️ IMPORTANT — read this before doing anything else:** the student spent an entire evening (2026-07-04) tuning gameplay balance instead of starting Fase 6 (SwingView), which is genuinely procrastination-via-a-fun-task avoiding the hard/new one (threading is a new concept, gameplay tuning is familiar territory). Gameplay balance is **not graded pass/fail**. SwingView **is a mandatory subject requirement** (`java -jar mazie.jar gui` must work) and is the **only remaining mandatory item not yet started**. **If the student starts talking about more gameplay/monster/balance tweaks again before Fase 6 is done, remind them clearly: finish the mandatory Swing requirement first.** Be kind about it — this is an ADHD/avoidance pattern, not laziness, and deadline stress is real — but be firm about the priority order.
+
 Only **Fase 6 — SwingView** remains, split into sub-phases below.
+
+**2026-07-04 GUI session progress:** the student made real, understood progress on Fase 6.1 — do NOT restart this from scratch next session, build on it. What exists now:
+
+- `mazie/src/main/java/mazie/view/gui/GuiView.java`: `JFrame` set up (`initFrame()`), icon loaded from classpath (`getClass().getResource("/mazie-icon.png")`, NOT a file path — important, works inside the jar), `SwingUtilities.invokeLater(() -> frame.setVisible(true))` correctly placed as the *last* step after all content is built (student understands *why*: invokeLater tasks run in FIFO submission order, so visibility must be scheduled last).
+- `mazie/src/main/java/mazie/view/gui/GamePanel.java`: `extends JPanel`, holds a `welcomePanel()` (logo `ImageIcon` from `/mazie-logo.png` + a "Start" `JButton`), swapped in via `setWelcomePanel(latch)` (`removeAll()` + `add()` + `revalidate()` + `repaint()` — student understands why all four calls are needed, incl. why `removeAll()` matters before swapping content, and why `revalidate/repaint` belongs in `GamePanel` itself rather than being the caller's (`GuiView`'s) responsibility).
+- `ThemeColor.java` copied over from `/oldold` as planned (pure color constants, no dependencies).
+- `showWelcome()` is **fully implemented and working**, and is a genuinely good solved example of the EDT↔controller hand-off pattern, just simpler than `askDirection()`: it uses a `CountDownLatch(1)` — `GuiView.showWelcome()` creates the latch, schedules `panel.setWelcomePanel(latch)` via `invokeLater`, then calls `latch.await()` on the controller thread; the "Start" button's `ActionListener` (running on the EDT) calls `latch.countDown()`. Student worked through *why* a plain `boolean` flag + busy-wait loop would be wrong here (busy-waiting wastes CPU; more importantly, no `happens-before` guarantee across threads without a proper synchronizer — directly connected back to the `SwingWorker` tutorial text about memory visibility). Also handled `InterruptedException` correctly with `Thread.currentThread().interrupt()` in the catch block, and understands *why* (nothing currently interrupts this thread in practice — it's defensive code, becomes relevant only if a future SIGINT/shutdown-hook feature is added, see next-session priority on Ctrl+C below).
+- Student was also corrected on a couple of concrete Swing API mistakes worth remembering if they recur: `JOptionPane` is a modal-dialog component, not a general-purpose layout container (don't `.add()` buttons into one to build a toolbar); `JScrollPane` needs `setViewportView(...)`/constructor-arg, not `.add(...)`, to attach its content.
+- Explicitly decided **against** `SwingWorker` for icon loading (loading a small local PNG is near-instant, not the "genuinely slow task" `SwingWorker` is for) — good applied YAGNI reasoning, worth remembering as a talking point for peer evaluation ("I considered X, here's why I didn't need it").
+
+**Still open in Fase 6.1:** the actual game screen (persistent `JTextArea` + `JScrollPane` for messages, plus the N/E/S/W `JButton` panel) has not been built yet inside `GamePanel` — only the welcome screen exists so far. This is the next concrete step before touching `askDirection()` itself.
 
 ### 🔄 Fase 6.1 — Static layout (no threading yet)
 
 Build the visual skeleton of `mazie/src/main/java/mazie/view/gui/GuiView.java` without solving the blocking-input problem yet. Hardcode/stub return values (e.g. `askDirection()` always returns `Direction.NORTH`) just to get the UI rendering and navigable.
 
-- `JFrame` with `BorderLayout`
-- Non-editable `JTextArea` (wrapped in `JScrollPane`) for messages/stats
-- Panel with 4 `JButton`s (N/E/S/W), only enabled during `askDirection()`
-- Reusable from `/oldold/src/main/java/ajav/view/swing/`: `ThemeColor.java` (color palette, copy directly) and the font-per-OS logic in `SwingGui.initFonts()` (Windows/Linux/other font fallback) — both are self-contained, no dependency on the old (incompatible) `GameView` interface there.
+- `JFrame` with `BorderLayout` ✅ done
+- Welcome screen with logo + Start button, actually gating on the click via `CountDownLatch` ✅ done (see session progress note above — this ended up needing real (simple) threading, not just static layout, and that's fine/expected)
+- Non-editable `JTextArea` (wrapped in `JScrollPane`) for messages/stats — **not started yet**, next step
+- Panel with 4 `JButton`s (N/E/S/W), only enabled during `askDirection()` — **not started yet**, next step
+- Reusable from `/oldold/src/main/java/ajav/view/swing/`: `ThemeColor.java` ✅ copied over. The font-per-OS logic in `SwingGui.initFonts()` — student deliberately skipped this for now (deprioritized, not forgotten), fine to pick up later or never if fonts look acceptable as-is.
 
 ### 🔄 Fase 6.2 — Blocking direction input (the hard part)
 
 Solve the EDT ↔ controller thread hand-off for `askDirection()`. The controller runs on the main thread and calls `view.askDirection()` expecting a synchronous return value; Swing button clicks fire on the EDT and don't return anything to the caller.
+
+**Good news for next session:** the student already solved a simpler version of exactly this problem in `showWelcome()` (see session progress note above, using `CountDownLatch`). `askDirection()` is the same pattern *plus* needing to pass back a value (`Direction`), which `CountDownLatch` can't carry — so a different tool is needed here. Frame it to the student as "you already did the hard conceptual part, now you need a tool that also carries a value" rather than a brand new problem.
 
 Approaches to look up and choose between:
 
@@ -94,14 +112,36 @@ New file for all of this: `mazie/src/main/java/mazie/view/gui/GuiView.java` (stu
 
 ---
 
+## NICE-TO-HAVE — MonsterFactory refactor (not started, low priority)
+
+**⚠️ If the student asks about this again: remind them to finish the "Next-session priorities" must-haves above first.** This is polish, not a requirement — the game already works and is balanced without it.
+
+**Why this idea came up (2026-07-04):** balance-testing revealed that FROG/HARE die in a very narrow, predictable level range (their fights resolve in few rounds → low variance → outcomes cluster tightly), while BEAR (many rounds per fight due to low attack) naturally has a much wider death-level spread from pure RNG variance. Giving each monster *species* (not just each tier) its own stat profile — e.g. a capybara is a tank (high defence/hp, lower attack), a mosquito is a glass cannon (low defence, decent attack) — would introduce natural per-encounter variance for fast fighters too, without bolting on a generic random multiplier.
+
+**Two design options discussed:**
+
+1. **Minimal**: keep `Monster` as one concrete class; `Monster.easy()/medium()/hard()` picks a random name **and** a matching stat-multiplier (e.g. a small per-species multiplier table). Small change, no new class hierarchy, less time.
+2. **Full OOP refactor (student's preference)**: `Monster` becomes `abstract class Monster`; one subclass per animal (`Butterfly`, `Fish`, `Hamster` for easy; `Cat`, `Mosquito`, `Cow`, `Seal` for medium; `Tiger`, `Shark`, `Capybara` for hard), each overriding its own attack/defence/hp multipliers relative to the tier baseline. A new `MonsterFactory` class picks a random subclass per tier (`MonsterFactory.easy(heroLevel)` etc.), replacing the current `Monster.easy/medium/hard()` static factory methods. `GameEngine`'s calls to `Monster.easy(...)` etc. need to change to `MonsterFactory.easy(...)`.
+
+**Suggested incremental approach if/when picked up:**
+
+1. Add the abstract `Monster` class + just one subclass per tier as a proof of concept (e.g. only `Capybara` and `Mosquito`) to validate the design compiles and plays correctly.
+2. Fill in the remaining subclasses.
+3. Add `MonsterFactory`, update `GameEngine` call sites.
+
+**Still to decide (student's call, not the agent's):** the exact attack/defence/hp multiplier per species — e.g. capybara = tank archetype, mosquito = glass cannon archetype. Suggested starting point discussed but not committed to numbers yet.
+
+---
+
 ## Next-session priorities (top of stack)
 
-1. **Submission hygiene** in `GameController`: remove debug `System.out.println`s in `setup()`, `gameLoop()`, `turn()`; verify `>` vs `>=` boundary in `Hero.gainXp()`.
-2. **Manually test the full persistence loop end-to-end** (console mode): create → confirm → play → win/lose/quit → relaunch → confirm the hero shows up correctly (or is gone, if deleted on loss) in `selectHero`.
-3. **Fase 6.1 — SwingView static layout**: build the visual skeleton first, no threading yet (see Fase 6.1 below).
-4. **Fase 6.2 — blocking direction input**: solve the EDT-to-controller hand-off (see Fase 6.2 below) — the hardest remaining piece of the whole project.
-5. **Fase 6.3 & 6.4**: modal dialogs, then wire in and test end-to-end in GUI mode.
+1. **🚨 Finish Fase 6.1 — build the actual game screen in `GamePanel`.** Welcome screen is done; still need the persistent `JTextArea`/`JScrollPane` for messages + the N/E/S/W `JButton` panel (still stubbed/no listeners yet). START HERE.
+2. **Fase 6.2 — blocking direction input**: solve the EDT-to-controller hand-off for `askDirection()` (see Fase 6.2 below). The student already solved the simpler version of this exact problem in `showWelcome()` using `CountDownLatch` — remind them of that if they feel stuck, it's the same pattern plus needing to carry a `Direction` value back (`SynchronousQueue`/`BlockingQueue`/`CompletableFuture`). Budget real focus time for this, it's normal for it to take longer than expected.
+3. **Fase 6.3 & 6.4**: modal dialogs (`JOptionPane` for `askNewGame`, `createHero`, `selectHero`, `confirmHero`, `askFightMonster`, `askKeepArtifact`), then wire in and test end-to-end in GUI mode.
+4. **Submission hygiene** in `GameController`: remove debug `System.out.println`s in `setup()`, `gameLoop()`, `turn()` (and in `GameEngine.fightRound()`); verify `>` vs `>=` boundary in `Hero.gainXp()`.
+5. **Manually test the full persistence loop end-to-end** (console mode): create → confirm → play → win/lose/quit → relaunch → confirm the hero shows up correctly (or is gone, if deleted on loss) in `selectHero`.
 6. **Ctrl+C (SIGINT) mid-game**: currently only EOF (Ctrl+D) is caught via `QuitException`; SIGINT isn't handled at all and will kill the JVM without persisting. Decide if a `Runtime.getRuntime().addShutdownHook(...)` is worth adding, or leave out of scope.
+7. **⚠️ NICE-TO-HAVE, NOT URGENT, DO NOT START BEFORE ITEM 1-3 ARE DONE: `MonsterFactory` refactor** (see dedicated section below). If the student brings this up again, remind them: SwingView first, this is polish on top of an already-working, already-tuned balance, not a blocker.
 
 ---
 
@@ -149,7 +189,7 @@ artifact(id, name, type, value, hero_id → hero.id)
 | --- | --- |
 | No map displayed to user | Student's deliberate choice — adds mystery, subject doesn't require it |
 | Artifact names in Artifact.java, not ArtifactType | Simpler, deadline-focused |
-| No MonsterFactory class | Monster.easy/medium/hard() is already Static Factory Method pattern, extra class adds no value |
+| No MonsterFactory class *(reconsidered 2026-07-04, see Nice-to-have section below)* | Originally: Monster.easy/medium/hard() is already Static Factory Method pattern, extra class adds no value. Reconsidered after balance testing revealed FROG/HARE have too little combat variance (short fights = low variance = death clusters tightly around one level). Per-species subclasses with different stat profiles (tank vs glass cannon) would add natural variance without a global random multiplier. Still a nice-to-have, not started. |
 | `Hero.id` field present but 0 until DB assigns it | Needed by DB (PRIMARY KEY). Not used by game logic — only the repository reads/writes it. Private constructor + `setId()` used during load. |
 | `gainXp()` returns boolean (levelup) | Cleaner than separate `levelUp()` call |
 | EOF in terminal input throws `QuitException` | `Ctrl+D` closes stdin permanently; bubbling a quit signal avoids infinite retry loops and keeps exit handling centralized |
