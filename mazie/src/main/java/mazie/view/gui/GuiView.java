@@ -3,11 +3,13 @@ package mazie.view.gui;
 import java.awt.BorderLayout;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
+import mazie.exception.QuitException;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
@@ -28,6 +30,7 @@ public class GuiView implements GameView {
         frame.getContentPane().add(panel);
 
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 frame.setVisible(true);
             }
@@ -66,7 +69,7 @@ public class GuiView implements GameView {
             latch.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            System.out.println("gui view welcome: " + e.getMessage());
+            throw new QuitException("thread interruption", e);
         }
     }
 
@@ -113,8 +116,18 @@ public class GuiView implements GameView {
     // get direction player wants to go
     @Override
     public Direction askDirection() {
-        // #todo implement
-        return Direction.EAST;
+        final var queue = new LinkedBlockingQueue<Direction>();
+
+        SwingUtilities.invokeLater(() -> {
+            panel.setDirectionPanel(queue);
+        });
+
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        }
     }
 
     // if no monster, show user took a step

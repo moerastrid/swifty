@@ -6,8 +6,6 @@
 - **Flowchart**: `Mazie.drawio` in the root — student's own design, used to derive the GameView interface. Open with draw.io desktop or diagrams.net.
 - **This file**: current plan, to be updated as work progresses.
 
-**Last full review: 2026-07-04** — re-read subject PDF, `Mazie.drawio`, and the actual current codebase (not just this file) to verify everything below is still accurate. See "Drawio review" section further down for details.
-
 ---
 
 ## Student context & agent interaction rules
@@ -61,42 +59,22 @@ Fases 1-5 and 7 (model/validation, `GameView` interface, SQLite persistence laye
 
 Only **Fase 6 — SwingView** remains, split into sub-phases below.
 
-**2026-07-04 GUI session progress:** the student made real, understood progress on Fase 6.1 — do NOT restart this from scratch next session, build on it. What exists now:
+**GUI progress as of 2026-07-05 — build on this, do NOT restart:**
 
-- `mazie/src/main/java/mazie/view/gui/GuiView.java`: `JFrame` set up (`initFrame()`), icon loaded from classpath (`getClass().getResource("/mazie-icon.png")`, NOT a file path — important, works inside the jar), `SwingUtilities.invokeLater(() -> frame.setVisible(true))` correctly placed as the *last* step after all content is built (student understands *why*: invokeLater tasks run in FIFO submission order, so visibility must be scheduled last).
-- `mazie/src/main/java/mazie/view/gui/GamePanel.java`: `extends JPanel`, holds a `welcomePanel()` (logo `ImageIcon` from `/mazie-logo.png` + a "Start" `JButton`), swapped in via `setWelcomePanel(latch)` (`removeAll()` + `add()` + `revalidate()` + `repaint()` — student understands why all four calls are needed, incl. why `removeAll()` matters before swapping content, and why `revalidate/repaint` belongs in `GamePanel` itself rather than being the caller's (`GuiView`'s) responsibility).
-- `ThemeColor.java` copied over from `/oldold` as planned (pure color constants, no dependencies).
-- `showWelcome()` is **fully implemented and working**, and is a genuinely good solved example of the EDT↔controller hand-off pattern, just simpler than `askDirection()`: it uses a `CountDownLatch(1)` — `GuiView.showWelcome()` creates the latch, schedules `panel.setWelcomePanel(latch)` via `invokeLater`, then calls `latch.await()` on the controller thread; the "Start" button's `ActionListener` (running on the EDT) calls `latch.countDown()`. Student worked through *why* a plain `boolean` flag + busy-wait loop would be wrong here (busy-waiting wastes CPU; more importantly, no `happens-before` guarantee across threads without a proper synchronizer — directly connected back to the `SwingWorker` tutorial text about memory visibility). Also handled `InterruptedException` correctly with `Thread.currentThread().interrupt()` in the catch block, and understands *why* (nothing currently interrupts this thread in practice — it's defensive code, becomes relevant only if a future SIGINT/shutdown-hook feature is added, see next-session priority on Ctrl+C below).
-- Student was also corrected on a couple of concrete Swing API mistakes worth remembering if they recur: `JOptionPane` is a modal-dialog component, not a general-purpose layout container (don't `.add()` buttons into one to build a toolbar); `JScrollPane` needs `setViewportView(...)`/constructor-arg, not `.add(...)`, to attach its content.
-- Explicitly decided **against** `SwingWorker` for icon loading (loading a small local PNG is near-instant, not the "genuinely slow task" `SwingWorker` is for) — good applied YAGNI reasoning, worth remembering as a talking point for peer evaluation ("I considered X, here's why I didn't need it").
+Files: `mazie/src/main/java/mazie/view/gui/` → `GuiView.java`, `GamePanel.java`, `DirectionButton.java`, `ThemeColor.java`.
 
-**Still open in Fase 6.1:** the actual game screen (persistent `JTextArea` + `JScrollPane` for messages, plus the N/E/S/W `JButton` panel) has not been built yet inside `GamePanel` — only the welcome screen exists so far. This is the next concrete step before touching `askDirection()` itself.
+- ✅ **Fase 6.1 welcome screen** — `GuiView`/`GamePanel` set up (`JFrame`+`BorderLayout`, icon/logo loaded via `getClass().getResource(...)` — classpath, not file path, works in the jar). `GamePanel.setWelcomePanel(latch)` swaps content (`removeAll()`+`add()`+`revalidate()`+`repaint()`, all inside `GamePanel` itself).
+- ✅ **`showWelcome()` fully working**: `CountDownLatch(1)` pattern — `GuiView` creates latch, schedules panel build via `invokeLater`, blocks on `latch.await()`; Start button's listener (EDT) calls `latch.countDown()`.
+- ✅ **Fase 6.2 `askDirection()` fully working** — same hand-off pattern, upgraded to carry a value: `LinkedBlockingQueue<Direction>`. `GuiView.askDirection()` creates queue, schedules `panel.setDirectionPanel(queue)`, blocks on `queue.take()`. `DirectionButton extends JButton` (dumb: only knows its own `Direction` + look, exposes `getDirection()`); `GamePanel.setListener(button, queue)` wires the actual `queue.put(...)` listener — deliberate split so `DirectionButton` doesn't need to know about `BlockingQueue`.
+- ✅ Both blocking methods handle `InterruptedException` the same way: `Thread.currentThread().interrupt()` + rethrow as `QuitException` (propagates up like the terminal's Ctrl+D handling — reuses existing exception, no new mechanism needed).
+- ⚠️ **Known small cleanup, not urgent**: `GamePanel.setDirectionPanel(BlockingQueue queue)` param is a raw type, should be `BlockingQueue<Direction>`.
+- ❌ **Not started**: persistent `JTextArea`/`JScrollPane` message log in `GamePanel` (still commented-out fields at top of the class) — needed for `showEmptyStep`, `showRunSuccess`, `showFightSummary`, `showLevelUp`, `showHeroStats`, `showError`, etc., all still `#todo` stubs in `GuiView`.
+- ❌ **Fase 6.3 not started**: `askNewGame`, `createHero`, `selectHero`, `confirmHero`, `askFightMonster`, `askKeepArtifact` all still stub returns in `GuiView` — plan is `JOptionPane.showXxxDialog(...)` for each (blocks the calling thread on its own, no queue needed).
+- Considered and rejected along the way (don't suggest again unless asked): `SwingWorker` for icon loading (not slow enough to justify it); a generic `SwingComponentFactory`/`ComponentFactory` holding the direction-button-building logic (mixed domain knowledge like `Direction`/`BlockingQueue` into what should be a purely visual factory — `DirectionButton` as its own class was the cleaner fix).
 
-### 🔄 Fase 6.1 — Static layout (no threading yet)
+### 🔄 Fase 6.1 — remaining: game screen message log
 
-Build the visual skeleton of `mazie/src/main/java/mazie/view/gui/GuiView.java` without solving the blocking-input problem yet. Hardcode/stub return values (e.g. `askDirection()` always returns `Direction.NORTH`) just to get the UI rendering and navigable.
-
-- `JFrame` with `BorderLayout` ✅ done
-- Welcome screen with logo + Start button, actually gating on the click via `CountDownLatch` ✅ done (see session progress note above — this ended up needing real (simple) threading, not just static layout, and that's fine/expected)
-- Non-editable `JTextArea` (wrapped in `JScrollPane`) for messages/stats — **not started yet**, next step
-- Panel with 4 `JButton`s (N/E/S/W), only enabled during `askDirection()` — **not started yet**, next step
-- Reusable from `/oldold/src/main/java/ajav/view/swing/`: `ThemeColor.java` ✅ copied over. The font-per-OS logic in `SwingGui.initFonts()` — student deliberately skipped this for now (deprioritized, not forgotten), fine to pick up later or never if fonts look acceptable as-is.
-
-### 🔄 Fase 6.2 — Blocking direction input (the hard part)
-
-Solve the EDT ↔ controller thread hand-off for `askDirection()`. The controller runs on the main thread and calls `view.askDirection()` expecting a synchronous return value; Swing button clicks fire on the EDT and don't return anything to the caller.
-
-**Good news for next session:** the student already solved a simpler version of exactly this problem in `showWelcome()` (see session progress note above, using `CountDownLatch`). `askDirection()` is the same pattern *plus* needing to pass back a value (`Direction`), which `CountDownLatch` can't carry — so a different tool is needed here. Frame it to the student as "you already did the hard conceptual part, now you need a tool that also carries a value" rather than a brand new problem.
-
-Approaches to look up and choose between:
-
-- `SynchronousQueue<Direction>` — EDT calls `put(dir)`, controller calls `take()`. Direct hand-off, no buffer.
-- `BlockingQueue<Direction>` with capacity 1 — similar, slightly more forgiving.
-- `CompletableFuture<Direction>` — controller awaits, EDT completes it.
-
-**Note:** `/oldold`'s `SwingGui.getInput()` is a placeholder (`return "input";`) — it does NOT solve this problem, don't expect a shortcut there.
-
-**EDT safety rule to look up:** all Swing UI updates must run on the EDT. Use `SwingUtilities.invokeLater(...)` from non-EDT threads.
+Add non-editable `JTextArea` wrapped in `JScrollPane` to `GamePanel` for messages/stats (the fields are already stubbed out in comments at the top of the class). Needed before `GuiView`'s remaining `show*` methods can do anything real.
 
 ### 🔄 Fase 6.3 — Modal dialogs
 
@@ -104,11 +82,9 @@ For `askFightMonster`, `askKeepArtifact`, `confirmHero`, `createHero`, `askNewGa
 
 ### 🔄 Fase 6.4 — Wire in + end-to-end test
 
-- Confirm `GameController` needs zero changes — it only calls `view.askDirection()` etc. and shouldn't know it's talking to Swing. The threading complexity from Fase 6.2 stays fully hidden inside `GuiView`.
+- `GameController` needs zero changes (confirmed) — only calls `view.xxx()`, doesn't know it's Swing.
 - `java -jar target/mazie.jar gui` should run the full game: create/select hero → persist → play → win/lose/quit → persist again.
 - Manually test the same scenarios already verified for `TerminalView`.
-
-New file for all of this: `mazie/src/main/java/mazie/view/gui/GuiView.java` (stub already exists), implements `GameView`.
 
 ---
 
@@ -135,13 +111,16 @@ New file for all of this: `mazie/src/main/java/mazie/view/gui/GuiView.java` (stu
 
 ## Next-session priorities (top of stack)
 
-1. **🚨 Finish Fase 6.1 — build the actual game screen in `GamePanel`.** Welcome screen is done; still need the persistent `JTextArea`/`JScrollPane` for messages + the N/E/S/W `JButton` panel (still stubbed/no listeners yet). START HERE.
-2. **Fase 6.2 — blocking direction input**: solve the EDT-to-controller hand-off for `askDirection()` (see Fase 6.2 below). The student already solved the simpler version of this exact problem in `showWelcome()` using `CountDownLatch` — remind them of that if they feel stuck, it's the same pattern plus needing to carry a `Direction` value back (`SynchronousQueue`/`BlockingQueue`/`CompletableFuture`). Budget real focus time for this, it's normal for it to take longer than expected.
-3. **Fase 6.3 & 6.4**: modal dialogs (`JOptionPane` for `askNewGame`, `createHero`, `selectHero`, `confirmHero`, `askFightMonster`, `askKeepArtifact`), then wire in and test end-to-end in GUI mode.
-4. **Submission hygiene** in `GameController`: remove debug `System.out.println`s in `setup()`, `gameLoop()`, `turn()` (and in `GameEngine.fightRound()`); verify `>` vs `>=` boundary in `Hero.gainXp()`.
-5. **Manually test the full persistence loop end-to-end** (console mode): create → confirm → play → win/lose/quit → relaunch → confirm the hero shows up correctly (or is gone, if deleted on loss) in `selectHero`.
-6. **Ctrl+C (SIGINT) mid-game**: currently only EOF (Ctrl+D) is caught via `QuitException`; SIGINT isn't handled at all and will kill the JVM without persisting. Decide if a `Runtime.getRuntime().addShutdownHook(...)` is worth adding, or leave out of scope.
-7. **⚠️ NICE-TO-HAVE, NOT URGENT, DO NOT START BEFORE ITEM 1-3 ARE DONE: `MonsterFactory` refactor** (see dedicated section below). If the student brings this up again, remind them: SwingView first, this is polish on top of an already-working, already-tuned balance, not a blocker.
+Welcome screen + `askDirection()` are done and working (see GUI progress note above) — the hardest conceptual part (EDT↔controller thread hand-off) is solved and understood. Remaining work is more mechanical from here.
+
+1. **🚨 Fase 6.1 remainder — message log in `GamePanel`**: add `JTextArea`+`JScrollPane` (fields already stubbed in comments). Needed before any `show*` method in `GuiView` can do something real. START HERE.
+2. **Fase 6.3 — modal dialogs**: `JOptionPane.showXxxDialog(...)` for `askNewGame`, `createHero`, `selectHero`, `confirmHero`, `askFightMonster`, `askKeepArtifact` — these block on their own, no queue/latch needed.
+3. **Fase 6.4**: wire remaining `GuiView` stubs to the message log + dialogs, then manually test `java -jar target/mazie.jar gui` end-to-end (same scenarios as `TerminalView`).
+4. **Small cleanup**: `GamePanel.setDirectionPanel` param is a raw `BlockingQueue`, should be `BlockingQueue<Direction>`.
+5. **Submission hygiene** in `GameController`: remove debug `System.out.println`s in `setup()`, `gameLoop()`, `turn()` (and in `GameEngine.fightRound()`); verify `>` vs `>=` boundary in `Hero.gainXp()`.
+6. **Manually test the full persistence loop end-to-end** (console mode): create → confirm → play → win/lose/quit → relaunch → confirm the hero shows up correctly (or is gone, if deleted on loss) in `selectHero`.
+7. **Ctrl+C (SIGINT) mid-game**: currently only EOF (Ctrl+D) is caught via `QuitException`; SIGINT isn't handled at all and will kill the JVM without persisting. Decide if a `Runtime.getRuntime().addShutdownHook(...)` is worth adding, or leave out of scope. Note: `GuiView`'s blocking calls (`showWelcome`/`askDirection`) already rethrow `InterruptedException` as `QuitException`, so a shutdown hook that interrupts the controller thread would already propagate correctly through existing exception handling.
+8. **⚠️ NICE-TO-HAVE, NOT URGENT, DO NOT START BEFORE ITEM 1-3 ARE DONE: `MonsterFactory` refactor** (see dedicated section below). If the student brings this up again, remind them: SwingView first, this is polish on top of an already-working, already-tuned balance, not a blocker.
 
 ---
 
@@ -193,7 +172,7 @@ artifact(id, name, type, value, hero_id → hero.id)
 | `Hero.id` field present but 0 until DB assigns it | Needed by DB (PRIMARY KEY). Not used by game logic — only the repository reads/writes it. Private constructor + `setId()` used during load. |
 | `gainXp()` returns boolean (levelup) | Cleaner than separate `levelUp()` call |
 | EOF in terminal input throws `QuitException` | `Ctrl+D` closes stdin permanently; bubbling a quit signal avoids infinite retry loops and keeps exit handling centralized |
-| SynchronousQueue for Swing direction input | Standard solution for blocking EDT-to-controller communication |
+| LinkedBlockingQueue<Direction> for Swing direction input (not SynchronousQueue) | Same EDT↔controller hand-off pattern as `CountDownLatch` in `showWelcome()`, but needs to carry a value back. `CountDownLatch` was the simpler warm-up case; `BlockingQueue` generalizes it to pass a `Direction`. |
 | JOptionPane for Swing dialogs | Blocks naturally, no queue needed |
 | Static Factory Methods instead of Builder pattern | Subject *hints* at Builder pattern (Chapter III). Skipped because Hero only has `name + type` as user input (Builder shines for many optional fields), and Monster/Artifact already use Static Factory Methods which are idiomatic for our case. **Be ready to explain this trade-off at peer evaluation** — evaluator may ask where Builder was applied. |
 | SQLite dependency in `pom.xml` | Used for the relational-DB bonus (replaces text file requirement). Subject explicitly allows a library for this bonus *"if explicitly justified and serving only that part"*. Justification: SQLite JDBC is the minimal driver needed to implement a relational DB; no ORM or abstraction layer used. |
@@ -246,4 +225,4 @@ artifact(id, name, type, value, hero_id → hero.id)
 
 `Mazie.drawio` still matches the intended design well — no redraw needed. One deliberate deviation from the literal diagram, worth knowing before touching persistence code again: the diagram shows a dashed "save hero with new xp" arrow after the border-of-map win check, plus a *separate* "save artifact" step after "keep?". The implementation simplifies this to a single `repository.update(hero)` call per event (win, or end of a won fight) instead of saving incrementally at every sub-step — acceptable since the subject has no mid-game crash-durability requirement.
 
-Remaining open question from the diagram's own "MY CURRENT QUESTIONS" box: how to handle Ctrl+C (SIGINT) mid-game — see next-session priority #4 above.
+Remaining open question from the diagram's own "MY CURRENT QUESTIONS" box: how to handle Ctrl+C (SIGINT) mid-game — see next-session priority #7 above.
