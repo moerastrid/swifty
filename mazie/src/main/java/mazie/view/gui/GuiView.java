@@ -77,7 +77,6 @@ public class GuiView implements GameView {
         }
     }
 
-    // create new hero
     @Override
     public Hero createHero() {
         final var queue = new SynchronousQueue<Hero>();
@@ -179,7 +178,7 @@ public class GuiView implements GameView {
     // fightsummary has a string with what happened during the fight + how much xp was gained. only called when user won.
     @Override
     public void showFightSummary(String fightSummary, int xpGained) {
-        // #todo implement
+        invokeLater(() -> panel.setFightSummary(fightSummary, xpGained));
     }
 
     @Override

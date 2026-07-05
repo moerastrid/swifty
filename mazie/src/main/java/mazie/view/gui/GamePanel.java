@@ -47,6 +47,10 @@ public class GamePanel extends JPanel {
         setLog("entering the maze...");
     }
 
+    public void setFightSummary(String fightSummary, int xpGained) {
+        setLog("%s (+ %d xp)".formatted(fightSummary, xpGained));
+    }
+
     public void setLevelUp(Hero hero, CountDownLatch latch) {
         this.setSubPanel(new LevelUpPanel(hero, latch));
     }

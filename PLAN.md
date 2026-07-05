@@ -53,66 +53,40 @@ java -jar target/mazie.jar gui
 
 Fases 1-5 and 7 (model/validation, `GameView` interface, SQLite persistence layer, `TerminalView`, `GameController` wiring, `Main`/args parsing) are **done**. Console mode (`java -jar target/mazie.jar console`) is fully playable end-to-end: create/select hero → persist → play → win/lose/quit → persist again.
 
-Only **Fase 6 — SwingView** remains, and it's now well underway.
+**Fase 6 — SwingView is DONE (2026-07-05).** Every `GameView` method is implemented in `GuiView`/`GamePanel`, project compiles clean, and the full manual end-to-end playthrough of `java -jar target/mazie.jar gui` has been verified by the student (new game → create hero → confirm → play → empty steps → fight/run → level up → artifact drop → win/lose → relaunch → load game → select existing hero → confirm → play again — all working). **The entire mandatory subject checklist is now done.** Remaining work on this project is optional polish only (see "Still open / low priority" below).
 
-**GUI progress as of 2026-07-05 (2nd session, big jump):**
+### GUI architecture reference (for peer-evaluation defense)
 
-Files: `mazie/src/main/java/mazie/view/gui/` → `GuiView.java`, `GamePanel.java`, `WelcomePanel.java`, `NewOrLoadGamePanel.java`, `SelectHeroPanel.java`, `ConfirmPanel.java`, `EndPanel.java`, `DirectionPanel.java`, `ArtifactPanel.java`, `RunPanel.java`, `LevelUpPanel.java`, `HeroPanel.java`, `DirectionButton.java`, `YesNoButton.java`, `YesNoButtonPanel.java`, `ThemeColor.java`.
+Files: `mazie/src/main/java/mazie/view/gui/` → `GuiView.java`, `GamePanel.java`, `WelcomePanel.java`, `NewOrLoadGamePanel.java`, `SelectHeroPanel.java`, `ConfirmPanel.java`, `NewHeroPanel.java`, `DirectionPanel.java`, `ArtifactPanel.java`, `RunPanel.java`, `LevelUpPanel.java`, `EndPanel.java`, `HeroPanel.java`, `DirectionButton.java`, `YesNoButton.java`, `YesNoButtonPanel.java`, `ThemeColor.java`.
 
-**Interface change:** `showHeroStats(Hero)` was **removed from `GameView`** — showing a hero's stats always happened together with a yes/no confirmation in practice (`confirmHero`), so the separate method was redundant. `ConfirmPanel` now covers that ground on its own (question label + `HeroPanel` + `YesNoButtonPanel`). If this comes up again: this was a deliberate interface simplification, not an oversight — don't re-add `showHeroStats` without the student asking.
+**`GamePanel`** is the single persistent container, with two independent, separately-managed slots:
 
-**Architecture, settled (unchanged from before, still holding up well under more screens):**
+- `subPanel` (`BorderLayout.CENTER`) — the current "screen", one `JPanel` subclass per `GameView` method that needs a full screen. Swapped via a private `setSubPanel(JPanel)` that removes only the previous `subPanel`, not the whole panel tree. Every screen owns its own construction (SRP) — `GamePanel` itself contains zero building logic.
+- `log` (`BorderLayout.SOUTH`) — a single-line `JLabel` status message for the passive `show*` methods, with two styles: `setLog(...)` (plain, routine status) and `setErrorLog(...)` (black-on-yellow, `showError`).
 
-- `GamePanel` is the single persistent container, with two independent, separately-managed slots:
-  - `subPanel` (`BorderLayout.CENTER`) — the current "screen". Swapped via a private `setSubPanel(JPanel)` that removes only the previous `subPanel`, not the whole panel tree.
-  - `log` (`BorderLayout.SOUTH`) — a single-line `JLabel` status message, swapped via `setLog(text)`/`clearLog()`. Now has two visual variants: `setLog(...)` (plain white text, routine status) and `setErrorLog(...)` (black text on yellow, opaque background — used for `showError`). This is how the earlier-discussed "log line vs `JOptionPane` for errors" question got resolved: errors stay in the same log slot but get a visually distinct style, keeping the whole UI in one consistent custom-panel look instead of mixing in native OS dialogs.
-  - Every screen is its own `JPanel` subclass (SRP) — `GamePanel` itself contains zero building logic.
-- Thread hand-off pattern (EDT ↔ controller thread), applied consistently across every interactive screen: `GuiView` creates a `CountDownLatch`/`BlockingQueue`, schedules the panel swap via `invokeLater`, then blocks (`.await()`/`.take()`) on the controller thread; button listeners on the EDT call `.countDown()`/`.put(...)`. `InterruptedException` always becomes `Thread.currentThread().interrupt()` + rethrow as `QuitException`.
-- `HeroPanel` is the reusable "hero stats card" (name + stats grid + worn artifacts) — now composed inside `LevelUpPanel`, `ConfirmPanel`, and each row of `SelectHeroPanel`. Good payoff from extracting it early.
-- `NewOrLoadGamePanel` (for `askNewGame`) and `SelectHeroPanel` (for `selectHero`) both settled on the same visual language as the rest: custom-styled `JPanel`s with `BlockingQueue` hand-off, not `JOptionPane` — confirms the student's consistency call from last session (custom panels throughout, no native dialogs anywhere so far).
-- Considered and rejected along the way (don't re-suggest unless asked): `SwingWorker` for icon loading; a generic `SwingComponentFactory`/`PanelFactory`/Abstract Factory centralizing screen construction; `CardLayout`; `JOptionPane` for any of the interactive screens (student chose full visual consistency instead).
+**Thread hand-off (EDT ↔ controller thread)**, identical pattern for every interactive method: `GuiView` creates a `CountDownLatch`/`BlockingQueue`, schedules the panel swap via `invokeLater`, then blocks (`.await()`/`.take()`) on the controller thread; button listeners on the EDT call `.countDown()`/`.put(...)`. `InterruptedException` always becomes `Thread.currentThread().interrupt()` + rethrow as `QuitException`. No `JOptionPane` used anywhere — every interactive screen is a custom `JPanel` for full visual consistency.
 
-**Done (fully wired in `GuiView`, working):**
+**Reused building blocks:** `HeroPanel` (stats card: name + stats grid + worn artifacts) is composed inside `LevelUpPanel`, `ConfirmPanel`, and each row of `SelectHeroPanel`. `YesNoButtonPanel` is composed inside `ArtifactPanel`, `RunPanel`, `ConfirmPanel`.
 
-- ✅ `showWelcome()` → `WelcomePanel` + `CountDownLatch`
-- ✅ `askNewGame()` → `NewOrLoadGamePanel` + `SynchronousQueue<Boolean>`
-- ✅ `selectHero(heroes)` → `SelectHeroPanel` (scrollable list of `HeroPanel` rows + select buttons) + `SynchronousQueue<Hero>`
-- ✅ `confirmHero(hero)` → `ConfirmPanel` (reuses `HeroPanel`) + `SynchronousQueue<Boolean>`
-- ✅ `showStartGame()` → log message
-- ✅ `askDirection()` → `DirectionPanel` + `LinkedBlockingQueue<Direction>`
-- ✅ `showEmptyStep()` → log message
-- ✅ `askFightMonster(monster)` → `RunPanel` + `SynchronousQueue<Boolean>`
-- ✅ `showRunSuccess(monster, success)` → log message
-- ✅ `showEndGame(win)` → `EndPanel` + `CountDownLatch` (also disposes the frame)
-- ✅ `showLevelUp(hero)` → `LevelUpPanel` (reuses `HeroPanel`) + `CountDownLatch`
-- ✅ `askKeepArtifact(artifact, hero)` → `ArtifactPanel` + `SynchronousQueue<Boolean>`
-- ✅ `showError(error)` → log message, styled distinctly (`setErrorLog`)
+**Interface change:** `GameView.showHeroStats(Hero)` was removed entirely — always used together with a yes/no confirmation in practice, so folded into `confirmHero(Hero)`.
 
-**Still `#todo` stubs in `GuiView` — only two left:**
+**Swing lessons learned (keep in mind if touched again):**
 
-- ❌ `createHero()` — currently returns a hardcoded `new Hero("hare5", HeroType.HARE)`
-- ❌ `showFightSummary(String, int)` — currently a no-op
+- `ButtonGroup` (mutual exclusion) + `JToggleButton` (persistent selected state) + `ItemListener`/`itemStateChanged` (fires for both the newly-selected **and** newly-deselected button) is the combo used in `NewHeroPanel` for the 3 `HeroType` buttons. A plain `ActionListener` does *not* work for this — it only fires for the button physically clicked, not the one a `ButtonGroup` silently deselects as a side effect.
+- On Windows, the native/default Look & Feel largely **ignores `setBackground()`/`setForeground()` on `JButton`/`JToggleButton`** (native chrome paints over custom colors). `NewHeroPanel` ended up using `setForeground()` only for selection styling. If background-color styling is needed again: either set a pure-Java L&F (`UIManager.setLookAndFeel(Metal/Nimbus...)`, once at startup) or use a `Border` instead (reliably painted by Swing regardless of L&F — see `ArtifactPanel`/`RunPanel`'s `BorderFactory.createLineBorder(...)`).
+- Considered and rejected (don't re-suggest unless asked): `SwingWorker` for icon loading; a centralized `PanelFactory`/Abstract Factory for screen construction; `CardLayout`.
 
-### 🔄 Step-by-step plan for the rest of Fase 6
-
-Almost there — just two methods and then an end-to-end test:
-
-1. **`showFightSummary(fightSummary, xpGained)`** — do this first, it's the easy one: a log message, exactly the same pattern as `showRunSuccess`/`showEmptyStep`/`showStartGame` (`panel.setLog(...)` with the formatted text). No new panel needed.
-2. **`createHero()`** — the last real screen to build: needs actual text/dropdown input (name + `HeroType`), unlike every other screen so far which was just buttons. A `JTextField` for the name + `JComboBox<HeroType>` (or 3 buttons, one per type — consistent with how `NewOrLoadGamePanel` used 2 plain buttons instead of a dropdown) stacked with `BoxLayout`, plus a submit button. Returns a `Hero` via a `BlockingQueue<Hero>`, same hand-off pattern as every other screen. Note: validation (`@Valid`/Hibernate Validator) happens in the controller, not the view — `createHero()` just needs to collect and return the raw input; if it's invalid, `showError(...)` fires and `createHero()` gets called again by the controller (confirm this loop still matches `GameController.createValidHero()`).
-3. **End-to-end test**: `GameController` needs zero changes (confirmed — it only calls `view.xxx()`, doesn't know it's Swing). Run `java -jar target/mazie.jar gui` and manually walk through every scenario already verified for `TerminalView`: new game → create hero → confirm → play → empty steps → fight/run → level up → artifact drop → win/lose → relaunch → load game → select existing hero → confirm → play again.
-4. **Once step 3 passes**: Fase 6 (and the whole mandatory subject checklist) is done. Revisit the "Still open / low priority" list below only after that.
-
-### Still open / low priority, not blocking Fase 6
+### Still open / low priority, not blocking anything
 
 - **Submission hygiene** in `GameController`: remove debug `System.out.println`s in `setup()`, `gameLoop()`, `turn()` (and in `GameEngine.fightRound()`); verify `>` vs `>=` boundary in `Hero.gainXp()`.
-- **Ctrl+C (SIGINT) mid-game**: currently only EOF (Ctrl+D) is caught via `QuitException`; SIGINT isn't handled at all and will kill the JVM without persisting. Decide if a `Runtime.getRuntime().addShutdownHook(...)` is worth adding, or leave out of scope. Note: `GuiView`'s blocking calls already rethrow `InterruptedException` as `QuitException`, so a shutdown hook that interrupts the controller thread would already propagate correctly through existing exception handling.
-- **`MonsterFactory` refactor** (nice-to-have, see dedicated section below) — cosmetic gameplay-variance polish, not a requirement. Do not start before Fase 6 is fully done and tested.
+- **Ctrl+C (SIGINT) mid-game**: currently only EOF (Ctrl+D) is caught via `QuitException`; SIGINT isn't handled at all and will kill the JVM without persisting. Decide if a `Runtime.getRuntime().addShutdownHook(...)` is worth adding, or leave out of scope. `GuiView`'s blocking calls already rethrow `InterruptedException` as `QuitException`, so a shutdown hook that interrupts the controller thread would already propagate correctly.
+- **`MonsterFactory` refactor** (nice-to-have, see dedicated section below) — cosmetic gameplay-variance polish, not a requirement.
 
 ---
 
 ## NICE-TO-HAVE — MonsterFactory refactor (not started, low priority)
 
-**⚠️ Do not start this before Fase 6 (SwingView) is fully done and tested.** This is polish, not a requirement — the game already works and is balanced without it.
+**⚠️ Purely optional polish, not a subject requirement.** The game already works and is balanced without it.
 
 **Why this idea came up:** balance-testing revealed that FROG/HARE die in a very narrow, predictable level range (their fights resolve in few rounds → low variance → outcomes cluster tightly), while BEAR (many rounds per fight due to low attack) naturally has a much wider death-level spread from pure RNG variance. Giving each monster *species* (not just each tier) its own stat profile — e.g. a capybara is a tank (high defence/hp, lower attack), a mosquito is a glass cannon (low defence, decent attack) — would introduce natural per-encounter variance for fast fighters too, without bolting on a generic random multiplier.
 
@@ -130,8 +104,6 @@ Almost there — just two methods and then an end-to-end test:
 **Still to decide (student's call, not the agent's):** the exact attack/defence/hp multiplier per species — e.g. capybara = tank archetype, mosquito = glass cannon archetype. Suggested starting point discussed but not committed to numbers yet.
 
 ---
-
-
 
 ## Fase 3 — Persistence, final implementation reference
 
@@ -202,7 +174,7 @@ artifact(id, name, type, value, hero_id → hero.id)
 
 - [x] MVC architecture (Model/View/Controller clearly separated)
 - [x] Launch with `java -jar mazie.jar console`
-- [ ] Launch with `java -jar mazie.jar gui` — *SwingView nearly done (Fase 6): only `createHero()` and `showFightSummary()` still stubbed, everything else wired and working, see step-by-step plan above*
+- [x] Launch with `java -jar mazie.jar gui` — *Fase 6 done, full manual end-to-end playthrough verified 2026-07-05*
 - [x] Build with `mvn clean package` → produces runnable jar
 - [x] No external libraries except Hibernate Validator + SQLite (SQLite justified as bonus DB library)
 - [x] Hero persistence (load on start, save on exit) — *wired in Fase 5, per-path saves matching the drawio*
@@ -234,4 +206,4 @@ artifact(id, name, type, value, hero_id → hero.id)
 
 `Mazie.drawio` still matches the intended design well — no redraw needed. One deliberate deviation from the literal diagram, worth knowing before touching persistence code again: the diagram shows a dashed "save hero with new xp" arrow after the border-of-map win check, plus a *separate* "save artifact" step after "keep?". The implementation simplifies this to a single `repository.update(hero)` call per event (win, or end of a won fight) instead of saving incrementally at every sub-step — acceptable since the subject has no mid-game crash-durability requirement.
 
-Remaining open question from the diagram's own "MY CURRENT QUESTIONS" box: how to handle Ctrl+C (SIGINT) mid-game — see next-session priority #7 above.
+Remaining open question from the diagram's own "MY CURRENT QUESTIONS" box: how to handle Ctrl+C (SIGINT) mid-game — see "Still open / low priority" list above.
