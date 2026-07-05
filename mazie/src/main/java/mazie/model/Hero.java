@@ -132,6 +132,11 @@ public class Hero {
         return (this.weapon == null) ? this.attack : this.attack + this.weapon.value();
     }
 
+    public String getAttackString() {
+        final var bonus = (this.weapon == null) ? 0 : this.weapon.value();
+        return ("%d (%d + %d)".formatted(this.getTotalAttack(), this.getAttack(), bonus));
+    }
+
     public void setAttack(int attack) {
         this.attack = attack;
     }
@@ -144,6 +149,11 @@ public class Hero {
         return (this.armour == null) ? this.defence : this.defence + this.armour.value();
     }
 
+    public String getDefenceString() {
+        final var bonus = (this.armour == null) ? 0 : this.armour.value();
+        return ("%d (%d + %d)".formatted(this.getTotalDefence(), this.getDefence(), bonus));
+    }
+
     public void setDefence(int defence) {
         this.defence = defence;
     }
@@ -154,6 +164,11 @@ public class Hero {
 
     public int getTotalHp() {
         return (this.helmet == null) ? this.hp : this.hp + this.helmet.value();
+    }
+
+    public String getHpString() {
+        final var bonus = (this.helmet == null) ? 0 : this.helmet.value();
+        return ("%d (%d + %d)".formatted(this.getTotalHp(), this.getHp(), bonus));
     }
 
     public void setHp(int hp) {

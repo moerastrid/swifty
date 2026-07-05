@@ -8,7 +8,7 @@ import java.util.concurrent.SynchronousQueue;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
+import static javax.swing.SwingUtilities.invokeLater;
 
 import mazie.exception.QuitException;
 import mazie.model.Artifact;
@@ -30,20 +30,18 @@ public class GuiView implements GameView {
         this.frame = initFrame();
         this.frame.getContentPane().add(this.panel);
 
-        SwingUtilities.invokeLater(()
-                -> this.frame.setVisible(true));
+        invokeLater(() -> this.frame.setVisible(true));
     }
 
     private JFrame initFrame() {
         final var fr = new JFrame(TITLE);
+        final var path = getClass().getResource("/mazie-icon.png");
+        final var icon = new ImageIcon(path);
+
         fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         fr.setSize(800, 600);
         fr.setLayout(new BorderLayout(10, 10));
         fr.setLocationRelativeTo(null);
-
-        final var path = getClass().getResource("/mazie-icon.png");
-        final var icon = new ImageIcon(path);
-
         fr.setIconImage(icon.getImage());
         return fr;
     }
@@ -59,10 +57,7 @@ public class GuiView implements GameView {
     public void showWelcome() {
         final var latch = new CountDownLatch(1);
 
-        SwingUtilities.invokeLater(() -> {
-            panel.setWelcomePanel(latch);
-        });
-
+        invokeLater(() -> panel.setWelcomePanel(latch));
         try {
             latch.await();
         } catch (InterruptedException e) {
@@ -108,18 +103,14 @@ public class GuiView implements GameView {
     // show that the game is starting
     @Override
     public void showStartGame() {
-
-        // #todo implement
+        invokeLater(() -> panel.setStartGame());
     }
 
     @Override
     public Direction askDirection() {
         final var queue = new LinkedBlockingQueue<Direction>();
 
-        SwingUtilities.invokeLater(() -> {
-            panel.setDirectionPanel(queue);
-        });
-
+        invokeLater(() -> panel.setDirectionPanel(queue));
         try {
             return queue.take();
         } catch (InterruptedException e) {
@@ -128,43 +119,42 @@ public class GuiView implements GameView {
         }
     }
 
-    // if no monster, show user took a step
     @Override
     public void showEmptyStep() {
-        SwingUtilities.invokeLater(() -> {
-            panel.setEmptyStep();
-        });
+        invokeLater(() -> panel.setEmptyStep());
     }
 
     // show monster, ask if user wants to fight or run
     @Override
     public boolean askFightMonster(Monster monster) {
-        // #todo implement
-        return false;
+        final var queue = new SynchronousQueue<Boolean>();
+
+        invokeLater(() -> panel.setRunPanel(monster, queue));
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        }
     }
 
-    // show if run attempt from monster was succesfull
     @Override
     public void showRunSuccess(Monster monster, boolean success) {
-        // #todo implement
+        invokeLater(() -> panel.setRunSucces(monster, success));
     }
 
-    // show that the game ended, because either user is at map edge (win) or defeated by a monster (dead)
     @Override
     public void showEndGame(boolean win) {
         final var latch = new CountDownLatch(1);
 
-        SwingUtilities.invokeLater(() -> {
-            panel.setEndPanel(latch, win);
-        });
-
+        invokeLater(() -> panel.setEndPanel(latch, win));
         try {
             latch.await();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new QuitException("thread interruption", e);
         } finally {
-            SwingUtilities.invokeLater(() -> {
+            invokeLater(() -> {
                 this.frame.setVisible(false);
                 this.frame.dispose();
             });
@@ -180,21 +170,21 @@ public class GuiView implements GameView {
     // show hero stats + congratz blabla
     @Override
     public void showLevelUp(Hero hero) {
-        // #todo implement
+        final var latch = new CountDownLatch(1);
+        invokeLater(() -> panel.setLevelUp(hero, latch));
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        }
     }
 
-    // show artifact, ask if user wants to keep it, show current hero (+ artifacts) too so user can make choise
     @Override
     public boolean askKeepArtifact(Artifact artifact, Hero hero) {
-        if (artifact == null || hero == null)
-            return false;
-
         final var queue = new SynchronousQueue<Boolean>();
 
-        SwingUtilities.invokeLater(() -> {
-            panel.setArtifactPanel(artifact, hero, queue);
-        });
-
+        invokeLater(() -> panel.setArtifactPanel(artifact, hero, queue));
         try {
             return queue.take();
         } catch (InterruptedException e) {
@@ -202,5 +192,4 @@ public class GuiView implements GameView {
             throw new QuitException("thread interruption", e);
         }
     }
-
 }

@@ -13,18 +13,18 @@ public class YesNoButtonPanel extends JPanel {
         final var yesButton = new YesNoButton(true);
         final var noButton = new YesNoButton(false);
         
-        setListener(yesButton, true, queue);
-        setListener(noButton, false, queue);
+        setListener(yesButton, queue);
+        setListener(noButton, queue);
 
         this.setLayout(new FlowLayout());
         this.add(yesButton);
         this.add(noButton);
     }
 
-    private void setListener(JButton button, Object value, BlockingQueue queue) {
+    private void setListener(YesNoButton button, BlockingQueue<Boolean> queue) {
         button.addActionListener(event -> {
             try {
-                queue.put(value);
+                queue.put(button.getYes());
             }  catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.out.println("gui view interrupted: " + e.getMessage());
