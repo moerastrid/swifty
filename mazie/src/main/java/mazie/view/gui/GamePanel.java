@@ -1,6 +1,7 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
+import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
@@ -11,6 +12,9 @@ import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.Monster;
+import static mazie.view.gui.ThemeColor.BLACK;
+import static mazie.view.gui.ThemeColor.WHITE;
+import static mazie.view.gui.ThemeColor.YELLOW;
 
 // gamePanel is persistent. hierin zitten kleinere panels die je kunt afwisselen, geloof ik?
 public class GamePanel extends JPanel {
@@ -23,6 +27,10 @@ public class GamePanel extends JPanel {
         this.setBackground(ThemeColor.LILA);
     }
 
+    public void setError(String error) {
+        this.setErrorLog(error);
+    }
+
     public void setWelcomePanel(CountDownLatch latch) {
         this.setSubPanel(new WelcomePanel(latch));
     }
@@ -32,11 +40,11 @@ public class GamePanel extends JPanel {
     }
 
     public void setEmptyStep() {
-        setLog(new JLabel("nothing here", JLabel.CENTER));
+        setLog("nothing here");
     }
 
     public void setStartGame() {
-        setLog(new JLabel("entering the maze...", JLabel.CENTER));
+        setLog("entering the maze...");
     }
 
     public void setLevelUp(Hero hero, CountDownLatch latch) {
@@ -45,7 +53,7 @@ public class GamePanel extends JPanel {
 
     public void setRunSucces(Monster monster, boolean success) {
         final var text = success ? "You've escaped! That %s got nothing on you" : "You lock eyes with the %s, there's no escaping now...";
-        setLog(new JLabel(text.formatted(monster.getName()), JLabel.CENTER));
+        setLog(text.formatted(monster.getName()));
     }
 
     public void setDirectionPanel(BlockingQueue<Direction> queue) {
@@ -62,6 +70,20 @@ public class GamePanel extends JPanel {
         this.setSubPanel(new RunPanel(monster, queue));
     }
 
+    public void setNewOrLoadGamePanel(BlockingQueue<Boolean> queue) {
+        // this.clearLog();
+        this.setSubPanel(new NewOrLoadGamePanel(queue));
+    }
+
+    public void setSelectHeroPanel(Map<Integer, Hero> heroes, BlockingQueue<Hero> queue) {
+        this.setSubPanel(new SelectHeroPanel(heroes, queue));
+    }
+
+    public void setConfirmPanel(Hero hero, BlockingQueue<Boolean> queue) {
+        this.clearLog();
+        this.setSubPanel(new ConfirmPanel(hero, queue));
+    }
+
     private void setSubPanel(JPanel screen) {
         if (subPanel != null) {
             this.remove(subPanel);
@@ -72,11 +94,25 @@ public class GamePanel extends JPanel {
         this.repaint();
     }
 
-    private void setLog(JLabel label) {
+    private void setLog(String text) {
         if (log != null) {
             this.remove(log);
         }
-        log = label;
+        log = new JLabel(text, JLabel.CENTER);
+        log.setForeground(WHITE);
+        this.add(log, BorderLayout.SOUTH);
+        this.revalidate();
+        this.repaint();
+    }
+
+    private void setErrorLog(String text) {
+        if (log != null) {
+            this.remove(log);
+        }
+        log = new JLabel(text, JLabel.CENTER);
+        log.setForeground(BLACK);
+        log.setBackground(YELLOW);
+        log.setOpaque(true);
         this.add(log, BorderLayout.SOUTH);
         this.revalidate();
         this.repaint();

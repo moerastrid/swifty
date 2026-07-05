@@ -23,14 +23,17 @@ public class HeroPanel extends JPanel {
 
         final var name = new JLabel(hero.getName(), JLabel.CENTER);
         name.setForeground(PURPLE);
+        name.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(name, BorderLayout.NORTH);
 
         this.add(this.statsPanel(hero), BorderLayout.CENTER);
 
-        final var artifacts = hero.getArtifacts().stream().map(a -> a.toString()).toList();
+        final var artifacts = hero.getArtifacts().stream().map(a -> "%s(%d)".formatted(a.name(), a.value())).toList();
+
         final var info = artifacts.isEmpty() ? "nothing" : String.join("\n - ", artifacts);
         final var current = new JTextArea("\ncurrently wearing:\n\n - %s".formatted(info));
         current.setBackground(GREY);
+        current.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(current, BorderLayout.SOUTH);
     }
 

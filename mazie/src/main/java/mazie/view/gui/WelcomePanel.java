@@ -22,7 +22,6 @@ public class WelcomePanel extends JPanel {
 
         final var image = new ImageIcon(getClass().getResource("/mazie-logo.png"));
         final var imageLabel = new JLabel(image);
-        imageLabel.setForeground(PURPLE);
         this.add(imageLabel, BorderLayout.CENTER);
 
         final var startButton = new JButton("Start");

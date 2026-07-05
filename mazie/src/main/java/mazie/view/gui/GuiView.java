@@ -46,11 +46,9 @@ public class GuiView implements GameView {
         return fr;
     }
 
-    // in case of error (invalid input for example)
     @Override
     public void showError(String error) {
-
-        //#todo implement
+        invokeLater(() -> panel.setError(error));
     }
 
     @Override
@@ -66,11 +64,17 @@ public class GuiView implements GameView {
         }
     }
 
-    // ask if the user wants to start a new game or load existing one. only prompted if existing heroes are present
     @Override
     public boolean askNewGame() {
-        // #todo implement
-        return false;
+        final var queue = new SynchronousQueue<Boolean>();
+
+        invokeLater(() -> panel.setNewOrLoadGamePanel(queue));
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        }
     }
 
     // create new hero
@@ -83,15 +87,31 @@ public class GuiView implements GameView {
     // select existing hero from list (only prompted if list is not empty)
     @Override
     public Hero selectHero(Map<Integer, Hero> heroes) {
+        final var queue = new SynchronousQueue<Hero>();
+
+        invokeLater(() -> panel.setSelectHeroPanel(heroes, queue));
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        }
+
         // #todo implement
-        return new Hero(9, "hare5", HeroType.HARE, 1, 220, 15, 6, 78);
+        // return new Hero(9, "hare5", HeroType.HARE, 1, 220, 15, 6, 78);
     }
 
-    // show stats of selected hero, confirm choice
     @Override
     public boolean confirmHero(Hero hero) {
-        // #todo implement
-        return Boolean.TRUE;
+        final var queue = new SynchronousQueue<Boolean>();
+
+        invokeLater(() -> panel.setConfirmPanel(hero, queue));
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        }
     }
 
     // show stats of selected hero

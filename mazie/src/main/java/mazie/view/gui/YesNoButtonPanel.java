@@ -3,8 +3,9 @@ package mazie.view.gui;
 import java.awt.FlowLayout;
 import java.util.concurrent.BlockingQueue;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
+
+import static mazie.view.gui.ThemeColor.GREY;
 
 public class YesNoButtonPanel extends JPanel {
 
@@ -17,6 +18,7 @@ public class YesNoButtonPanel extends JPanel {
         setListener(noButton, queue);
 
         this.setLayout(new FlowLayout());
+        this.setBackground(GREY);
         this.add(yesButton);
         this.add(noButton);
     }

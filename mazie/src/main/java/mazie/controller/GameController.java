@@ -1,10 +1,14 @@
 package mazie.controller;
 
+import java.util.Collections;
+import java.util.Map;
+
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import mazie.exception.QuitException;
+import mazie.exception.RepositoryException;
 import mazie.game.GameEngine;
 import mazie.model.Hero;
 import mazie.repository.HeroRepository;
@@ -41,10 +45,14 @@ public class GameController {
                 return;
             }
 
-            if (hero.getId() == 0) {
-                repository.save(hero);
-            } else {
-                repository.update(hero);
+            try {
+                if (hero.getId() == 0) {
+                    repository.save(hero);
+                } else {
+                    repository.update(hero);
+                }
+            } catch (RepositoryException ex) {
+                System.err.println("[WARNIGN]" + ex.getMessage());
             }
         }
     }
@@ -52,7 +60,14 @@ public class GameController {
     private Hero setup() {
 
         // #todo: alleen als er helden zijn om te laten, vragen of user een nieuwe game wil beginnen. Nu geen repo dus altijd true?
-        final var heroes = repository.loadAllHeroes();
+        
+        Map<Integer, Hero> heroes = Collections.emptyMap();
+        try {
+            heroes = repository.loadAllHeroes();
+        } catch (RepositoryException e) {
+            view.showError(e.getMessage());
+        }
+
 
         boolean newGame = false;
         if (heroes == null || heroes.isEmpty()) {
@@ -79,7 +94,12 @@ public class GameController {
             System.out.println("the chosen one:"); //#todo remove (debugging)
             System.out.println(hero); //#todo remove (debugging)
             if (hero.getId() == 0) {
-                repository.save(hero);
+                try {
+                    repository.save(hero);
+                } catch (RepositoryException e) {
+                    view.showError("try again: " + e.getMessage());
+                    return setup();
+                }
             }
             return hero;
         }
@@ -115,7 +135,11 @@ public class GameController {
 
             if (engine.win()) {
                 playing = false;
-                repository.update(hero);
+                try {
+                    repository.update(hero);
+                } catch (RepositoryException e) {
+                    view.showError(e.getMessage());
+                }
                 view.showEndGame(true);
             }
         }
@@ -144,7 +168,11 @@ public class GameController {
 
         if (!result.win()) {
             view.showEndGame(false);
-            repository.delete(hero);
+            try {
+                repository.delete(hero);
+            } catch (RepositoryException e) {
+                view.showError(e.getMessage());
+            }
             return false;
         }
 
@@ -160,7 +188,11 @@ public class GameController {
                 hero.setArtifact(result.drop());
             }
         }
-        repository.update(hero);
+        try {
+            repository.update(hero);
+        } catch (RepositoryException e) {
+            view.showError(e.getMessage());
+        }
         return true;
     }
 

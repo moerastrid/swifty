@@ -3,6 +3,8 @@ package mazie.view.gui;
 import javax.swing.JButton;
 
 import mazie.model.Direction;
+import static mazie.view.gui.ThemeColor.TEAL;
+import static mazie.view.gui.ThemeColor.YELLOW;
 
 public class DirectionButton extends JButton {
 
@@ -12,8 +14,8 @@ public class DirectionButton extends JButton {
         this.dir = dir;
         this.setText(dir.toString().toLowerCase());
         final var color = switch (dir) {
-            case NORTH, SOUTH -> ThemeColor.YELLOW;
-            case EAST, WEST -> ThemeColor.TEAL;
+            case NORTH, SOUTH -> YELLOW;
+            case EAST, WEST -> TEAL;
         };
         this.setBackground(color);
     }
