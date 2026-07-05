@@ -80,11 +80,17 @@ public class GuiView implements GameView {
     // create new hero
     @Override
     public Hero createHero() {
-        // #todo implement
-        return new Hero("hare5", HeroType.HARE);
+        final var queue = new SynchronousQueue<Hero>();
+
+        invokeLater(() -> panel.setNewHeroPanel(queue));
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        }
     }
 
-    // select existing hero from list (only prompted if list is not empty)
     @Override
     public Hero selectHero(Map<Integer, Hero> heroes) {
         final var queue = new SynchronousQueue<Hero>();
@@ -96,9 +102,6 @@ public class GuiView implements GameView {
             Thread.currentThread().interrupt();
             throw new QuitException("thread interruption", e);
         }
-
-        // #todo implement
-        // return new Hero(9, "hare5", HeroType.HARE, 1, 220, 15, 6, 78);
     }
 
     @Override
@@ -114,13 +117,6 @@ public class GuiView implements GameView {
         }
     }
 
-    // show stats of selected hero
-    @Override
-    public void showHeroStats(Hero hero) {
-        // #todo implement
-    }
-
-    // show that the game is starting
     @Override
     public void showStartGame() {
         invokeLater(() -> panel.setStartGame());
@@ -144,7 +140,6 @@ public class GuiView implements GameView {
         invokeLater(() -> panel.setEmptyStep());
     }
 
-    // show monster, ask if user wants to fight or run
     @Override
     public boolean askFightMonster(Monster monster) {
         final var queue = new SynchronousQueue<Boolean>();
@@ -187,7 +182,6 @@ public class GuiView implements GameView {
         // #todo implement
     }
 
-    // show hero stats + congratz blabla
     @Override
     public void showLevelUp(Hero hero) {
         final var latch = new CountDownLatch(1);

@@ -96,8 +96,7 @@ public class TerminalView implements GameView {
         return choose(prompt, YES_NO);
     }
 
-    @Override
-    public void showHeroStats(Hero hero) {
+    private void showHeroStats(Hero hero) {
 
         final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(a -> a.toString()).toList());
 

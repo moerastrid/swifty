@@ -88,8 +88,6 @@ public class GameController {
             hero = createValidHero();
         }
 
-        view.showHeroStats(hero);
-
         if (view.confirmHero(hero)) {
             System.out.println("the chosen one:"); //#todo remove (debugging)
             System.out.println(hero); //#todo remove (debugging)
@@ -126,8 +124,6 @@ public class GameController {
         view.showStartGame();
 
         while (playing) {
-            System.out.println("this is hero:"); //#todo remove
-            view.showHeroStats(hero); //#todo remove
 
             System.out.println("current map:\n" + engine.getMapString()); //#todo remove
 

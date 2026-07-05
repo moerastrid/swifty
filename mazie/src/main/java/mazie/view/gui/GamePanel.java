@@ -75,6 +75,10 @@ public class GamePanel extends JPanel {
         this.setSubPanel(new NewOrLoadGamePanel(queue));
     }
 
+    public void setNewHeroPanel(BlockingQueue<Hero> queue) {
+        this.setSubPanel(new NewHeroPanel(queue));
+    }
+
     public void setSelectHeroPanel(Map<Integer, Hero> heroes, BlockingQueue<Hero> queue) {
         this.setSubPanel(new SelectHeroPanel(heroes, queue));
     }

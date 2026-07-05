@@ -27,9 +27,6 @@ public interface GameView {
     // show stats of selected hero, confirm choice
     public boolean confirmHero(Hero hero);
 
-    // show stats of selected hero
-    public void showHeroStats(Hero hero);
-
     // show that the game is starting
     public void showStartGame();
 
