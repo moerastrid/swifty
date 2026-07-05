@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -21,16 +22,16 @@ public class GuiView implements GameView {
 
     private static final String TITLE = "Mazie - an a-maze-ing RPG";
 
-    private JFrame frame;
-    private GamePanel panel;
+    private final JFrame frame;
+    private final GamePanel panel;
 
     public GuiView() {
-        panel = new GamePanel();
-        frame = initFrame();
-        frame.getContentPane().add(panel);
+        this.panel = new GamePanel();
+        this.frame = initFrame();
+        this.frame.getContentPane().add(this.panel);
 
         SwingUtilities.invokeLater(()
-                -> frame.setVisible(true));
+                -> this.frame.setVisible(true));
     }
 
     private JFrame initFrame() {
@@ -107,6 +108,7 @@ public class GuiView implements GameView {
     // show that the game is starting
     @Override
     public void showStartGame() {
+
         // #todo implement
     }
 
@@ -129,7 +131,9 @@ public class GuiView implements GameView {
     // if no monster, show user took a step
     @Override
     public void showEmptyStep() {
-        // #todo implement
+        SwingUtilities.invokeLater(() -> {
+            panel.setEmptyStep();
+        });
     }
 
     // show monster, ask if user wants to fight or run
@@ -148,7 +152,23 @@ public class GuiView implements GameView {
     // show that the game ended, because either user is at map edge (win) or defeated by a monster (dead)
     @Override
     public void showEndGame(boolean win) {
-        // #todo implement
+        final var latch = new CountDownLatch(1);
+
+        SwingUtilities.invokeLater(() -> {
+            panel.setEndPanel(latch, win);
+        });
+
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        } finally {
+            SwingUtilities.invokeLater(() -> {
+                this.frame.setVisible(false);
+                this.frame.dispose();
+            });
+        }
     }
 
     // fightsummary has a string with what happened during the fight + how much xp was gained. only called when user won.
@@ -166,8 +186,21 @@ public class GuiView implements GameView {
     // show artifact, ask if user wants to keep it, show current hero (+ artifacts) too so user can make choise
     @Override
     public boolean askKeepArtifact(Artifact artifact, Hero hero) {
-        // #todo implement
-        return false;
+        if (artifact == null || hero == null)
+            return false;
+
+        final var queue = new SynchronousQueue<Boolean>();
+
+        SwingUtilities.invokeLater(() -> {
+            panel.setArtifactPanel(artifact, hero, queue);
+        });
+
+        try {
+            return queue.take();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption", e);
+        }
     }
 
 }
