@@ -63,7 +63,7 @@ public class Hero {
 
         this.xp += xp;
 
-        if (this.xp > xpNeed) {
+        if (this.xp >= xpNeed) {
             this.xp -= xpNeed;
             return lvlUp();
         }

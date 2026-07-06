@@ -1,6 +1,8 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -14,7 +16,6 @@ import mazie.exception.QuitException;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
-import mazie.model.HeroType;
 import mazie.model.Monster;
 import mazie.view.GameView;
 
@@ -22,10 +23,12 @@ public class GuiView implements GameView {
 
     private static final String TITLE = "Mazie - an a-maze-ing RPG";
 
+    private final Thread controllerThread;
     private final JFrame frame;
     private final GamePanel panel;
 
     public GuiView() {
+        this.controllerThread = Thread.currentThread();
         this.panel = new GamePanel();
         this.frame = initFrame();
         this.frame.getContentPane().add(this.panel);
@@ -38,7 +41,14 @@ public class GuiView implements GameView {
         final var path = getClass().getResource("/mazie-icon.png");
         final var icon = new ImageIcon(path);
 
-        fr.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        fr.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                controllerThread.interrupt();
+                fr.dispose();
+            }
+        });
         fr.setSize(800, 600);
         fr.setLayout(new BorderLayout(10, 10));
         fr.setLocationRelativeTo(null);
@@ -59,7 +69,7 @@ public class GuiView implements GameView {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }
@@ -72,7 +82,7 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }
@@ -85,7 +95,7 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }
@@ -98,7 +108,7 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }
@@ -111,7 +121,7 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }
@@ -129,7 +139,7 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }
@@ -147,7 +157,7 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }
@@ -165,7 +175,7 @@ public class GuiView implements GameView {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         } finally {
             invokeLater(() -> {
@@ -188,7 +198,7 @@ public class GuiView implements GameView {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }
@@ -201,7 +211,7 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            controllerThread.interrupt();
             throw new QuitException("thread interruption", e);
         }
     }

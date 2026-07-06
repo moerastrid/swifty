@@ -65,7 +65,7 @@ public class GamePanel extends JPanel {
     }
 
     public void setArtifactPanel(Artifact artifact, Hero hero, BlockingQueue<Boolean> queue) {
-        this.clearLog();
+        // this.clearLog();
         this.setSubPanel(new ArtifactPanel(artifact, hero, queue));
     }
 

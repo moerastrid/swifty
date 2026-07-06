@@ -11,9 +11,6 @@ public class Main {
 
     public static void main(final String[] args) {
         final var console = parse(args);
-
-        System.out.println("hoi :)");
-
         GameView view;
 
         if (console) {

@@ -24,21 +24,21 @@ public class SQLiteHeroRepository implements HeroRepository {
     private static final String CREATE_HERO_TABLE_SQL = """
             CREATE TABLE IF NOT EXISTS hero(
                 id      INTEGER PRIMARY KEY AUTOINCREMENT,
-                name    TEXT NOT NULL UNIQUE,
+                name    TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 2 AND 30),
                 type    TEXT NOT NULL CHECK(type IN ('FROG', 'HARE', 'BEAR')),
-                level   INTEGER,
-                xp      INTEGER,
-                attack  INTEGER,
-                defence INTEGER,
-                hp      INTEGER
+                level   INTEGER NOT NULL CHECK(level >= 1),
+                xp      INTEGER NOT NULL CHECK(xp >= 0),
+                attack  INTEGER NOT NULL CHECK(attack >= 0),
+                defence INTEGER NOT NULL CHECK(defence >= 0),
+                hp      INTEGER NOT NULL
             );
         """;
     private static final String CREATE_ARTIFACT_TABLE_SQL = """
             CREATE TABLE IF NOT EXISTS artifact(
                 id      INTEGER PRIMARY KEY AUTOINCREMENT,
-                name    TEXT,
-                type    TEXT CHECK(type IN ('WEAPON', 'HELMET', 'ARMOUR')),
-                value   INTEGER,
+                name    TEXT NOT NULL,
+                type    TEXT NOT NULL CHECK(type IN ('WEAPON', 'HELMET', 'ARMOUR')),
+                value   INTEGER NOT NULL CHECK(value >= 0),
                 hero_id INTEGER NOT NULL,
                 FOREIGN KEY(hero_id) REFERENCES hero(id)
             );

@@ -1,5 +1,6 @@
 package mazie.view.gui;
 
+import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.util.concurrent.BlockingQueue;
@@ -32,10 +33,25 @@ public class NewHeroPanel extends JPanel {
 
         this.add(typeButtons());
 
-        final var nameField = new JTextField(30);
-        this.add(nameField);
+        final var nameField = new JTextField();
+        this.add(namePanel(nameField));
 
         this.add(okButton(nameField, queue));
+    }
+
+    private JPanel namePanel(JTextField nameField) {
+        final var panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        panel.setBackground(TEAL);
+        panel.setLayout(new BorderLayout());
+
+        final var nameLabel = new JLabel("give it a name: ", JLabel.CENTER);
+        panel.add(nameLabel, BorderLayout.NORTH);
+
+        nameField.setHorizontalAlignment(JTextField.CENTER);
+        panel.add(nameField, BorderLayout.CENTER);
+
+        return panel;
     }
 
     private JPanel typeButtons() {

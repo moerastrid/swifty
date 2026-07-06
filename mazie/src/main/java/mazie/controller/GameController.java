@@ -60,14 +60,12 @@ public class GameController {
     private Hero setup() {
 
         // #todo: alleen als er helden zijn om te laten, vragen of user een nieuwe game wil beginnen. Nu geen repo dus altijd true?
-        
         Map<Integer, Hero> heroes = Collections.emptyMap();
         try {
             heroes = repository.loadAllHeroes();
         } catch (RepositoryException e) {
             view.showError(e.getMessage());
         }
-
 
         boolean newGame = false;
         if (heroes == null || heroes.isEmpty()) {
@@ -163,13 +161,19 @@ public class GameController {
         System.out.println("fight result\nwin: %s\nlvlup: %s\ndrop: %s".formatted(result.win(), result.levelup(), result.drop()));
 
         if (!result.win()) {
-            view.showEndGame(false);
             try {
                 repository.delete(hero);
             } catch (RepositoryException e) {
                 view.showError(e.getMessage());
             }
+            view.showEndGame(false);
             return false;
+        } else {
+            try {
+                repository.update(hero);
+            } catch (RepositoryException e) {
+                view.showError(e.getMessage());
+            }
         }
 
         view.showFightSummary("the fight ended", monster.getXpReward());
@@ -182,13 +186,14 @@ public class GameController {
             final var keep = view.askKeepArtifact(result.drop(), hero);
             if (keep) {
                 hero.setArtifact(result.drop());
+                try {
+                    repository.update(hero);
+                } catch (RepositoryException e) {
+                    view.showError(e.getMessage());
+                }
             }
         }
-        try {
-            repository.update(hero);
-        } catch (RepositoryException e) {
-            view.showError(e.getMessage());
-        }
+        
         return true;
     }
 

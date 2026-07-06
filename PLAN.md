@@ -4,7 +4,7 @@
 
 - **Subject PDF**: `swingy.en.subject.pdf` in the root of this repo — this is the ULTIMATE source of truth for requirements.
 - **Flowchart**: `Mazie.drawio` in the root — student's own design, used to derive the GameView interface. Open with draw.io desktop or diagrams.net.
-- **This file**: current plan, to be updated as work progresses.
+- **This file**: current plan + wishlist, kept up to date by the agent as work progresses. This is the plan, not a changelog — finished work is summarized briefly, not narrated in detail. Detailed rationale for decisions that are done and settled belongs in memory (`/memories/repo/`) or git history, not here.
 
 ---
 
@@ -49,139 +49,138 @@ java -jar target/mazie.jar gui
 
 ---
 
-## Current status
+## Current status (re-verified 2026-07-06)
 
-Fases 1-5 and 7 (model/validation, `GameView` interface, SQLite persistence layer, `TerminalView`, `GameController` wiring, `Main`/args parsing) are **done**. Console mode (`java -jar target/mazie.jar console`) is fully playable end-to-end: create/select hero → persist → play → win/lose/quit → persist again.
+The entire **mandatory checklist is done and re-verified against the subject PDF + a fresh code read** (see checklist below — every item confirmed in code, not just assumed). Console and GUI modes are both fully playable end-to-end. Bonus: SQLite persistence is done; runtime console/GUI switching is not.
 
-**Fase 6 — SwingView is DONE (2026-07-05).** Every `GameView` method is implemented in `GuiView`/`GamePanel`, project compiles clean, and the full manual end-to-end playthrough of `java -jar target/mazie.jar gui` has been verified by the student (new game → create hero → confirm → play → empty steps → fight/run → level up → artifact drop → win/lose → relaunch → load game → select existing hero → confirm → play again — all working). **The entire mandatory subject checklist is now done.** Remaining work on this project is optional polish only (see "Still open / low priority" below).
-
-### GUI architecture reference (for peer-evaluation defense)
-
-Files: `mazie/src/main/java/mazie/view/gui/` → `GuiView.java`, `GamePanel.java`, `WelcomePanel.java`, `NewOrLoadGamePanel.java`, `SelectHeroPanel.java`, `ConfirmPanel.java`, `NewHeroPanel.java`, `DirectionPanel.java`, `ArtifactPanel.java`, `RunPanel.java`, `LevelUpPanel.java`, `EndPanel.java`, `HeroPanel.java`, `DirectionButton.java`, `YesNoButton.java`, `YesNoButtonPanel.java`, `ThemeColor.java`.
-
-**`GamePanel`** is the single persistent container, with two independent, separately-managed slots:
-
-- `subPanel` (`BorderLayout.CENTER`) — the current "screen", one `JPanel` subclass per `GameView` method that needs a full screen. Swapped via a private `setSubPanel(JPanel)` that removes only the previous `subPanel`, not the whole panel tree. Every screen owns its own construction (SRP) — `GamePanel` itself contains zero building logic.
-- `log` (`BorderLayout.SOUTH`) — a single-line `JLabel` status message for the passive `show*` methods, with two styles: `setLog(...)` (plain, routine status) and `setErrorLog(...)` (black-on-yellow, `showError`).
-
-**Thread hand-off (EDT ↔ controller thread)**, identical pattern for every interactive method: `GuiView` creates a `CountDownLatch`/`BlockingQueue`, schedules the panel swap via `invokeLater`, then blocks (`.await()`/`.take()`) on the controller thread; button listeners on the EDT call `.countDown()`/`.put(...)`. `InterruptedException` always becomes `Thread.currentThread().interrupt()` + rethrow as `QuitException`. No `JOptionPane` used anywhere — every interactive screen is a custom `JPanel` for full visual consistency.
-
-**Reused building blocks:** `HeroPanel` (stats card: name + stats grid + worn artifacts) is composed inside `LevelUpPanel`, `ConfirmPanel`, and each row of `SelectHeroPanel`. `YesNoButtonPanel` is composed inside `ArtifactPanel`, `RunPanel`, `ConfirmPanel`.
-
-**Interface change:** `GameView.showHeroStats(Hero)` was removed entirely — always used together with a yes/no confirmation in practice, so folded into `confirmHero(Hero)`.
-
-**Swing lessons learned (keep in mind if touched again):**
-
-- `ButtonGroup` (mutual exclusion) + `JToggleButton` (persistent selected state) + `ItemListener`/`itemStateChanged` (fires for both the newly-selected **and** newly-deselected button) is the combo used in `NewHeroPanel` for the 3 `HeroType` buttons. A plain `ActionListener` does *not* work for this — it only fires for the button physically clicked, not the one a `ButtonGroup` silently deselects as a side effect.
-- On Windows, the native/default Look & Feel largely **ignores `setBackground()`/`setForeground()` on `JButton`/`JToggleButton`** (native chrome paints over custom colors). `NewHeroPanel` ended up using `setForeground()` only for selection styling. If background-color styling is needed again: either set a pure-Java L&F (`UIManager.setLookAndFeel(Metal/Nimbus...)`, once at startup) or use a `Border` instead (reliably painted by Swing regardless of L&F — see `ArtifactPanel`/`RunPanel`'s `BorderFactory.createLineBorder(...)`).
-- Considered and rejected (don't re-suggest unless asked): `SwingWorker` for icon loading; a centralized `PanelFactory`/Abstract Factory for screen construction; `CardLayout`.
-
-### Still open / low priority, not blocking anything
-
-- **Submission hygiene** in `GameController`: remove debug `System.out.println`s in `setup()`, `gameLoop()`, `turn()` (and in `GameEngine.fightRound()`); verify `>` vs `>=` boundary in `Hero.gainXp()`.
-- **Ctrl+C (SIGINT) mid-game**: currently only EOF (Ctrl+D) is caught via `QuitException`; SIGINT isn't handled at all and will kill the JVM without persisting. Decide if a `Runtime.getRuntime().addShutdownHook(...)` is worth adding, or leave out of scope. `GuiView`'s blocking calls already rethrow `InterruptedException` as `QuitException`, so a shutdown hook that interrupts the controller thread would already propagate correctly.
-- **`MonsterFactory` refactor** (nice-to-have, see dedicated section below) — cosmetic gameplay-variance polish, not a requirement.
+The project is functionally complete. All remaining work is the student's polish/quality wishlist below — nothing here is blocking or required for the mandatory grade.
 
 ---
 
-## NICE-TO-HAVE — MonsterFactory refactor (not started, low priority)
+## Wishlist — next up
 
-**⚠️ Purely optional polish, not a subject requirement.** The game already works and is balanced without it.
+Organized by topic. Items with an *(agent note: ...)* were checked against the current code on 2026-07-06 — read those before starting that item, they usually already point at the exact file/line and the trade-off to explain to the student.
 
-**Why this idea came up:** balance-testing revealed that FROG/HARE die in a very narrow, predictable level range (their fights resolve in few rounds → low variance → outcomes cluster tightly), while BEAR (many rounds per fight due to low attack) naturally has a much wider death-level spread from pure RNG variance. Giving each monster *species* (not just each tier) its own stat profile — e.g. a capybara is a tank (high defence/hp, lower attack), a mosquito is a glass cannon (low defence, decent attack) — would introduce natural per-encounter variance for fast fighters too, without bolting on a generic random multiplier.
+### General / robustness
 
-**Two design options discussed:**
+- [ ] **Audit null-checks throughout the codebase.** *(agent note: `Hero.setWeapon/setArmour/setHelmet/setArtifact` throw a plain `RuntimeException` on `null` input instead of failing at a real boundary — worth discussing whether that's acceptable defensive coding or should be restructured.)*
+- [ ] **Audit Swing thread-safety.** *(agent note: `GuiView`'s EDT↔controller hand-off — `invokeLater` + `CountDownLatch`/`SynchronousQueue`/`LinkedBlockingQueue`, one pattern reused for every interactive method — looks correct on a first pass. No shared mutable state spotted beyond the `Hero`/`Monster` objects, which are only mutated from the controller thread while the EDT only reads them via freshly-built panels. Worth a deliberate per-screen pass rather than trusting this note alone.)*
+- [ ] **Handle Ctrl+C (SIGINT) gracefully.** Window-close (clicking the X) is already handled (see Architecture reference below); SIGINT is not — it still kills the JVM with no save. A `Runtime.getRuntime().addShutdownHook(...)` registered once in `Main.main()` is the idiomatic option, interrupting the controller thread — needs its own careful look since a shutdown hook runs on yet another thread.
+- [ ] **Rethink the exception-handling strategy.** Catch everything at one boundary vs. propagate to `Main` and exit with a status code? Research common Java conventions before deciding. *(agent note: today `Main.main()` catches nothing at all; `GameController.start()` only catches `QuitException`. Everything else — `ParseException` from arg parsing, `FatalException`, any `RuntimeException` such as Hero's null-artifact guards above — propagates to the JVM's default handler: a raw stack trace on stderr and exit code 1. Decide on one consistent policy, e.g. every custom exception caught once in `Main` → mapped to a user message + explicit exit code.)*
+- [ ] **Decide what happens after a player wins.** Quit entirely? Back to the main/new-game menu? Offer to immediately start a fresh map with the same hero?
+- [ ] Write player-facing instructions / how-to-play text.
 
-1. **Minimal**: keep `Monster` as one concrete class; `Monster.easy()/medium()/hard()` picks a random name **and** a matching stat-multiplier (e.g. a small per-species multiplier table). Small change, no new class hierarchy, less time.
-2. **Full OOP refactor (student's preference)**: `Monster` becomes `abstract class Monster`; one subclass per animal (`Butterfly`, `Fish`, `Hamster` for easy; `Cat`, `Mosquito`, `Cow`, `Seal` for medium; `Tiger`, `Shark`, `Capybara` for hard), each overriding its own attack/defence/hp multipliers relative to the tier baseline. A new `MonsterFactory` class picks a random subclass per tier (`MonsterFactory.easy(heroLevel)` etc.), replacing the current `Monster.easy/medium/hard()` static factory methods. `GameEngine`'s calls to `Monster.easy(...)` etc. need to change to `MonsterFactory.easy(...)`.
+### GitHub / submission
 
-**Suggested incremental approach if/when picked up:**
+- [ ] Write a README for GitHub.
+- [ ] Consider publishing builds under GitHub Releases.
 
-1. Add the abstract `Monster` class + just one subclass per tier as a proof of concept (e.g. only `Capybara` and `Mosquito`) to validate the design compiles and plays correctly.
-2. Fill in the remaining subclasses.
-3. Add `MonsterFactory`, update `GameEngine` call sites.
+### Persistence
 
-**Still to decide (student's call, not the agent's):** the exact attack/defence/hp multiplier per species — e.g. capybara = tank archetype, mosquito = glass cannon archetype. Suggested starting point discussed but not committed to numbers yet.
+- [ ] Allow deleting a hero from the load-game / select-hero screen.
 
----
+### High scores (new idea, not designed yet)
 
-## Fase 3 — Persistence, final implementation reference
+- [ ] On win *or* loss, record something about the hero as a persistent "high score" entry (new SQLite table, same repository pattern as `HeroRepository`). Open questions the student still needs to decide: what counts as "the score" (level reached? xp? map size / turns survived?), where it's shown (a leaderboard screen? on the end-game screen?), and whether it's one global list or split per hero type.
 
-Package: `mazie.repository`. Chosen approach: **SQLite** (bonus — replaces text file requirement). Status: **done**, including controller wiring (Fase 5).
+### Game engine
 
-**Files:**
+- [ ] **Build a `MonsterFactory`.** Not started, purely optional balance/variance polish — the game works and is balanced without it. Motivation: FROG/HARE fights resolve in very few rounds (low variance → death levels cluster tightly), while BEAR's low attack means longer fights with naturally wider variance from RNG alone. Giving each monster *species* (not just tier) its own stat profile — e.g. a capybara as a tank (high defence/hp, low attack) vs. a mosquito as a glass cannon (low defence, decent attack) — would add natural per-encounter variance for the fast fighters too.
+  - Two options discussed: (1) minimal — keep one `Monster` class, `Monster.easy/medium/hard()` just also picks a per-species stat multiplier from a small table; (2) full OOP (student's preference) — `Monster` becomes `abstract`, one subclass per animal (e.g. `Butterfly`/`Fish`/`Hamster` easy, `Cat`/`Mosquito`/`Cow`/`Seal` medium, `Tiger`/`Shark`/`Capybara` hard), a new `MonsterFactory` picks a random subclass per tier, `GameEngine`'s `Monster.easy(...)` call sites move to `MonsterFactory.easy(...)`.
+  - Suggested incremental path: add the abstract class + one subclass per tier as a proof of concept first (e.g. just `Capybara` + `Mosquito`), validate it plays correctly, then fill in the rest.
+  - Exact per-species stat multipliers are still the student's call — not decided yet.
+- [ ] **Write a real fight-summary narration** instead of the current flat string (`GameController.turn()` → `view.showFightSummary("the fight ended", ...)`). Consider monster-specific attack flavor text, and reflecting the hero's equipped weapon in the narration.
+- [ ] Decide: does winning actually reward the player with anything besides "you win"? What's the in-game motivation to reach the border? (see also the new "High scores" idea under Persistence above — might answer this.)
+- [ ] *(idea recovered from `old/`, not adopted yet)* `old/src/main/java/mazie/model/{Quality.java,util/QualityDefiner.java}` had a small `BAD/NORMAL/GOOD` artifact-quality roll (weighted 1/3/1 via `random.nextInt(5)`) that could scale artifact value independently of the monster's own stats. Current `GameEngine.dropArtifact()` only scales value off monster attack+defence — no quality tier. Could combine nicely with the `MonsterFactory` variance idea above, but is a separate, smaller change if picked up alone.
 
-- `HeroRepository.java` — interface: `Map<Integer, Hero> loadAllHeroes()`, `save(Hero)`, `update(Hero)`, `delete(Hero)` ✅
-- `SQLiteHeroRepository.java` — connection/transaction lifecycle + CRUD orchestration ✅
-- `SQLiteHeroMapper.java` — `ResultSet` → `Hero`/`Artifact` mapping, extracted for SRP reasons ✅
+### Builder pattern (new idea — deliberate learning goal, not just a feature)
 
-**Schema:**
+- [ ] Student explicitly wants to apply the Builder pattern somewhere and be able to explain it — even as a pure refactor with no new functionality, the goal is understanding it, not adding features. Directly relevant to the existing "No Builder pattern used" defense note in the Architecture reference below (implementing this would replace/soften that trade-off explanation).
+  - Best candidate to discuss: `Hero`'s DB-loading constructor (`Hero(int id, String name, HeroType type, int level, int xp, int attack, int defence, int hp)` — 8 positional params, see `Hero.java`) is a reasonable textbook case to start the Builder-vs-telescoping-constructors-vs-static-factory discussion.
+  - Worth an honest discussion when picked up: Builder shines with many *optional* params, and this constructor's params are all required — so is Builder the textbook-correct fit here, or is it being deliberately retrofitted to practice the pattern? Both are legitimate reasons to do it, but the student should be able to articulate which one applies for peer-eval defense.
 
-```sql
-hero(id, name, type, level, xp, attack, defence, hp)
-artifact(id, name, type, value, hero_id → hero.id)
-```
+### Swing GUI
 
-- `hero.type` CHECK: `'FROG'`, `'HARE'`, `'BEAR'`
-- `artifact.type` CHECK: `'WEAPON'`, `'ARMOUR'`, `'HELMET'`
-- `PRAGMA foreign_keys = ON` enabled in `createTables()`
-- `connection.setAutoCommit(false)` set once in the constructor; every write method ends with `commitConnection()` on success or `rollbackConnection()` in the catch block
+- [ ] **Keep the hero's stats visible at all times while playing.** *(agent note: today `HeroPanel` only appears inside `ConfirmPanel`, `LevelUpPanel`, and `SelectHeroPanel` rows — not during `DirectionPanel`/`ArtifactPanel`/`RunPanel`, i.e. not while actually walking/fighting.)*
+- [ ] Arrow-key navigation for movement (N/E/S/W) — and consider extending keyboard control to other screens too.
+- [ ] Give the fight summary its own dedicated screen, once the narrated version above is written.
+- [ ] General look & feel pass — buttons currently use the default OS chrome and the whole UI reads as "very old-school Java". *(agent note: Windows' native L&F ignores `setBackground()`/`setForeground()` on `JButton`/`JToggleButton` — `UIManager.setLookAndFeel(Metal/Nimbus...)` once at startup is the fix if a non-native look is wanted; `Border`s paint reliably regardless of L&F and are already used in `ArtifactPanel`/`RunPanel`.)*
+- [ ] Win/lose screen artwork.
+- [ ] *(idea recovered from `oldold/`, not adopted yet)* `oldold/src/main/java/ajav/view/swing/SwingGui.java`'s `initFonts()` picked different named system fonts per OS (`os.name` contains `"win"`/`"linux"`/else → e.g. `"Cambria Math"` vs `"DejaVu Math TeX Gyre"` vs `"Serif"`) for header/input/body text, instead of relying on the L&F default font. No actual font *files* exist anywhere in `old/`/`oldold/` — this is a code pattern, not an asset to copy. Worth considering alongside the L&F pass above, though it doesn't solve the button-background-color problem (that needs `UIManager.setLookAndFeel` or `Border`s regardless).
 
-**Key patterns used (for reference / peer-evaluation defense):**
+### Visual assets (general)
 
-- `PreparedStatement` for all INSERT/UPDATE/DELETE (prevents SQL injection)
-- `statement.getGeneratedKeys()` after the hero INSERT to get the auto-generated id → `hero.setId(id)` (artifacts don't need this — `Artifact` is an immutable `record` with no persisted identity, see design decisions)
-- Manual switch-expressions in `SQLiteHeroMapper` reconstruct `HeroType`/`ArtifactType` enums from DB strings
-- `hero.setArtifact(artifact)` routes to the right slot (weapon/armour/helmet) — used in the mapper, guarded by `artifactName != null` (a hero with no artifacts still produces one `LEFT JOIN` row with all-`NULL` artifact columns — skip it, otherwise `NullPointerException`)
-- Do NOT run Hibernate Validator when loading from DB — validation is only for fresh user input
+- [ ] Icons/art for heroes and monsters — ASCII art for the terminal view, PNGs for the Swing view.
 
-**`update()` strategy:** DELETE all old artifacts for `hero_id` + UPDATE hero row + INSERT current artifacts fresh (full-replace, not diffing) — deliberate, given a hero only ever has ≤3 artifacts and `Artifact` has no identity to diff against.
+### Repo cleanup (`old/` + `oldold/`)
 
-**`delete()` order:** DELETE from `artifact` first (FK constraint), then DELETE from `hero`.
+**Scanned 2026-07-06 — nothing essential is missing from the current `mazie/` project.** Both folders are earlier, superseded attempts kept around "just in case"; here's what's in them and why none of it needs porting before deleting them:
 
-**No known bugs in this layer.**
+- `old/src/main/resources/{mazie-logo.png,mazie-icon.png}` — **already copied into `mazie/src/main/resources/`** and already used (`GuiView`'s frame icon, `WelcomePanel`/`NewOrLoadGamePanel`'s logo). Nothing to do.
+- `old/model/HeroFactory.java` + its 5 `HeroType`s (`PENGUIN`/`FROG`/`BEAR`/`HARE`/`TURTLE`, singleton + string-switch factory) — superseded by the current 3-type `Hero(name, type)` design. Not a gap, a deliberate simplification.
+- `old/model/artifact/{Weapon,Armor,Helm,Artifact}.java` (one subclass per artifact type) — superseded by the current single `Artifact` value type + `ArtifactType` enum (see "Notes worth remembering for peer-evaluation defense" above — this was a conscious simplification, not an oversight).
+- `old/model/util/QualityDefiner.java` + `Quality.java` — the one genuinely reusable *idea*, already folded into the Game engine wishlist above (artifact quality tiers).
+- `old/database/HeroDao.java` + `old/controller/{GameValidator,Options,Prompts}.java` — an earlier plain-JDBC DAO + terminal menu system, superseded by the current `SQLiteHeroRepository`/`SQLiteHeroMapper` (transactions, mapper split) and `TerminalView`. Current implementation is strictly more mature; nothing to recover.
+- `oldold/` (`ajav.*` package) — the earliest prototype (`old_hero`, a separate console view, no persistence layer at all). The only reusable idea is the OS-aware font-picking pattern, already folded into the Swing GUI wishlist above.
 
----
+**Proposed next step (not yet done — needs a go-ahead before touching it):** delete `old/` and `oldold/` entirely, and flatten `mazie/` up to the repo root (so `pom.xml`, `src/`, etc. live directly under `swingy/` instead of `swingy/mazie/`). This is a structural change that touches build commands, this plan file, and repo memory — before executing: confirm with the student, then update the "Project structure"/"Build & run commands" section above, `/memories/repo/swingy-progress.md`, and check for any other hard-coded `mazie/`-relative paths (e.g. IDE run configs, `.gitignore`) first.
 
-## Design decisions made
+### Open questions / other
 
-| Decision | Rationale |
-| --- | --- |
-| No map displayed to user | Student's deliberate choice — adds mystery, subject doesn't require it |
-| Artifact names in Artifact.java, not ArtifactType | Simpler, deadline-focused |
-| No MonsterFactory class *(reconsidered 2026-07-04, see Nice-to-have section below)* | Originally: Monster.easy/medium/hard() is already Static Factory Method pattern, extra class adds no value. Reconsidered after balance testing revealed FROG/HARE have too little combat variance (short fights = low variance = death clusters tightly around one level). Per-species subclasses with different stat profiles (tank vs glass cannon) would add natural variance without a global random multiplier. Still a nice-to-have, not started. |
-| `Hero.id` field present but 0 until DB assigns it | Needed by DB (PRIMARY KEY). Not used by game logic — only the repository reads/writes it. Private constructor + `setId()` used during load. |
-| `gainXp()` returns boolean (levelup) | Cleaner than separate `levelUp()` call |
-| EOF in terminal input throws `QuitException` | `Ctrl+D` closes stdin permanently; bubbling a quit signal avoids infinite retry loops and keeps exit handling centralized |
-| LinkedBlockingQueue<Direction> for Swing direction input (not SynchronousQueue) | Same EDT↔controller hand-off pattern as `CountDownLatch` in `showWelcome()`, but needs to carry a value back. `CountDownLatch` was the simpler warm-up case; `BlockingQueue` generalizes it to pass a `Direction`. |
-| JOptionPane for Swing dialogs | Blocks naturally, no queue needed |
-| Static Factory Methods instead of Builder pattern | Subject *hints* at Builder pattern (Chapter III). Skipped because Hero only has `name + type` as user input (Builder shines for many optional fields), and Monster/Artifact already use Static Factory Methods which are idiomatic for our case. **Be ready to explain this trade-off at peer evaluation** — evaluator may ask where Builder was applied. |
-| SQLite dependency in `pom.xml` | Used for the relational-DB bonus (replaces text file requirement). Subject explicitly allows a library for this bonus *"if explicitly justified and serving only that part"*. Justification: SQLite JDBC is the minimal driver needed to implement a relational DB; no ORM or abstraction layer used. |
-| Validation trigger in controller, not view | `createValidHero()` validates; the view only collects input. Keeps the view dumb and makes the same validation reusable for the Swing view. |
-| `ParameterMessageInterpolator` instead of `buildDefaultValidatorFactory()` | Avoids needing a Jakarta EL implementation (e.g. Expressly) on the classpath — one less dependency to justify against the "no external libraries" rule. Handles `{min}`/`{max}` placeholders, which is all we use. |
-| `choose(prompt, Map<String,T>)` generic helper | A `Map` captures *what is valid* (keys) **and** *what it maps to* (values) in one structure, eliminating per-method switches. A `Set` would only validate and force a second switch. |
-| Trim + lowercase all input in `scanNextLine()` | Single normalization point: `"  Y  "` works everywhere, and `@Size`/`@NotBlank` see meaningful characters (blocks names like `"        a"`). |
-| `Hero.toString()` is debug-only; stats presentation lives in the view | `toString()` convention = logging/debug. Player presentation belongs in the view (MVC) so each view (terminal/Swing) formats independently. `GameView.showHeroStats(Hero)` was later removed entirely — `confirmHero(Hero)` always needed the same stats display anyway, so the separate method was redundant (`TerminalView` prints stats inline in `confirmHero`; `GuiView`'s `ConfirmPanel` composes `HeroPanel`). |
-| `HeroRepository.loadAllHeroes()` returns `Map<Integer, Hero>`, not `List<Hero>` | Repository stays keyed by DB id (the natural, free identifier); `TerminalView.selectHero()` converts it internally to `Map<String, Hero>` for its own `choose()` helper. Each layer picks the key type it actually needs — the repository shouldn't need to know about view/UI concerns. |
-| `SQLiteHeroMapper` extracted from `SQLiteHeroRepository`; a generic `Utils` class and a separate `HeroSchema` class were not | Row→object mapping has a genuinely different "reason to change" (domain model shape) than SQL/connection code, and needs no `Connection` — a clean SRP-motivated split. A grab-bag `Utils` class (considered for *all* private methods, static, with `Connection` passed as a parameter everywhere) and a separate `HeroSchema` class (schema/DDL only, tried then reverted) were both rejected: they either leak `connection` as a parameter through the whole class or add a whole extra file for 3 lines of one-time DDL — overhead without real benefit at this project's scale. |
-| Manual transactions (`setAutoCommit(false)` once + explicit `commit()`/`rollback()` per write) | `save()`/`update()`/`delete()` each touch 2+ tables (hero + artifacts); without a transaction, a failure partway through could leave the DB in an inconsistent state (e.g. hero row saved, artifact insert failed). |
+- [ ] **Bonus: switch between console and GUI view at runtime, without restarting.** Not started, no design chosen yet — needs its own investigation (e.g. `GameController.setView()` already exists as a hook, but nothing calls it yet, and swapping the *active* view mid-blocking-call needs real thought).
+- [ ] Reconcile Hibernate Validator's rules with what `GameController`/the repository actually check — any duplication or gaps? Needs investigation.
+- [ ] Re-verify MVC separation once more against the subject's "only a good and clear implementation will be accepted" — a full, deliberate pass, not just a checklist tick.
+- [ ] Re-verify "best practices suited for this problem" — no concrete checklist for this yet; research what's expected, then review class-by-class.
 
 ---
 
-## Mandatory requirements checklist (from subject)
+## Architecture reference (essential facts for whoever picks this up next)
 
-> This checklist **is** the subject's mandatory part (V.1 Gameplay, V.2 Features, V.3 Validation) — treat it as the grading rubric. The turn order inside the game loop follows `Mazie.drawio`.
+### GUI (`mazie/view/gui/`)
+
+Files: `GuiView.java`, `GamePanel.java`, `WelcomePanel.java`, `NewOrLoadGamePanel.java`, `SelectHeroPanel.java`, `ConfirmPanel.java`, `NewHeroPanel.java`, `DirectionPanel.java`, `ArtifactPanel.java`, `RunPanel.java`, `LevelUpPanel.java`, `EndPanel.java`, `HeroPanel.java`, `DirectionButton.java`, `YesNoButton.java`, `YesNoButtonPanel.java`, `ThemeColor.java`.
+
+- **`GamePanel`** is the single persistent container with two independently-managed slots: `subPanel` (`BorderLayout.CENTER`, the current "screen" — one `JPanel` subclass per `GameView` method that needs a full screen, swapped via a private `setSubPanel(JPanel)` that removes only the previous `subPanel`) and `log` (`BorderLayout.SOUTH`, a one-line `JLabel` status message, with `setLog(...)` for routine status vs. black-on-yellow `setErrorLog(...)` for `showError`).
+- **Thread hand-off (EDT ↔ controller thread)** — identical pattern for every interactive `GameView` method: `GuiView` creates a `CountDownLatch`/`SynchronousQueue`/`LinkedBlockingQueue`, schedules the panel swap via `invokeLater`, then blocks (`.await()`/`.take()`) on the controller thread; button listeners on the EDT call `.countDown()`/`.put(...)`. `InterruptedException` always becomes `controllerThread.interrupt()` + rethrow as `QuitException`. No `JOptionPane` anywhere — every interactive screen is a custom `JPanel`.
+- **Window-close handling (added 2026-07-06):** `GuiView` captures `Thread.currentThread()` at construction time as `controllerThread` (valid because `new GuiView()` and the later `controller.start()` call both happen on the same thread — `Main.main()` runs everything sequentially on one thread, no separate thread is ever spun up for the controller). `initFrame()` sets `JFrame.DO_NOTHING_ON_CLOSE` and adds a `WindowAdapter` whose `windowClosing(...)` calls `controllerThread.interrupt()` (wakes whichever blocking call the controller thread is parked in, existing `InterruptedException`→`QuitException` machinery handles the rest, exactly like a terminal Ctrl+D quit) followed by `fr.dispose()`. Calling `dispose()` immediately (rather than waiting for the save to finish) is safe: it only tears down the window/native resources on the EDT and does not affect the JVM's overall liveness — the process still only exits once the controller thread itself finishes its save and `Main.main()` returns naturally, since that's a separate, still-running non-daemon thread. SIGINT (Ctrl+C) is still unhandled — this only covers clicking the window's X.
+- **Reused building blocks:** `HeroPanel` (stats card) is composed inside `LevelUpPanel`, `ConfirmPanel`, and each row of `SelectHeroPanel`. `YesNoButtonPanel` is composed inside `ArtifactPanel`, `RunPanel`, `ConfirmPanel`.
+- **Swing gotchas already learned:** `ButtonGroup` + `JToggleButton` + `ItemListener`/`itemStateChanged` (fires for both the newly-selected *and* newly-deselected button) is the combo `NewHeroPanel` uses for the 3 `HeroType` buttons — a plain `ActionListener` only fires for the button physically clicked. Windows' native L&F ignores `setBackground()`/`setForeground()` on buttons — use `UIManager.setLookAndFeel(...)` or a `Border` instead.
+
+### Persistence (`mazie.repository`)
+
+SQLite (bonus, replaces the text-file requirement). `HeroRepository` interface (`loadAllHeroes/save/update/delete`) → `SQLiteHeroRepository` (connection/transaction lifecycle + CRUD) → `SQLiteHeroMapper` (ResultSet → Hero/Artifact mapping, split out for SRP).
+
+- Schema: `hero(id, name, type, level, xp, attack, defence, hp)`, `artifact(id, name, type, value, hero_id → hero.id)`. `hero.type` CHECK `'FROG'/'HARE'/'BEAR'`, `artifact.type` CHECK `'WEAPON'/'ARMOUR'/'HELMET'`. `PRAGMA foreign_keys = ON`.
+- All numeric/text columns are `NOT NULL` with `CHECK` constraints against bad hand-edited data (`level >= 1`, `xp/attack/defence/value >= 0`, `name` length between 2\u201330) — deliberately **excluding** `hero.hp`, which gets `NOT NULL` but no `CHECK(hp >= 0)`: a hero's raw `hp` column can legitimately go negative mid-combat while a `HELMET` artifact keeps their *total* hp (`hp + helmet.value`) positive, and SQLite `CHECK` constraints can't reference another table's row to enforce that combined invariant without a `TRIGGER` — left as an app-layer invariant (`GameEngine`'s `getTotalHp() > 0` check) instead.
+- Manual transactions: `setAutoCommit(false)` once in the constructor; every write method ends with commit on success / rollback in the catch block (needed since `save`/`update`/`delete` each touch 2+ tables).
+- `update()` is full-replace, not diffing: delete all artifacts for `hero_id`, update the hero row, re-insert current artifacts — fine since a hero has ≤3 artifacts with no persisted identity to diff against.
+- `delete()` order: `artifact` rows first (FK constraint), then `hero`.
+- Do **not** run Hibernate Validator on heroes loaded from the DB — validation is for fresh user input only.
+- All writes use `PreparedStatement` with `?` placeholders (SQL-injection safety) — see the JDBC/SQLite cheat-sheet in user memory for exact syntax if needed again.
+
+### Notes worth remembering for peer-evaluation defense
+
+- **No Builder pattern used**, even though the subject hints at it (Chapter III). Static Factory Methods were used instead (`Monster.easy/medium/hard()`, `Artifact.weapon/armour/helmet(...)`) — justified because `Hero` only takes `name + type` from the user (Builder shines with many optional fields), and Static Factory is already idiomatic for `Monster`/`Artifact`. Be ready to explain this trade-off if asked "where's your Builder?".
+- **SQLite dependency justification**: allowed under the subject's bonus-library exception ("if explicitly justified and serving only that part") — it's the minimal JDBC driver needed for a relational DB, no ORM/abstraction layer on top.
+- **`ParameterMessageInterpolator`** is used instead of `buildDefaultValidatorFactory()`'s default, to avoid needing a Jakarta EL implementation on the classpath as an extra dependency to justify.
+- Validation is triggered in the controller (`GameController.createValidHero()`), not the view — keeps views dumb/reusable across terminal + Swing.
+
+---
+
+## Mandatory requirements checklist (from subject) — re-verified 2026-07-06
+
+> This checklist **is** the subject's mandatory part (V.1 Gameplay, V.2 Features, V.3 Validation). Re-checked line-by-line against the subject PDF and the current code (`GameController`, `GameEngine`, `GameMap`, `Hero`, `pom.xml`) — not just carried over from before.
 
 - [x] MVC architecture (Model/View/Controller clearly separated)
 - [x] Launch with `java -jar mazie.jar console`
-- [x] Launch with `java -jar mazie.jar gui` — *Fase 6 done, full manual end-to-end playthrough verified 2026-07-05*
+- [x] Launch with `java -jar mazie.jar gui`
 - [x] Build with `mvn clean package` → produces runnable jar
-- [x] No external libraries except Hibernate Validator + SQLite (SQLite justified as bonus DB library)
-- [x] Hero persistence (load on start, save on exit) — *wired in Fase 5, per-path saves matching the drawio*
+- [x] No external libraries except Hibernate Validator + SQLite JDBC (confirmed — `pom.xml` has exactly these two `<dependency>` entries)
+- [x] Hero persistence (load on start, save on exit)
 - [x] Create hero flow
 - [x] Select existing hero flow
 - [x] Show hero stats (name, class, level, xp, attack, defence, hp)
-- [x] Square map, size = (level-1)*5+10-(level%2)
+- [x] Square map, size = (level-1)\*5+10-(level%2) (confirmed in `GameMap` constructor, matches formula exactly)
 - [x] Move in 4 directions (N/E/S/W)
 - [x] Win by reaching border
 - [x] Monsters randomly spread on map
@@ -190,20 +189,12 @@ artifact(id, name, type, value, hero_id → hero.id)
 - [x] Battle simulation using hero + monster stats
 - [x] Lose battle = game over
 - [x] Win battle = XP gain, possible artifact drop
-- [x] Level up formula: level*1000 + (level-1)^2* 450 — *verify `>` vs `>=` boundary still open*
+- [x] Level up formula: level\*1000 + (level-1)^2\* 450
 - [x] 3 artifact types: Weapon (+attack), Armor (+defence), Helm (+hp)
 - [x] Annotation-based validation (Hibernate Validator) on user input
 - [x] Validation failure highlighted to user
 
 ## Bonus checklist
 
-- [x] Hero persistence in relational database instead of text file — *fully wired into `GameController` (Fase 5), playable end-to-end*
-- [ ] Switch between console/GUI at runtime without closing
-
----
-
-## Drawio review (2026-07-03)
-
-`Mazie.drawio` still matches the intended design well — no redraw needed. One deliberate deviation from the literal diagram, worth knowing before touching persistence code again: the diagram shows a dashed "save hero with new xp" arrow after the border-of-map win check, plus a *separate* "save artifact" step after "keep?". The implementation simplifies this to a single `repository.update(hero)` call per event (win, or end of a won fight) instead of saving incrementally at every sub-step — acceptable since the subject has no mid-game crash-durability requirement.
-
-Remaining open question from the diagram's own "MY CURRENT QUESTIONS" box: how to handle Ctrl+C (SIGINT) mid-game — see "Still open / low priority" list above.
+- [x] Hero persistence in a relational database instead of a text file
+- [ ] Switch between console/GUI at runtime without closing — see Open questions wishlist above
