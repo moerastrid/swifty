@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import mazie.exception.ModelException;
 
 public class Hero {
 
@@ -103,7 +104,7 @@ public class Hero {
 
     public void setType(HeroType type) {
         if (type == null) {
-            throw new RuntimeException("that aint my type :(");
+            throw new ModelException("that aint my type :(");
         }
         this.type = type;
     }
@@ -181,7 +182,7 @@ public class Hero {
 
     public void setWeapon(Artifact weapon) {
         if (weapon == null || weapon.type() != ArtifactType.WEAPON) {
-            throw new RuntimeException("thats no weapon :(");
+            throw new ModelException("thats no weapon :(");
         }
         this.weapon = weapon;
     }
@@ -192,7 +193,7 @@ public class Hero {
 
     public void setArmour(Artifact armour) {
         if (armour == null || armour.type() != ArtifactType.ARMOUR) {
-            throw new RuntimeException("thats no armour :(");
+            throw new ModelException("thats no armour :(");
         }
         this.armour = armour;
     }
@@ -203,7 +204,7 @@ public class Hero {
 
     public void setHelmet(Artifact helmet) {
         if (helmet == null || helmet.type() != ArtifactType.HELMET) {
-            throw new RuntimeException("thats no helmet :(");
+            throw new ModelException("thats no helmet :(");
         }
         this.helmet = helmet;
     }
@@ -224,7 +225,7 @@ public class Hero {
 
     public void setArtifact(Artifact artifact) {
         if (artifact == null) {
-            throw new RuntimeException("thats null :(");
+            throw new ModelException("thats null :(");
         }
 
         switch (artifact.type()) {

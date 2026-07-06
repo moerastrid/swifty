@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
+import mazie.exception.RepositoryException;
 import mazie.model.Artifact;
 import mazie.model.ArtifactType;
 import mazie.model.Hero;
@@ -51,7 +52,7 @@ public class SQLiteHeroMapper {
             case "BEAR" ->
                 HeroType.BEAR;
             default ->
-                null;
+                throw new RepositoryException("can't contvert hero type [%s]".formatted(type));
         };
     }
 
@@ -64,7 +65,7 @@ public class SQLiteHeroMapper {
             case "HELMET" ->
                 ArtifactType.HELMET;
             default ->
-                null;
+                throw new RepositoryException("can't contvert artifact type [%s]".formatted(type));
         };
     }
 }

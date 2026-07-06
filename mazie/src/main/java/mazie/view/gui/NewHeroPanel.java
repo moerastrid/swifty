@@ -15,28 +15,34 @@ import javax.swing.JToggleButton;
 
 import mazie.model.Hero;
 import mazie.model.HeroType;
+import static mazie.view.gui.ThemeColor.BLACK;
 import static mazie.view.gui.ThemeColor.GREEN;
 import static mazie.view.gui.ThemeColor.PURPLE;
 import static mazie.view.gui.ThemeColor.TEAL;
 import static mazie.view.gui.ThemeColor.WHITE;
+import static mazie.view.gui.ThemeColor.YELLOW;
 
 public class NewHeroPanel extends JPanel {
 
     private HeroType type;
+    private final JTextField nameField = new JTextField();
+    private final JLabel errorLabel = new JLabel("", JLabel.CENTER);
 
     public NewHeroPanel(BlockingQueue<Hero> queue) {
         this.setBackground(TEAL);
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        this.setLayout(new GridLayout(4, 1));
+        this.setLayout(new GridLayout(5, 1));
+
+        errorLabel.setForeground(BLACK);
+        this.add(errorLabel);
 
         this.add(new JLabel("create your hero", JLabel.CENTER));
 
         this.add(typeButtons());
 
-        final var nameField = new JTextField();
         this.add(namePanel(nameField));
 
-        this.add(okButton(nameField, queue));
+        this.add(okButton(queue));
     }
 
     private JPanel namePanel(JTextField nameField) {
@@ -46,9 +52,11 @@ public class NewHeroPanel extends JPanel {
         panel.setLayout(new BorderLayout());
 
         final var nameLabel = new JLabel("give it a name: ", JLabel.CENTER);
+        nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.add(nameLabel, BorderLayout.NORTH);
 
         nameField.setHorizontalAlignment(JTextField.CENTER);
+        nameField.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.add(nameField, BorderLayout.CENTER);
 
         return panel;
@@ -67,7 +75,7 @@ public class NewHeroPanel extends JPanel {
             button.setSize(100, 60);
             button.setBackground(GREEN);
             button.setForeground(WHITE);
-            
+
             button.addItemListener(event -> {
                 if (button.isSelected()) {
                     this.type = typeSelect;
@@ -79,16 +87,23 @@ public class NewHeroPanel extends JPanel {
             group.add(button);
             panel.add(button);
         }
+
         return panel;
     }
 
-    private JButton okButton(JTextField nameField, BlockingQueue<Hero> queue) {
+    private JButton okButton(BlockingQueue<Hero> queue) {
         final var button = new JButton("ok");
         button.setForeground(PURPLE);
 
         button.addActionListener(event -> {
             try {
-                queue.put(new Hero(nameField.getText(), type));
+                if (type != null) {
+                    queue.put(new Hero(nameField.getText(), type));
+                } else {
+                    this.errorLabel.setText("select a type");
+                    this.errorLabel.setBackground(YELLOW);
+                    this.errorLabel.setOpaque(true);
+                }
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.out.println("gui view interrupted: " + e.getMessage());
@@ -96,5 +111,4 @@ public class NewHeroPanel extends JPanel {
         });
         return button;
     }
-
 }

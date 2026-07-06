@@ -1,32 +1,71 @@
 package mazie;
 
 import mazie.controller.GameController;
+import mazie.exception.FatalException;
+import mazie.exception.ModelException;
 import mazie.exception.ParseException;
+import mazie.exception.QuitException;
 import mazie.repository.SQLiteHeroRepository;
-import mazie.view.GameView;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
 
 public class Main {
 
-    public static void main(final String[] args) {
-        final var console = parse(args);
-        GameView view;
+    private static final int EX_SUCCESS = 0;
+    private static final int EX_GENERAL = 1;
+    private static final int EX_USAGE = 64;
+    private static final int EX_UNAVAILABLE = 69;
+    private static final int EX_SOFTWARE = 70;
 
-        if (console) {
-            view = new TerminalView();
-        } else {
-            view = new GuiView();
+    private static volatile boolean edtCrashed = false;
+
+    public static void main(final String[] args) {
+        threadConfig();
+
+        try {
+            run(args);
+        } catch (FatalException fe) {
+            System.err.println(fe.getMessage());
+            System.exit(EX_UNAVAILABLE);
+        } catch (ModelException me) {
+            System.err.println(me.getMessage());
+            System.exit(EX_SOFTWARE);
+        } catch (ParseException pe) {
+            System.err.println(pe.getMessage());
+            System.exit(EX_USAGE);
+        } catch (QuitException qe) {
+            System.err.println(qe.getMessage());
+            System.exit(EX_SUCCESS);
+        } catch (Throwable t) {
+            System.err.println(t.getMessage());
+            System.exit(EX_GENERAL);
         }
 
-        final var repository = new SQLiteHeroRepository();
+        if (edtCrashed) {
+            System.exit(EX_SOFTWARE);
+        }
+        System.exit(EX_SUCCESS);
+    }
 
-        var controller = new GameController(view, repository);
+    private static void threadConfig() {
+        final var mainThread = Thread.currentThread();
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            System.err.println("Thread [%s] error: %s".formatted(thread.getName(), throwable.getMessage()));
+            edtCrashed = true;
+            mainThread.interrupt();
+        });
+    }
+
+    private static void run(final String[] args) {
+        final var console = parse(args);
+        final var view = console ? new TerminalView() : new GuiView();
+        final var repository = new SQLiteHeroRepository();
+        final var controller = new GameController(view, repository);
 
         controller.start();
     }
 
-    public static boolean parse(final String[] args) {
+    private static boolean parse(final String[] args) {
         if (args.length == 0) {
             return false;
         }

@@ -31,6 +31,7 @@ public class GuiView implements GameView {
         this.controllerThread = Thread.currentThread();
         this.panel = new GamePanel();
         this.frame = initFrame();
+        this.setIcon();
         this.frame.getContentPane().add(this.panel);
 
         invokeLater(() -> this.frame.setVisible(true));
@@ -38,8 +39,7 @@ public class GuiView implements GameView {
 
     private JFrame initFrame() {
         final var fr = new JFrame(TITLE);
-        final var path = getClass().getResource("/mazie-icon.png");
-        final var icon = new ImageIcon(path);
+
 
         fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         fr.addWindowListener(new WindowAdapter() {
@@ -52,8 +52,20 @@ public class GuiView implements GameView {
         fr.setSize(800, 600);
         fr.setLayout(new BorderLayout(10, 10));
         fr.setLocationRelativeTo(null);
-        fr.setIconImage(icon.getImage());
+        
         return fr;
+    }
+
+    private void setIcon() {
+        final var url = "/mazie-icon.png";
+        final var path = getClass().getResource(url);
+
+        if (path != null) {
+            final var icon = new ImageIcon(path);
+            this.frame.setIconImage(icon.getImage());
+        } else {
+            System.err.println("[WAARNING] url[%s] not available?".formatted(url));
+        }
     }
 
     @Override
