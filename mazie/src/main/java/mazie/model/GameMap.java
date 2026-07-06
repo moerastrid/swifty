@@ -2,8 +2,12 @@ package mazie.model;
 
 import java.util.Random;
 
+import mazie.model.monster.Monster;
+import mazie.model.monster.MonsterFactory;
+
 public class GameMap {
 
+    private MonsterFactory factory;
     private final int size;
     private final Monster[][] monsters;
     private final Random random;
@@ -12,6 +16,7 @@ public class GameMap {
 
     // private GameMap() {};
     public GameMap(int heroLevel) {
+        this.factory = MonsterFactory.getInstance();
         this.random = new Random();
         this.size = (heroLevel - 1) * 5 + 10 - (heroLevel % 2);
         this.heroX = size / 2;
@@ -78,13 +83,13 @@ public class GameMap {
         final int easyCount = total / 9;
 
         for (int i = 0; i < easyCount; i++) {
-            this.generateMonster(random, Monster.easy(heroLevel));
+            this.generateMonster(random, factory.newEasyMonster(heroLevel));
         }
         for (int i = 0; i < mediumCount; i++) {
-            this.generateMonster(random, Monster.medium(heroLevel));
+            this.generateMonster(random, factory.newMediumMonster(heroLevel));
         }
         for (int i = 0; i < hardCount; i++) {
-            this.generateMonster(random, Monster.hard(heroLevel));
+            this.generateMonster(random, factory.newHardMonster(heroLevel));
         }
     }
 

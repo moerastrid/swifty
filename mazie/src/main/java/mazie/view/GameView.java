@@ -5,7 +5,7 @@ import java.util.Map;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
-import mazie.model.Monster;
+import mazie.model.monster.Monster;
 
 public interface GameView {
 

@@ -9,9 +9,30 @@ public record Artifact(
         ) {
 
     private static final Random RANDOM = new Random();
-    private static final String[] WEAPONS = {"a knife", "a fork", "a spoon"};
-    private static final String[] ARMOURS = {"a glitterlegging", "a dress"};
-    private static final String[] HELMETS = {"a colander", "a carton box", "a little hat", "a yankee with no brim"};
+    private static final String[] WEAPONS = {
+        "a fidget spinner",
+        "an emergency snack",
+        "a stress ball",
+        "your emotional support cucumber",
+        "a pebble",
+        "a spoon",
+        "a cool stick", 
+        "a kazoo"
+    };
+    private static final String[] ARMOURS = {
+        "glitterleggings", 
+        "a dress (it has pockets!)",
+        "an oversized hoodie",
+        "a band shirt",
+        "fluffy socks"
+    };
+    private static final String[] HELMETS = {
+        "noise cancelling headphones", 
+        "a cardboard box", 
+        "a little hat", 
+        "a yankee with no brim", 
+        "sunglasses"
+    };
 
     public static Artifact weapon(final int value) {
         final String name = WEAPONS[RANDOM.nextInt(WEAPONS.length)];

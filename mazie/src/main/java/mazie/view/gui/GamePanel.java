@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
-import mazie.model.Monster;
+import mazie.model.monster.Monster;
 import static mazie.view.gui.ThemeColor.BLACK;
 import static mazie.view.gui.ThemeColor.WHITE;
 import static mazie.view.gui.ThemeColor.YELLOW;

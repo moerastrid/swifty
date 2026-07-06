@@ -6,7 +6,7 @@ import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.GameMap;
 import mazie.model.Hero;
-import mazie.model.Monster;
+import mazie.model.monster.Monster;
 
 public class GameEngine {
 
