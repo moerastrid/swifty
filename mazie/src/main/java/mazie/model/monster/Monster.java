@@ -16,14 +16,14 @@ public abstract class Monster {
 
     private static final Random RANDOM = new Random();
 
-    protected Monster(String name, String[] actions, String finalMessage, int attack, int defence, int hp, int xpReward) {
+    protected Monster(String name, String[] actions, String finalMessage, int heroLevel, int baseAttack, int baseDefence, int baseHp, int baseXpReward) {
         this.name = name;
         this.actions = actions;
         this.finalMessage = finalMessage;
-        this.attack = attack;
-        this.defence = defence;
-        this.hp = hp;
-        this.xpReward = xpReward;
+        this.attack = calcAttack(baseAttack, heroLevel);
+        this.defence = calcDefence(baseDefence, heroLevel);
+        this.hp = calcHp(baseHp, heroLevel);
+        this.xpReward = calcXpReward(baseXpReward, heroLevel);
     }
 
     public String getName() {
@@ -61,27 +61,27 @@ public abstract class Monster {
         return this.xpReward;
     }
 
-    protected static int calcAttack(int lvl) {
-        return 17 + (lvl * 12) / 10;
+    protected static int calcAttack(int base, int lvl) {
+        return base + (base * (lvl - 1)) / 50;
     }
 
-    protected static int calcDefence(int lvl) {
-        return 2 + (lvl * 8) / 10;
+    protected static int calcDefence(int base, int lvl) {
+        return base + (base * (lvl - 1)) / 50;
     }
 
-    protected static int calcHp(int lvl) {
-        return 20 + lvl * 6;
+    protected static int calcHp(int base, int lvl) {
+        return base + (base * (lvl - 1)) / 50;
     }
 
-    protected static int calcXp(int lvl) {
-        return 95 + (lvl / 2 + lvl) * 125;
+    protected static int calcXpReward(int base, int lvl) {
+        return base + (base * (lvl - 1)) / 10;
     }
 
     @Override
     public String toString() {
         return String.format(
                 """
-            Evil %s
+            Monster: %s
              attack:%d, defence:%d, hp:%d
             """, this.name, this.attack, this.defence, this.hp
         );

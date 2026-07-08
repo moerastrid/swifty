@@ -12,22 +12,6 @@ public class Office extends Monster {
     final static String GOODBYE = "17 o'clock, time to leave this place.";
 
     public Office(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, calcAttack(lvl), calcDefence(lvl), calcHp(lvl), calcXp(lvl));
-    }
-
-    protected static int calcAttack(int lvl) {
-        return 11 + lvl;
-    }
-
-    protected static int calcDefence(int lvl) {
-        return 1 + lvl / 2;
-    }
-
-    protected static int calcHp(int lvl) {
-        return 15 + lvl * 4;
-    }
-
-    protected static int calcXp(int lvl) {
-        return 60 + (lvl / 2 + lvl) * 95;
+        super(NAME, ACTIONS, GOODBYE, lvl, 18, 4, 22, 95);
     }
 }
