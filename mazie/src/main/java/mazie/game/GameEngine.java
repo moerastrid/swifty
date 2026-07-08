@@ -91,6 +91,10 @@ public class GameEngine {
                 return;
             }
         }
+        // #todo monster eigen staat? monster.isalive? & monster.takesdamage() -> return isalive?
+        // #todo hero hetzelfde? dus geen setters? (setHp)
+        // nu weet game engine hoe de hp van monster afneemt -> 
+
 
         // monster attacks hero
         int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
@@ -111,6 +115,11 @@ public class GameEngine {
 
     }
 
+    // misschien vanuit monster ook? -> gaat om de interne toestand van het monster
+    // monster zou je een soort 'get artifact value' aan vragen oid.
+    // berekening is monster. drop kans is game engine.
+    // je kunt ook zeggen dat monster altijd een artifact heeft en je die soms krijgt
+    // dan kun je al zien wat het monster heeft ook.
     private Artifact dropArtifact(Monster monster) {
         int value = (monster.getAttack() + monster.getDefence()) / 4;
         if (value < 1) {

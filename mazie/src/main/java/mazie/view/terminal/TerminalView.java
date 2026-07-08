@@ -58,12 +58,13 @@ public class TerminalView implements GameView {
 		""";
 
         final var options = new HashMap<String, HeroType>();
-        options.put("b", HeroType.BEAR);
-        options.put("bear", HeroType.BEAR);
+        options.put("w", HeroType.WEEVIL);
+        options.put("weevil", HeroType.WEEVIL);
         options.put("f", HeroType.FROG);
         options.put("frog", HeroType.FROG);
-        options.put("h", HeroType.HARE);
-        options.put("hare", HeroType.HARE);
+        options.put("m", HeroType.MOUSE);
+        options.put("mouse", HeroType.MOUSE);
+        // #todo waarom doe je dit hier handmatig putten? herotype.values()
 
         HeroType type = choose(typePrompt, options);
 

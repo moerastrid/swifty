@@ -24,17 +24,17 @@ public class Main {
 
         try {
             run(args);
-        } catch (FatalException fe) {
-            System.err.println(fe.getMessage());
+        } catch (FatalException ex) {
+            System.err.println(ex.getMessage());
             System.exit(EX_UNAVAILABLE);
-        } catch (ModelException me) {
-            System.err.println(me.getMessage());
+        } catch (ModelException | IllegalArgumentException ex) {
+            System.err.println(ex.getMessage());
             System.exit(EX_SOFTWARE);
-        } catch (ParseException pe) {
-            System.err.println(pe.getMessage());
+        } catch (ParseException ex) {
+            System.err.println(ex.getMessage());
             System.exit(EX_USAGE);
-        } catch (QuitException qe) {
-            System.err.println(qe.getMessage());
+        } catch (QuitException ex) {
+            System.err.println(ex.getMessage());
             System.exit(EX_SUCCESS);
         } catch (Throwable t) {
             System.err.println(t.getMessage());
@@ -80,7 +80,7 @@ public class Main {
             case "gui", "g" ->
                 false;
             default ->
-                throw new ParseException("unknown argument (%s) pls help".formatted(args[0]));
+                throw new ParseException("unknown argument: [%s]".formatted(args[0]));
         };
     }
 }

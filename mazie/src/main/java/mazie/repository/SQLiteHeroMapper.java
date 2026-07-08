@@ -44,28 +44,21 @@ public class SQLiteHeroMapper {
     }
 
     private static HeroType convertHeroType(String type) {
-        return switch (type) {
-            case "FROG" ->
-                HeroType.FROG;
-            case "HARE" ->
-                HeroType.HARE;
-            case "BEAR" ->
-                HeroType.BEAR;
-            default ->
-                throw new RepositoryException("can't contvert hero type [%s]".formatted(type));
-        };
+
+        for (HeroType enumType : HeroType.values()) {
+            if (enumType.toString().equals(type)) {
+                return enumType;
+            }
+        }
+        throw new IllegalArgumentException("can't contvert hero type [%s]".formatted(type));
     }
 
     private static ArtifactType convertArtifactType(String type) {
-        return switch (type) {
-            case "WEAPON" ->
-                ArtifactType.WEAPON;
-            case "ARMOUR" ->
-                ArtifactType.ARMOUR;
-            case "HELMET" ->
-                ArtifactType.HELMET;
-            default ->
-                throw new RepositoryException("can't contvert artifact type [%s]".formatted(type));
-        };
+        for (ArtifactType enumType : ArtifactType.values()) {
+            if (enumType.toString().equals(type)) {
+                return enumType;
+            }
+        }
+        throw new RepositoryException("can't contvert artifact type [%s]".formatted(type));
     }
 }

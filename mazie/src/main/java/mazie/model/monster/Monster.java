@@ -6,13 +6,13 @@ import mazie.exception.ModelException;
 
 public abstract class Monster {
 
-    final String name;
-    final String[] actions;
-    final String finalMessage;
-    final int attack;
-    final int defence;
-    int hp;
-    final int xpReward;
+    private final String name;
+    private final String[] actions;
+    private final String finalMessage;
+    private final int attack;
+    private final int defence;
+    private int hp;
+    private final int xpReward;
 
     private static final Random RANDOM = new Random();
 
@@ -61,19 +61,19 @@ public abstract class Monster {
         return this.xpReward;
     }
 
-    protected static int calcAttack(int base, int lvl) {
+    private static int calcAttack(int base, int lvl) {
         return base + (base * (lvl - 1)) / 50;
     }
 
-    protected static int calcDefence(int base, int lvl) {
+    private static int calcDefence(int base, int lvl) {
         return base + (base * (lvl - 1)) / 50;
     }
 
-    protected static int calcHp(int base, int lvl) {
+    private static int calcHp(int base, int lvl) {
         return base + (base * (lvl - 1)) / 50;
     }
 
-    protected static int calcXpReward(int base, int lvl) {
+    private static int calcXpReward(int base, int lvl) {
         return base + (base * (lvl - 1)) / 10;
     }
 

@@ -139,6 +139,7 @@ public class GameController {
         }
     }
 
+    // #todo wat zijn deze 6 if - statements -> opsplitsen
     private boolean turn(GameEngine engine, Hero hero) {
         final var dir = view.askDirection();
         final var monster = engine.move(dir);

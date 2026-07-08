@@ -53,5 +53,4 @@ public class MonsterFactory {
                 new Vim(heroLevel);
         };
     }
-
 }

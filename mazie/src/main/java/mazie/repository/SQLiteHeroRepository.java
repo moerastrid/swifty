@@ -5,11 +5,13 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 import java.util.Map;
 
 import mazie.exception.FatalException;
 import mazie.exception.RepositoryException;
 import mazie.model.Hero;
+import mazie.model.HeroType;
 
 public class SQLiteHeroRepository implements HeroRepository {
     private static final String DB_URL = "jdbc:sqlite:data/swingy.db";
@@ -21,23 +23,28 @@ public class SQLiteHeroRepository implements HeroRepository {
     private static final String HERO_NO_ID = "hero with no ID";
 
     private static final String FOREIGN_KEYS_ON_SQL = "PRAGMA foreign_keys = ON;";
+
+    private static final String HERO_TYPES = String.join(", ", Arrays.asList(HeroType.values()).stream().map(type -> "\'%s\'".formatted(type.name())).toList());
+
+    // #todo artifact types ook zo
+
     private static final String CREATE_HERO_TABLE_SQL = """
             CREATE TABLE IF NOT EXISTS hero(
                 id      INTEGER PRIMARY KEY AUTOINCREMENT,
                 name    TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 2 AND 30),
-                type    TEXT NOT NULL CHECK(type IN ('FROG', 'HARE', 'BEAR')),
+                type    TEXT NOT NULL (CHECK type IN(%s)),
                 level   INTEGER NOT NULL CHECK(level >= 1),
                 xp      INTEGER NOT NULL CHECK(xp >= 0),
                 attack  INTEGER NOT NULL CHECK(attack >= 0),
                 defence INTEGER NOT NULL CHECK(defence >= 0),
                 hp      INTEGER NOT NULL
             );
-        """;
+        """.formatted(HERO_TYPES);
     private static final String CREATE_ARTIFACT_TABLE_SQL = """
             CREATE TABLE IF NOT EXISTS artifact(
                 id      INTEGER PRIMARY KEY AUTOINCREMENT,
                 name    TEXT NOT NULL,
-                type    TEXT NOT NULL CHECK(type IN ('WEAPON', 'HELMET', 'ARMOUR')),
+                type    TEXT NOT NULL,
                 value   INTEGER NOT NULL CHECK(value >= 0),
                 hero_id INTEGER NOT NULL,
                 FOREIGN KEY(hero_id) REFERENCES hero(id)
