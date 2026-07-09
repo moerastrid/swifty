@@ -84,7 +84,6 @@ public class SQLiteHeroRepository implements HeroRepository {
 
     private final Connection connection;
 
-
     public SQLiteHeroRepository() {
         this.connection = setupConnection();
         setAutoCommit();
@@ -151,7 +150,7 @@ public class SQLiteHeroRepository implements HeroRepository {
     private void insertHero(Hero hero) throws SQLException {
         try (final var statement = connection.prepareStatement(INSERT_HERO_SQL, Statement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, hero.getName());
-            statement.setString(2, hero.getType().toString());
+            statement.setString(2, hero.getType().name());
             statement.setInt(3, hero.getLevel());
             statement.setInt(4, hero.getXp());
             statement.setInt(5, hero.getAttack());
@@ -174,7 +173,7 @@ public class SQLiteHeroRepository implements HeroRepository {
         for (final var artifact : hero.getArtifacts()) {
             try (final var statement = connection.prepareStatement(INSERT_ARTIFACT_SQL, Statement.RETURN_GENERATED_KEYS)) {
                 statement.setString(1, artifact.name());
-                statement.setString(2, artifact.type().toString());
+                statement.setString(2, artifact.type().name());
                 statement.setInt(3, artifact.value());
                 statement.setInt(4, hero.getId());
                 statement.executeUpdate();
@@ -202,7 +201,7 @@ public class SQLiteHeroRepository implements HeroRepository {
     private void updateHero(Hero hero) throws SQLException {
         try (final var statement = connection.prepareStatement(UPDATE_HERO_SQL)) {
             statement.setString(1, hero.getName());
-            statement.setString(2, hero.getType().toString());
+            statement.setString(2, hero.getType().name());
             statement.setInt(3, hero.getLevel());
             statement.setInt(4, hero.getXp());
             statement.setInt(5, hero.getAttack());
