@@ -13,6 +13,6 @@ public class Bus extends Monster {
     final static String GOODBYE = "you arrive at your stop and leave the bus.";
 
     public Bus(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 17, 3, 24, 90);
+        super(NAME, ACTIONS, GOODBYE, lvl, 10, 3, 17, 71);
     }
 }

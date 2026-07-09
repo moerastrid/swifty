@@ -12,6 +12,6 @@ public class TeamBuilding extends Monster {
     final static String GOODBYE = "the event got extended during lunch, but is over now. you question why you ever started working in corporate.";
 
     public TeamBuilding(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 24, 2, 13, 150);
+        super(NAME, ACTIONS, GOODBYE, lvl, 19, 4, 25, 104);
     }
 }

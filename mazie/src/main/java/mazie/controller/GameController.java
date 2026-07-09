@@ -59,7 +59,7 @@ public class GameController {
 
     private Hero setup() {
 
-        // #todo: alleen als er helden zijn om te laten, vragen of user een nieuwe game wil beginnen. Nu geen repo dus altijd true?
+        // #todo: alleen als er helden zijn om te laden, vragen of user een nieuwe game wil beginnen. Nu geen repo dus altijd true?
         Map<Integer, Hero> heroes = Collections.emptyMap();
         try {
             heroes = repository.loadAllHeroes();

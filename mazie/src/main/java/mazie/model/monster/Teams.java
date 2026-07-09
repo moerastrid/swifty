@@ -13,6 +13,6 @@ public class Teams extends Monster {
     final static String GOODBYE = "this could have been an email";
 
     public Teams(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 13, 4, 34, 80);
+        super(NAME, ACTIONS, GOODBYE, lvl, 13, 3, 16, 73);
     }
 }

@@ -11,6 +11,6 @@ public class Park extends Monster {
     final static String GOODBYE = "what a lovely time outside, you're sad to go";
 
     public Park(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 12, 3, 20, 55);
+        super(NAME, ACTIONS, GOODBYE, lvl, 5, 2, 12, 42);
     }
 }

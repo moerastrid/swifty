@@ -10,6 +10,6 @@ public class Library extends Monster {
     final static String GOODBYE = "you leave the library, once again with more books than you planned on borrowing.";
 
     public Library(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 15, 2, 15, 55);
+        super(NAME, ACTIONS, GOODBYE, lvl, 6, 2, 10, 40);
     }
 }

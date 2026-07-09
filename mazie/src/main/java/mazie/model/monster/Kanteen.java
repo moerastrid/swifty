@@ -12,6 +12,6 @@ public class Kanteen extends Monster {
     final static String GOODBYE = "alright, time to get back to work!";
 
     public Kanteen(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 14, 5, 32, 90);
+        super(NAME, ACTIONS, GOODBYE, lvl, 11, 3, 20, 72);
     }
 }

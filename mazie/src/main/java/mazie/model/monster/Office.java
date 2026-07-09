@@ -12,6 +12,6 @@ public class Office extends Monster {
     final static String GOODBYE = "17 o'clock, time to leave this place.";
 
     public Office(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 18, 4, 22, 95);
+        super(NAME, ACTIONS, GOODBYE, lvl, 14, 3, 19, 74);
     }
 }

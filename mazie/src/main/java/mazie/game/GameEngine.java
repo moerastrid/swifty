@@ -94,7 +94,7 @@ public class GameEngine {
     // je kunt ook zeggen dat monster altijd een artifact heeft en je die soms krijgt
     // dan kun je al zien wat het monster heeft ook.
     private Artifact dropArtifact(Monster monster) {
-        int value = (monster.getXpReward()) / 12;
+        int value = (monster.getXpReward()) / 20;
         if (value < 1) {
             value = 1;
         }

@@ -11,7 +11,7 @@ public class IKEA extends Monster {
     final static String GOODBYE = "you leave with candles.";
 
     public IKEA(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 19, 1, 9, 60);
+        super(NAME, ACTIONS, GOODBYE, lvl, 8, 2, 8, 43);
     }
 
 }

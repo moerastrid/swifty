@@ -11,6 +11,6 @@ public class Hairsalon extends Monster {
     final static String GOODBYE = "you leave with a new hairdo, not entirely sure if you like it yet.";
 
     public Hairsalon(int lvl) {
-        super(NAME, ACTIONS, GOODBYE, lvl, 23, 2, 14, 85);
+        super(NAME, ACTIONS, GOODBYE, lvl, 12, 3, 18, 70);
     }
 }

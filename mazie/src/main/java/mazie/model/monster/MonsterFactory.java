@@ -41,7 +41,7 @@ public class MonsterFactory {
     }
 
     public Monster newHardMonster(int heroLevel) {
-        final var bound = (heroLevel > 5) ? 4 : 3;
+        final var bound = (heroLevel >= 5) ? 4 : 3;
         return switch (RANDOM.nextInt(bound)) {
             case 0 ->
                 new Swimmingpool(heroLevel);
