@@ -61,9 +61,9 @@ public abstract class Monster {
         return this.xpReward;
     }
 
-    private static int calcForLevel(int baseValue, int level) {
+    private int calcForLevel(int val, int level) {
         final var levelIncrement = Math.pow(1.15, (double)(level - 1));
-        return (int) (baseValue * levelIncrement);
+        return (int)(val * levelIncrement);
     }
 
     @Override
