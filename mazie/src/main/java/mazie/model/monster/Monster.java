@@ -20,10 +20,10 @@ public abstract class Monster {
         this.name = name;
         this.actions = actions;
         this.finalMessage = finalMessage;
-        this.attack = calcAttack(baseAttack, heroLevel);
-        this.defence = calcDefence(baseDefence, heroLevel);
-        this.hp = calcHp(baseHp, heroLevel);
-        this.xpReward = calcXpReward(baseXpReward, heroLevel);
+        this.attack = calcForLevel(baseAttack, heroLevel);
+        this.defence = calcForLevel(baseDefence, heroLevel);
+        this.hp = calcForLevel(baseHp, heroLevel);
+        this.xpReward = calcForLevel(baseXpReward, heroLevel);
     }
 
     public String getName() {
@@ -61,20 +61,9 @@ public abstract class Monster {
         return this.xpReward;
     }
 
-    private static int calcAttack(int base, int lvl) {
-        return base + (base * (lvl - 1)) / 50;
-    }
-
-    private static int calcDefence(int base, int lvl) {
-        return base + (base * (lvl - 1)) / 50;
-    }
-
-    private static int calcHp(int base, int lvl) {
-        return base + (base * (lvl - 1)) / 50;
-    }
-
-    private static int calcXpReward(int base, int lvl) {
-        return base + (base * (lvl - 1)) / 10;
+    private static int calcForLevel(int baseValue, int level) {
+        final var levelIncrement = Math.pow(1.15, (double)(level - 1));
+        return (int) (baseValue * levelIncrement);
     }
 
     @Override

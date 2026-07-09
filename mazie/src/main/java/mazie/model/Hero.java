@@ -65,7 +65,6 @@ public class Hero {
         this.xp += xp;
 
         if (this.xp >= xpNeed) {
-            this.xp -= xpNeed;
             return lvlUp();
         }
         return false;
@@ -73,11 +72,15 @@ public class Hero {
 
     private boolean lvlUp() {
         this.level += 1;
-        final int hpMax = type.baseHp + ((this.level - 1) * type.baseHp / 10);
-        final int newHp = this.hp + (hpMax / 2);
+
+        final var levelIncrement = Math.pow(1.1, (double)(this.level - 1));
+
+        this.attack = (int)(type.baseAttack * levelIncrement);
+        this.defence = (int)(type.baseDefence * levelIncrement);
+        final var hpMax = (int)(type.baseHp * levelIncrement);
+
+        final var newHp = this.hp + (hpMax / 2);
         this.hp = (newHp > hpMax) ? hpMax : newHp;
-        this.attack = type.baseAttack + ((this.level - 1) * type.baseAttack / 10);
-        this.defence = type.baseDefence + ((this.level - 1) * type.baseDefence / 10);
 
         return true;
     }

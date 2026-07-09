@@ -8,10 +8,13 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Map;
 
+import java.util.stream.Collectors;
+
 import mazie.exception.FatalException;
 import mazie.exception.RepositoryException;
 import mazie.model.Hero;
 import mazie.model.HeroType;
+import mazie.model.ArtifactType;
 
 public class SQLiteHeroRepository implements HeroRepository {
     private static final String DB_URL = "jdbc:sqlite:data/swingy.db";
@@ -24,7 +27,9 @@ public class SQLiteHeroRepository implements HeroRepository {
 
     private static final String FOREIGN_KEYS_ON_SQL = "PRAGMA foreign_keys = ON;";
 
-    private static final String HERO_TYPES = String.join(", ", Arrays.asList(HeroType.values()).stream().map(type -> "\'%s\'".formatted(type.name())).toList());
+    private static final String HERO_TYPE = Arrays.stream(HeroType.values()).map(type -> "'%s'".formatted(type.name())).collect(Collectors.joining(", "));
+    private static final String ARTIFACT_TYPE = Arrays.stream(ArtifactType.values()).map(type -> "'%s'".formatted(type.name())).collect(Collectors.joining(", "));
+    
 
     // #todo artifact types ook zo
 
@@ -32,24 +37,24 @@ public class SQLiteHeroRepository implements HeroRepository {
             CREATE TABLE IF NOT EXISTS hero(
                 id      INTEGER PRIMARY KEY AUTOINCREMENT,
                 name    TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 2 AND 30),
-                type    TEXT NOT NULL (CHECK type IN(%s)),
+                type    TEXT NOT NULL CHECK(type IN (%s)),
                 level   INTEGER NOT NULL CHECK(level >= 1),
                 xp      INTEGER NOT NULL CHECK(xp >= 0),
                 attack  INTEGER NOT NULL CHECK(attack >= 0),
                 defence INTEGER NOT NULL CHECK(defence >= 0),
                 hp      INTEGER NOT NULL
             );
-        """.formatted(HERO_TYPES);
+        """.formatted(HERO_TYPE);
     private static final String CREATE_ARTIFACT_TABLE_SQL = """
             CREATE TABLE IF NOT EXISTS artifact(
                 id      INTEGER PRIMARY KEY AUTOINCREMENT,
                 name    TEXT NOT NULL,
-                type    TEXT NOT NULL,
+                type    TEXT NOT NULL CHECK(type IN (%s)),
                 value   INTEGER NOT NULL CHECK(value >= 0),
                 hero_id INTEGER NOT NULL,
                 FOREIGN KEY(hero_id) REFERENCES hero(id)
             );
-        """;
+        """.formatted(ARTIFACT_TYPE);
     private static final String LOAD_HEROES_SQL = """
                 SELECT h.*, a.name AS a_name, a.type AS a_type, a.value AS a_value, a.hero_id AS a_hero_id
                 FROM hero h
