@@ -54,7 +54,13 @@ public abstract class Monster {
     }
 
     public int getXpReward() {
-        return this.xpReward;
+        final var xpBonus = 42;
+        return this.xpReward + xpBonus;
+    }
+
+    public int getArtifactValue() {
+        final var value = this.xpReward / 20;
+        return value < 1 ? 1 : value;
     }
 
     public void takeDamage(int damage) {
