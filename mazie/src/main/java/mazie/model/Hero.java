@@ -34,9 +34,6 @@ public class Hero {
     private Artifact armour = null;
     private Artifact helmet = null;
 
-    private Hero() {
-    }
-
     public Hero(String name, HeroType type) {
         this.name = name;
         this.type = type;
@@ -97,35 +94,16 @@ public class Hero {
         return this.name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public HeroType getType() {
         return this.type;
-    }
-
-    public void setType(HeroType type) {
-        if (type == null) {
-            throw new ModelException("that aint my type :(");
-        }
-        this.type = type;
     }
 
     public int getLevel() {
         return this.level;
     }
 
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
     public int getXp() {
         return this.xp;
-    }
-
-    public void setXp(int xp) {
-        this.xp = xp;
     }
 
     public int getAttack() {
@@ -141,10 +119,6 @@ public class Hero {
         return ("%d (%d + %d)".formatted(this.getTotalAttack(), this.getAttack(), bonus));
     }
 
-    public void setAttack(int attack) {
-        this.attack = attack;
-    }
-
     public int getDefence() {
         return this.defence;
     }
@@ -156,10 +130,6 @@ public class Hero {
     public String getDefenceString() {
         final var bonus = (this.armour == null) ? 0 : this.armour.value();
         return ("%d (%d + %d)".formatted(this.getTotalDefence(), this.getDefence(), bonus));
-    }
-
-    public void setDefence(int defence) {
-        this.defence = defence;
     }
 
     public int getHp() {
@@ -183,33 +153,12 @@ public class Hero {
         return this.weapon;
     }
 
-    public void setWeapon(Artifact weapon) {
-        if (weapon == null || weapon.type() != ArtifactType.WEAPON) {
-            throw new ModelException("thats no weapon :(");
-        }
-        this.weapon = weapon;
-    }
-
     public Artifact getArmour() {
         return this.armour;
     }
 
-    public void setArmour(Artifact armour) {
-        if (armour == null || armour.type() != ArtifactType.ARMOUR) {
-            throw new ModelException("thats no armour :(");
-        }
-        this.armour = armour;
-    }
-
     public Artifact getHelmet() {
         return this.helmet;
-    }
-
-    public void setHelmet(Artifact helmet) {
-        if (helmet == null || helmet.type() != ArtifactType.HELMET) {
-            throw new ModelException("thats no helmet :(");
-        }
-        this.helmet = helmet;
     }
 
     public List<Artifact> getArtifacts() {
@@ -228,16 +177,16 @@ public class Hero {
 
     public void setArtifact(Artifact artifact) {
         if (artifact == null) {
-            throw new ModelException("thats null :(");
+            throw new ModelException("that artifact is null :(");
         }
 
         switch (artifact.type()) {
             case WEAPON ->
-                this.setWeapon(artifact);
+                this.weapon = artifact;
             case ARMOUR ->
-                this.setArmour(artifact);
+                this.armour = artifact;
             case HELMET ->
-                this.setHelmet(artifact);
+                this.helmet = artifact;
         }
     }
 
