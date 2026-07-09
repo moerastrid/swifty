@@ -53,6 +53,17 @@ public class Hero {
         this.hp = hp;
     }
 
+    public void takeDamage(int damage) {
+        final var damageSum = damage - this.defence;
+        final var totalDamage = damageSum > 1 ? damageSum : 1;
+        System.out.println("damage to hero: " + totalDamage); //#todo remove (debugging)
+        this.hp -= totalDamage;
+    }
+
+    public boolean isDead() {
+        return this.getTotalHp() <= 0;
+    }
+
     /*
         returns true if lvlUp = true.
      */

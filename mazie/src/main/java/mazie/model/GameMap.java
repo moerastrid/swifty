@@ -18,7 +18,7 @@ public class GameMap {
     public GameMap(int heroLevel) {
         this.factory = MonsterFactory.getInstance();
         this.random = new Random();
-        this.size = (heroLevel - 1) * 5 + 10 - (heroLevel % 2);
+        this.size = ((heroLevel - 1) * 5 + 10 - (heroLevel % 2) + 2);
         this.heroX = size / 2;
         this.heroY = size / 2;
         this.monsters = new Monster[size][size];

@@ -53,12 +53,19 @@ public abstract class Monster {
         return this.hp;
     }
 
-    public void setHp(int hp) {
-        this.hp = hp;
-    }
-
     public int getXpReward() {
         return this.xpReward;
+    }
+
+    public void takeDamage(int damage) {
+        final var damageSum = damage - this.defence;
+        final var totalDamage = damageSum > 1 ? damageSum : 1;
+        System.out.println("damage to monster: " + totalDamage); //#todo remove (debugging)
+        this.hp -= totalDamage;
+    }
+
+    public boolean isDead() {
+        return this.hp <= 0;
     }
 
     private int calcForLevel(int val, int level) {

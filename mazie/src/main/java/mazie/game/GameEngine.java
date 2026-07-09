@@ -29,13 +29,13 @@ public class GameEngine {
 
         final var monster = map.getMonsterInDirection(dir);
 
-        if (monster == null) {
-            map.moveHero(dir);
-            this.currentDir = null;
-            return null;
-        } else {
+        if (monster != null) {
             return monster;
         }
+
+        map.moveHero(dir);
+        this.currentDir = null;
+        return null;
     }
 
     public boolean runAway() {
@@ -74,33 +74,10 @@ public class GameEngine {
     }
 
     private void fightRound(Monster monster) {
-
         // hero attacks monster
-        int damageToMonster = this.hero.getTotalAttack() - monster.getDefence();
-        System.out.println("damage to monster: " + damageToMonster); //#todo remove (debugging)
-
-        if (damageToMonster <= 0) {
-            damageToMonster = 1;
-        }
-
-        if (damageToMonster > 0) {
-            final var newMonsterHp = monster.getHp() - damageToMonster;
-            monster.setHp(newMonsterHp);
-
-            if (monster.getHp() <= 0) {
-                return;
-            }
-        }
-        // #todo monster eigen staat? monster.isalive? & monster.takesdamage() -> return isalive?
-        // #todo hero hetzelfde? dus geen setters? (setHp)
-        // nu weet game engine hoe de hp van monster afneemt -> 
-
-
-        // monster attacks hero
-        int damageToHero = monster.getAttack() - this.hero.getTotalDefence();
-
-        if (damageToHero <= 0) {
-            damageToHero = 1;
+        monster.takeDamage(this.hero.getTotalAttack());
+        if (monster.isDead()) {
+            return;
         }
 
         // monster 50% chance attacks hero
@@ -108,11 +85,7 @@ public class GameEngine {
             System.out.println("monster misses"); //#todo remove (debugging)
             return;
         }
-        System.out.println("damage to hero: " + damageToHero); //#todo remove (debugging)
-
-        final var newHp = this.hero.getHp() - damageToHero;
-        this.hero.setHp(newHp);
-
+        hero.takeDamage(monster.getAttack());
     }
 
     // misschien vanuit monster ook? -> gaat om de interne toestand van het monster
@@ -121,7 +94,7 @@ public class GameEngine {
     // je kunt ook zeggen dat monster altijd een artifact heeft en je die soms krijgt
     // dan kun je al zien wat het monster heeft ook.
     private Artifact dropArtifact(Monster monster) {
-        int value = (monster.getAttack() + monster.getDefence()) / 4;
+        int value = (monster.getXpReward()) / 12;
         if (value < 1) {
             value = 1;
         }
