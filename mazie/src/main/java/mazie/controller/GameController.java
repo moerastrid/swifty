@@ -11,6 +11,7 @@ import mazie.exception.QuitException;
 import mazie.exception.RepositoryException;
 import mazie.game.GameEngine;
 import mazie.model.Hero;
+import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
 
@@ -139,12 +140,20 @@ public class GameController {
         }
     }
 
-    // #todo wat zijn deze 6 if - statements -> opsplitsen
-    private boolean turn(GameEngine engine, Hero hero) {
+    private Monster takeStepOrMonster(GameEngine engine) {
         final var dir = view.askDirection();
         final var monster = engine.move(dir);
         if (monster == null) {
             view.showEmptyStep();
+        }
+        return monster;
+    }
+
+    // #todo wat zijn deze 6 if - statements -> opsplitsen
+    private boolean turn(GameEngine engine, Hero hero) {
+
+        final var monster = takeStepOrMonster(engine);
+        if (monster == null) {
             return true;
         }
 
@@ -194,7 +203,7 @@ public class GameController {
                 }
             }
         }
-        
+
         return true;
     }
 

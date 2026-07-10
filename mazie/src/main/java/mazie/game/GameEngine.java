@@ -14,6 +14,7 @@ public class GameEngine {
     private final GameMap map;
     private final Random random = new Random();
     private Direction currentDir = null;
+    private Monster currentMonster = null;
 
     public GameEngine(Hero hero) {
         this.hero = hero;
@@ -26,16 +27,11 @@ public class GameEngine {
 
     public Monster move(Direction dir) {
         this.currentDir = dir;
-
-        final var monster = map.getMonsterInDirection(dir);
-
-        if (monster != null) {
-            return monster;
+        this.currentMonster = map.advance(dir);
+        if (this.currentMonster == null) {
+            this.currentDir = null;
         }
-
-        map.moveHero(dir);
-        this.currentDir = null;
-        return null;
+        return currentMonster;
     }
 
     public boolean runAway() {
@@ -51,14 +47,14 @@ public class GameEngine {
     }
 
     public FightResult fight() {
-        final var monster = this.map.getMonsterInDirection(this.currentDir);
+        final var monster = this.currentMonster;
 
-        while (this.hero.getTotalHp() > 0 && monster.getHp() > 0) {
+        while (!this.hero.isDead() && !monster.isDead()) {
             fightRound(monster);
         }
 
         // no win
-        if (this.hero.getTotalHp() <= 0) {
+        if (this.hero.isDead()) {
             return new FightResult(false, false, null);
         }
 
@@ -66,9 +62,10 @@ public class GameEngine {
         final var levelUp = hero.gainXp(monster.getXpReward());
         final var drop = dropArtifact(monster);
 
-        map.removeMonster(currentDir);
-        map.moveHero(currentDir);
+        map.advance(currentDir);
+
         currentDir = null;
+        currentMonster = null;
 
         return new FightResult(true, levelUp, drop);
     }

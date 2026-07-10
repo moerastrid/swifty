@@ -7,14 +7,13 @@ import mazie.model.monster.MonsterFactory;
 
 public class GameMap {
 
-    private MonsterFactory factory;
+    private final MonsterFactory factory;
     private final int size;
     private final Monster[][] monsters;
     private final Random random;
     private int heroX = 0;
     private int heroY = 0;
 
-    // private GameMap() {};
     public GameMap(int heroLevel) {
         this.factory = MonsterFactory.getInstance();
         this.random = new Random();
@@ -25,51 +24,38 @@ public class GameMap {
         this.generateMonsters(random, heroLevel);
     }
 
-    public int getSize() {
-        return this.size;
+    public boolean isHeroOnEdge() {
+        return isEdge(this.heroX, this.heroY);
     }
 
-    public int getHeroX() {
-        return this.heroX;
+    public Monster advance(Direction dir) {
+        final var monster = this.getMonsterInDirection(dir);
+        if (monster == null) {
+            this.moveHero(dir);
+        } else if (monster.isDead()) {
+            this.removeMonster(dir);
+            return advance(dir);
+        }
+        return monster;
     }
 
-    public int getHeroY() {
-        return this.heroY;
-    }
-
-    public Monster[][] getMonsters() {
-        return this.monsters;
-    }
-
-    public Monster getMonster(int x, int y) {
-        return (monsters[x][y]);
-    }
-
-    public Monster getMonsterInDirection(Direction dir) {
-        final var x = this.getHeroX() + dir.dx;
-        final var y = this.getHeroY() + dir.dy;
+    private Monster getMonsterInDirection(Direction dir) {
+        final var x = this.heroX + dir.dx;
+        final var y = this.heroY + dir.dy;
 
         return (monsters[x][y]);
     }
 
-    public void removeMonster(int x, int y) {
-        monsters[x][y] = null;
-    }
-
-    public void removeMonster(Direction dir) {
-        final var x = this.getHeroX() + dir.dx;
-        final var y = this.getHeroY() + dir.dy;
-
-        monsters[x][y] = null;
-    }
-
-    public void moveHero(Direction dir) {
+    private void moveHero(Direction dir) {
         this.heroX += dir.dx;
         this.heroY += dir.dy;
     }
 
-    public boolean isHeroOnEdge() {
-        return isEdge(this.heroX, this.heroY);
+    private void removeMonster(Direction dir) {
+        final var x = this.heroX + dir.dx;
+        final var y = this.heroY + dir.dy;
+
+        monsters[x][y] = null;
     }
 
     // public boolean isHeroNextToMonster(Direction dir) {

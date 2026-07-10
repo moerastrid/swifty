@@ -156,10 +156,6 @@ public class Hero {
         return ("%d (%d + %d)".formatted(this.getTotalHp(), this.getHp(), bonus));
     }
 
-    public void setHp(int hp) {
-        this.hp = hp;
-    }
-
     public Artifact getWeapon() {
         return this.weapon;
     }
