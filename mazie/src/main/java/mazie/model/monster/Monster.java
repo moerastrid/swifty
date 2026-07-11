@@ -14,7 +14,7 @@ public abstract class Monster {
     private int hp;
     private final int xpReward;
 
-    private static final Random RANDOM = new Random();
+    private final Random random = new Random();
 
     protected Monster(String name, String[] actions, String finalMessage, int heroLevel, int baseAttack, int baseDefence, int baseHp, int baseXpReward) {
         this.name = name;
@@ -34,7 +34,7 @@ public abstract class Monster {
         if (actions.length <= 0) {
             throw new ModelException("%s has no action".formatted(this.name));
         }
-        return actions[RANDOM.nextInt(actions.length)];
+        return actions[random.nextInt(actions.length)];
     }
 
     public String getFinalMessage() {

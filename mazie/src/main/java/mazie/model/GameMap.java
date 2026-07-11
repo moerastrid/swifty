@@ -21,7 +21,7 @@ public class GameMap {
         this.heroX = size / 2;
         this.heroY = size / 2;
         this.monsters = new Monster[size][size];
-        this.generateMonsters(random, heroLevel);
+        this.generateMonsters(heroLevel);
     }
 
     public boolean isHeroOnEdge() {
@@ -61,25 +61,16 @@ public class GameMap {
     // public boolean isHeroNextToMonster(Direction dir) {
     //     return isMonster(this.heroX + dir.dx, this.heroY + dir.dy);
     // }
-    private void generateMonsters(Random random, int heroLevel) {
+    private void generateMonsters(int heroLevel) {
         final int total = size * size;
 
-        final int hardCount = total / 27;
-        final int mediumCount = total / 12;
-        final int easyCount = total / 9;
-
-        for (int i = 0; i < easyCount; i++) {
-            this.generateMonster(random, factory.newEasyMonster(heroLevel));
-        }
-        for (int i = 0; i < mediumCount; i++) {
-            this.generateMonster(random, factory.newMediumMonster(heroLevel));
-        }
-        for (int i = 0; i < hardCount; i++) {
-            this.generateMonster(random, factory.newHardMonster(heroLevel));
+        for (int i = 0; i < total; i++) {
+            final var monster = factory.generateMonster(heroLevel);
+            this.placeOnMap(monster);
         }
     }
 
-    private void generateMonster(Random random, Monster monster) {
+    private void placeOnMap(Monster monster) {
         int x = random.nextInt(1, size - 2);
         int y = random.nextInt(1, size - 2);
 
@@ -87,7 +78,7 @@ public class GameMap {
             x = random.nextInt(1, size - 2);
             y = random.nextInt(1, size - 2);
         }
-        monsters[x][y] = monster;
+        this.monsters[x][y] = monster;
     }
 
     private boolean isAvailable(int x, int y) {

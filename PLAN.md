@@ -49,9 +49,11 @@ java -jar target/mazie.jar gui
 
 ---
 
-## Current status (2026-07-09)
+## Current status (2026-07-11)
 
 All mandatory requirements are implemented and match the subject (see checklist below). Console and GUI modes are both fully playable end-to-end. Bonus: SQLite persistence is done; runtime console/GUI switching is not started. Remaining work is the polish/quality wishlist below — nothing there is blocking or required for the mandatory grade.
+
+A SOLID/encapsulation pass (student-initiated, started from a "Tell, Don't Ask" refactor of `Hero`/`Monster.takeDamage()`) is mostly done: `GameMap` now exposes one cohesive `advance(Direction)` command instead of separate ask-then-act calls, and `MonsterFactory.generateMonster(heroLevel)` owns the easy/medium/hard difficulty distribution (48/36/16%) while `GameMap` only handles placement on the grid.
 
 ---
 

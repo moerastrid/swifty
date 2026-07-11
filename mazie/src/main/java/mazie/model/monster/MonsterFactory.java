@@ -5,7 +5,13 @@ import java.util.Random;
 public class MonsterFactory {
 
     private static final MonsterFactory instance = new MonsterFactory();
-    private static final Random RANDOM = new Random();
+    private final Random random = new Random();
+
+    private static enum Difficulty {
+        EASY,
+        MEDIUM,
+        HARD;
+    }
 
     private MonsterFactory() {
     }
@@ -14,8 +20,35 @@ public class MonsterFactory {
         return instance;
     }
 
-    public Monster newEasyMonster(int heroLevel) {
-        return switch (RANDOM.nextInt(3)) {
+    public Monster generateMonster(int heroLevel) {
+
+        return switch(this.pickDifficulty()) {
+            case EASY ->
+                newEasyMonster(heroLevel);
+            case MEDIUM ->
+                newMediumMonster(heroLevel);
+            case HARD ->
+                newHardMonster(heroLevel);
+        };
+    }
+
+    private Difficulty pickDifficulty() {
+        final var easy = 12;
+        final var medium = 9;
+        final var hard = 4;
+        final var roll = random.nextInt(easy + medium + hard);
+
+        if (roll < easy) {
+            return Difficulty.EASY;
+        }
+        if (roll < (easy + medium)) {
+            return Difficulty.MEDIUM;
+        }
+        return Difficulty.HARD;
+    }
+
+    private Monster newEasyMonster(int heroLevel) {
+        return switch (random.nextInt(3)) {
             case 0 ->
                 new Library(heroLevel);
             case 1 ->
@@ -25,8 +58,8 @@ public class MonsterFactory {
         };
     }
 
-    public Monster newMediumMonster(int heroLevel) {
-        return switch (RANDOM.nextInt(5)) {
+    private Monster newMediumMonster(int heroLevel) {
+        return switch (random.nextInt(5)) {
             case 0 ->
                 new Hairsalon(heroLevel);
             case 1 ->
@@ -40,9 +73,9 @@ public class MonsterFactory {
         };
     }
 
-    public Monster newHardMonster(int heroLevel) {
+    private Monster newHardMonster(int heroLevel) {
         final var bound = (heroLevel >= 5) ? 4 : 3;
-        return switch (RANDOM.nextInt(bound)) {
+        return switch (random.nextInt(bound)) {
             case 0 ->
                 new Swimmingpool(heroLevel);
             case 1 ->
