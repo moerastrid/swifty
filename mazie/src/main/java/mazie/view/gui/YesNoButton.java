@@ -1,5 +1,6 @@
 package mazie.view.gui;
 
+
 import javax.swing.JButton;
 
 import static mazie.view.gui.ThemeColor.GREEN;
