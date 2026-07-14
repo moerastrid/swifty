@@ -2,6 +2,7 @@ package mazie.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -53,11 +54,11 @@ public class Hero {
         this.hp = hp;
     }
 
-    public void takeDamage(int damage) {
+    public int takeDamage(int damage) {
         final var damageSum = damage - this.defence;
         final var totalDamage = damageSum > 1 ? damageSum : 1;
-        System.out.println("damage to hero: " + totalDamage); //#todo remove (debugging)
         this.hp -= totalDamage;
+        return totalDamage;
     }
 
     public boolean isDead() {
@@ -195,6 +196,25 @@ public class Hero {
             case HELMET ->
                 this.helmet = artifact;
         }
+    }
+
+    public String getAction() {
+        final var random = new Random();
+        String[] emptyActions = {
+            "makes a joke to lighten the mood", 
+            "pretends their mom just called, we need to leave right away", 
+            "finds a quiet corner"
+        };
+        
+        final var artifacts = this.getArtifacts();
+        if (artifacts.isEmpty()) {
+            return "%s %s".formatted(this.name, emptyActions[random.nextInt(0, emptyActions.length)]);
+        }
+        final var artifactActions = artifacts.stream().map(a -> a.getAction()).toList();
+
+
+
+        return "";
     }
 
     @Override

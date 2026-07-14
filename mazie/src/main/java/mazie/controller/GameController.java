@@ -156,11 +156,11 @@ public class GameController {
 
         final var result = engine.fight();
 
-        // #todo give fight result to view after building it in engine?
+        // #todo remove debugging string
         System.out.println("fight result\nwin: %s\nlvlup: %s\ndrop: %s".formatted(result.win(), result.levelup(), result.drop()));
 
         if (result.win()) {
-            handleRoundWin(hero, monster);
+            handleRoundWin(hero, monster, result.damageToHero());
         } else {
             handleRoundLoss(hero);
             return false;
@@ -193,8 +193,8 @@ public class GameController {
         return running;
     }
 
-    private void handleRoundWin(Hero hero, Monster monster) {
-        view.showFightSummary("the fight ended", monster.getXpReward());
+    private void handleRoundWin(Hero hero, Monster monster, int damageToHero) {
+        view.showFightSummary(damageToHero, hero.getAction(), monster.getAction(), monster.getFinalMessage(), monster.getXpReward());
         try {
             repository.update(hero);
         } catch (RepositoryException e) {

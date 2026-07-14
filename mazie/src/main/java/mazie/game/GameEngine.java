@@ -49,13 +49,14 @@ public class GameEngine {
     public FightResult fight() {
         final var monster = this.currentMonster;
 
+        var totalDamageToHero = 0;
         while (!this.hero.isDead() && !monster.isDead()) {
-            fightRound(monster);
+            totalDamageToHero += fightRound(monster);
         }
 
         // no win
         if (this.hero.isDead()) {
-            return new FightResult(false, false, null);
+            return new FightResult(false, false, null, totalDamageToHero);
         }
 
         // yes win
@@ -67,22 +68,21 @@ public class GameEngine {
         currentDir = null;
         currentMonster = null;
 
-        return new FightResult(true, levelUp, drop);
+        return new FightResult(true, levelUp, drop, totalDamageToHero);
     }
 
-    private void fightRound(Monster monster) {
+    private int fightRound(Monster monster) {
         // hero attacks monster
         monster.takeDamage(this.hero.getTotalAttack());
         if (monster.isDead()) {
-            return;
+            return 0;
         }
 
         // monster 50% chance attacks hero
         if (random.nextBoolean()) {
-            System.out.println("monster misses"); //#todo remove (debugging)
-            return;
+            return 0;
         }
-        hero.takeDamage(monster.getAttack());
+        return hero.takeDamage(monster.getAttack());
     }
 
     // misschien vanuit monster ook? -> gaat om de interne toestand van het monster
@@ -92,16 +92,6 @@ public class GameEngine {
     // dan kun je al zien wat het monster heeft ook.
     private Artifact dropArtifact(Monster monster) {
         final var value = monster.getArtifactValue();
-        final var drop = random.nextInt(5);
-        return switch (drop) {
-            case 0 ->
-                Artifact.weapon(value);
-            case 1 ->
-                Artifact.armour(value);
-            case 2 ->
-                Artifact.helmet(value);
-            default ->
-                null;
-        };
+        return Artifact.createArtifact(value);
     }
 }

@@ -49,11 +49,11 @@ java -jar target/mazie.jar gui
 
 ---
 
-## Current status (2026-07-11)
+## Current status (2026-07-14)
 
 All mandatory requirements are implemented and match the subject (see checklist below). Console and GUI modes are both fully playable end-to-end. Bonus: SQLite persistence is done; runtime console/GUI switching is not started. Remaining work is the polish/quality wishlist below — nothing there is blocking or required for the mandatory grade.
 
-A SOLID/encapsulation pass (student-initiated, started from a "Tell, Don't Ask" refactor of `Hero`/`Monster.takeDamage()`) is mostly done: `GameMap` now exposes one cohesive `advance(Direction)` command instead of separate ask-then-act calls, and `MonsterFactory.generateMonster(heroLevel)` owns the easy/medium/hard difficulty distribution (48/36/16%) while `GameMap` only handles placement on the grid.
+A SOLID/encapsulation pass (student-initiated, started from a "Tell, Don't Ask" refactor of `Hero`/`Monster.takeDamage()`) is done: `GameMap` now exposes one cohesive `advance(Direction)` command instead of separate ask-then-act calls, and `MonsterFactory.generateMonster(heroLevel)` owns the easy/medium/hard difficulty distribution (48/36/16%) while `GameMap` only handles placement on the grid. `GameController.turn()`/`setup()` have both been split into small, single-purpose private methods (`runningAway`, `handleRoundWin`/`handleRoundLoss`, `handleDrop`, `newGame`/`setupHero`/`confirmSetup`), and `GameEngine` is now a controller field instead of being threaded through every method call. A monster-count bug introduced during the `MonsterFactory` split (`GameMap` was generating `size*size` monsters — far more than available placement cells — causing an infinite loop on game start) is fixed by deriving the monster count from the same density the old easy/medium/hard split used, without `GameMap` needing to know the difficulty ratios itself.
 
 ---
 
@@ -85,7 +85,7 @@ Organized by topic.
 
 - [ ] Confirm `Hero.gainXp(xp)` intentionally no longer resets `xp` on level-up (it used to subtract `xpNeed`; now `xp` keeps accumulating past the threshold) — check nothing downstream assumes the old per-level reset.
 - [ ] Reconsider exception type: `SQLiteHeroMapper.convertHeroType(...)` now throws `IllegalArgumentException` (was `RepositoryException`, still is in `convertArtifactType`) — `Main`'s catch merges `ModelException | IllegalArgumentException`, mixing bad-user-input with corrupt-persisted-data handling. Probably should stay a `RepositoryException`.
-- [ ] `GameController.turn()` — split into smaller methods (currently 6 if-statements, student's own `#todo`).
+- [ ] **Decide on `RepositoryException` handling strategy in `GameController`.** Discussed but not decided: currently every `repository.update/delete/save` call is individually wrapped in a local try/catch showing an error and continuing. Alternative considered: let it propagate up (it's already an unchecked `RuntimeException`) for the in-game-loop calls (`update`/`delete` failures here are realistically always genuine DB/infra problems, never recoverable user input, since a hero's name — the only `UNIQUE` constraint — never changes after creation), while keeping the local catch+retry only in `setup()`'s `save()` call (the one spot where a failure can be a recoverable, user-caused duplicate name). Would also need a dedicated `catch (RepositoryException ex)` branch in `Main` instead of falling into the generic `Throwable` catch.
 - [ ] **Write a real fight-summary narration** instead of the current flat string (`GameController.turn()` → `view.showFightSummary("the fight ended", ...)`). Consider monster-specific attack flavor text and reflecting the hero's equipped weapon.
 - [ ] Decide: does winning reward the player with anything besides "you win"? (see High scores idea above — might answer this.)
 - [ ] *(idea recovered from `old/`, not adopted)* `old/model/{Quality,util/QualityDefiner}.java` had a `BAD/NORMAL/GOOD` artifact-quality roll independent of monster stats — current `dropArtifact()` only scales off `monster.getXpReward()`. Could add a quality tier on top.

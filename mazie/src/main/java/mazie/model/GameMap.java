@@ -58,9 +58,6 @@ public class GameMap {
         monsters[x][y] = null;
     }
 
-    // public boolean isHeroNextToMonster(Direction dir) {
-    //     return isMonster(this.heroX + dir.dx, this.heroY + dir.dy);
-    // }
     private void generateMonsters(int heroLevel) {
         final int total =  (int)(0.23 * (size - 2) * (size - 2));
 
