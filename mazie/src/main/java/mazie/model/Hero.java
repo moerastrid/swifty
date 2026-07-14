@@ -82,11 +82,11 @@ public class Hero {
     private boolean lvlUp() {
         this.level += 1;
 
-        final var levelIncrement = Math.pow(1.1, (double)(this.level - 1));
+        final var levelIncrement = Math.pow(1.1, (double) (this.level - 1));
 
-        this.attack = (int)(type.baseAttack * levelIncrement);
-        this.defence = (int)(type.baseDefence * levelIncrement);
-        final var hpMax = (int)(type.baseHp * levelIncrement);
+        this.attack = (int) (type.baseAttack * levelIncrement);
+        this.defence = (int) (type.baseDefence * levelIncrement);
+        final var hpMax = (int) (type.baseHp * levelIncrement);
 
         final var newHp = this.hp + (hpMax / 2);
         this.hp = (newHp > hpMax) ? hpMax : newHp;
@@ -200,21 +200,26 @@ public class Hero {
 
     public String getAction() {
         final var random = new Random();
-        String[] emptyActions = {
-            "makes a joke to lighten the mood", 
-            "pretends their mom just called, we need to leave right away", 
-            "finds a quiet corner"
-        };
-        
+        final var actions = new ArrayList<>(List.of(
+                "makes a joke to lighten the mood",
+                "pretends their mom just called, we need to leave right away",
+                "finds a quiet corner",
+                "starts rambling about their latest interest",
+                "hums a soft melody",
+                "shows you pictures of their pet snail",
+                "spots a really cool bird",
+                "zoned out (professionally)"
+        ));
+
         final var artifacts = this.getArtifacts();
-        if (artifacts.isEmpty()) {
-            return "%s %s".formatted(this.name, emptyActions[random.nextInt(0, emptyActions.length)]);
+        if (!artifacts.isEmpty()) {
+            final var artifactActions = artifacts.stream().map(a -> a.getAction()).toList();
+            // (adding the artifact Actions twice for having a higher change of getting those)
+            actions.addAll(artifactActions);
+            actions.addAll(artifactActions);
         }
-        final var artifactActions = artifacts.stream().map(a -> a.getAction()).toList();
 
-
-
-        return "";
+        return "%s %s".formatted(this.name, actions.get(random.nextInt(actions.size())));
     }
 
     @Override

@@ -28,6 +28,10 @@ public record Artifact(
         return new Artifact(type.randomName(), type, value);
     }
 
+    public String getAction() {
+        return this.type.actionFor(this.name);
+    }
+
     @Override
     public String toString() {
         return String.format("%s, type:%s, value:%d",

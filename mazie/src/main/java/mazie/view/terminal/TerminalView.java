@@ -233,15 +233,6 @@ public class TerminalView implements GameView {
     }
 
     @Override
-    public void showFightSummary(String fightSummary, int xpGained) {
-        final var prompt = """
-			fight summary: %s
-			XP gained: %s
-		""".formatted(fightSummary, xpGained);
-        colorPrint(AnsiColor.BLUE, prompt);
-    }
-
-    @Override
     public void showLevelUp(Hero hero) {
         final var prompt = """
 

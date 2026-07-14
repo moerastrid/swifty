@@ -199,8 +199,8 @@ public class GuiView implements GameView {
 
     // fightsummary has a string with what happened during the fight + how much xp was gained. only called when user won.
     @Override
-    public void showFightSummary(String fightSummary, int xpGained) {
-        invokeLater(() -> panel.setFightSummary(fightSummary, xpGained));
+    public void showFightSummary(int damageToHero, String heroAction, String monsterAction, String finalMessage, int xpGain){
+        invokeLater(() -> panel.setFightSummary(damageToHero, heroAction, monsterAction, finalMessage, xpGain));
     }
 
     @Override
