@@ -27,7 +27,7 @@ public class Main {
         } catch (FatalException ex) {
             System.err.println(ex.getMessage());
             System.exit(EX_UNAVAILABLE);
-        } catch (ModelException | IllegalArgumentException ex) {
+        } catch (ModelException | IllegalArgumentException | IllegalStateException ex) {
             System.err.println(ex.getMessage());
             System.exit(EX_SOFTWARE);
         } catch (ParseException ex) {
