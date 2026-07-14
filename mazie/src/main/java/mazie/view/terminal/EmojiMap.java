@@ -44,7 +44,7 @@ public class EmojiMap {
             case Swimmingpool _ -> "🏊🏻‍♂️";
             case TeamBuilding _ -> "🤼‍♂️";
             case Teams _ -> "👥";
-            case Vim _ -> "⌨️";
+            case Vim _ -> "😈";
             default -> throw new IllegalStateException("Unexpected value: " + (monster));
         };
     }
