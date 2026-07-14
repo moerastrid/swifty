@@ -1,6 +1,5 @@
 package mazie.controller;
 
-import java.util.Collections;
 import java.util.Map;
 
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -10,6 +9,7 @@ import jakarta.validation.Validator;
 import mazie.exception.QuitException;
 import mazie.exception.RepositoryException;
 import mazie.game.GameEngine;
+import mazie.model.Artifact;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
@@ -17,7 +17,7 @@ import mazie.view.GameView;
 
 public class GameController {
 
-    // private GameEngine engine;
+    private GameEngine engine = null;
     private GameView view;
     private final HeroRepository repository;
     private final Validator validator = Validation.byDefaultProvider()
@@ -29,6 +29,14 @@ public class GameController {
     public GameController(GameView view, HeroRepository repository) {
         this.view = view;
         this.repository = repository;
+    }
+
+    public GameView getView() {
+        return this.view;
+    }
+
+    public void setView(GameView view) {
+        this.view = view;
     }
 
     public void start() {
@@ -59,48 +67,43 @@ public class GameController {
     }
 
     private Hero setup() {
-
-        // #todo: alleen als er helden zijn om te laden, vragen of user een nieuwe game wil beginnen. Nu geen repo dus altijd true?
-        Map<Integer, Hero> heroes = Collections.emptyMap();
         try {
-            heroes = repository.loadAllHeroes();
+            final var heroes = repository.loadAllHeroes();
+            final var hero = this.setupHero(this.newGame(heroes), heroes);
+            return this.confirmSetup(hero);
+
         } catch (RepositoryException e) {
             view.showError(e.getMessage());
         }
-
-        boolean newGame = false;
-        if (heroes == null || heroes.isEmpty()) {
-            newGame = true;
-        }
-
-        Hero hero = null;
-
-        if (!newGame) {
-            newGame = view.askNewGame();
-        }
-
-        if (!newGame) {
-            hero = view.selectHero(heroes);
-        }
-
-        if (hero == null) {
-            hero = createValidHero();
-        }
-
-        if (view.confirmHero(hero)) {
-            System.out.println("the chosen one:"); //#todo remove (debugging)
-            System.out.println(hero); //#todo remove (debugging)
-            if (hero.getId() == 0) {
-                try {
-                    repository.save(hero);
-                } catch (RepositoryException e) {
-                    view.showError("try again: " + e.getMessage());
-                    return setup();
-                }
-            }
-            return hero;
-        }
         return setup();
+    }
+
+    private boolean newGame(Map<Integer, Hero> heroes) {
+        if (heroes.isEmpty()) {
+            return true;
+        }
+        return view.askNewGame();
+    }
+
+    private Hero setupHero(boolean newGame, Map<Integer, Hero> heroes) {
+        return newGame ? this.createValidHero() : view.selectHero(heroes);
+    }
+
+    private Hero confirmSetup(Hero hero) {
+        if (hero == null || !view.confirmHero(hero)) {
+            return this.setup();
+        }
+        System.out.println("the chosen one:"); //#todo remove (debugging)
+        System.out.println(hero); //#todo remove (debugging)
+        if (hero.getId() == 0) {
+            try {
+                repository.save(hero);
+            } catch (RepositoryException e) {
+                view.showError("try again: " + e.getMessage());
+                return setup();
+            }
+        }
+        return hero;
     }
 
     private Hero createValidHero() {
@@ -117,7 +120,7 @@ public class GameController {
 
     private void gameLoop(Hero hero) {
 
-        final var engine = new GameEngine(hero);
+        this.engine = new GameEngine(hero);
         var playing = true;
 
         view.showStartGame();
@@ -126,7 +129,7 @@ public class GameController {
 
             System.out.println("current map:\n" + engine.getMapString()); //#todo remove
 
-            playing = turn(engine, hero);
+            playing = turn(hero);
 
             if (engine.win()) {
                 playing = false;
@@ -140,78 +143,88 @@ public class GameController {
         }
     }
 
-    private Monster takeStepOrMonster(GameEngine engine) {
+    private boolean turn(Hero hero) {
+
+        final var monster = takeStepOrMonster();
+        if (monster == null) {
+            return true;
+        }
+
+        if (runningAway(monster)) {
+            return true;
+        }
+
+        final var result = engine.fight();
+
+        // #todo give fight result to view after building it in engine?
+        System.out.println("fight result\nwin: %s\nlvlup: %s\ndrop: %s".formatted(result.win(), result.levelup(), result.drop()));
+
+        if (result.win()) {
+            handleRoundWin(hero, monster);
+        } else {
+            handleRoundLoss(hero);
+            return false;
+        }
+
+        if (result.levelup()) {
+            view.showLevelUp(hero);
+        }
+
+        this.handleDrop(result.drop(), hero);
+        return true;
+    }
+
+    private Monster takeStepOrMonster() {
         final var dir = view.askDirection();
-        final var monster = engine.move(dir);
+        final var monster = this.engine.move(dir);
         if (monster == null) {
             view.showEmptyStep();
         }
         return monster;
     }
 
-    // #todo wat zijn deze 6 if - statements -> opsplitsen
-    private boolean turn(GameEngine engine, Hero hero) {
-
-        final var monster = takeStepOrMonster(engine);
-        if (monster == null) {
-            return true;
-        }
-
+    private boolean runningAway(Monster monster) {
         final boolean feelingAgressive = view.askFightMonster(monster);
-        var running = false;
-        if (!feelingAgressive) {
-            running = engine.runAway();
-            view.showRunSuccess(monster, running);
-        }
-        if (running) {
-            return true;
-        }
-
-        final var result = engine.fight();
-        System.out.println("fight result\nwin: %s\nlvlup: %s\ndrop: %s".formatted(result.win(), result.levelup(), result.drop()));
-
-        if (!result.win()) {
-            try {
-                repository.delete(hero);
-            } catch (RepositoryException e) {
-                view.showError(e.getMessage());
-            }
-            view.showEndGame(false);
+        if (feelingAgressive) {
             return false;
-        } else {
-            try {
-                repository.update(hero);
-            } catch (RepositoryException e) {
-                view.showError(e.getMessage());
-            }
         }
+        var running = this.engine.runAway();
+        view.showRunSuccess(monster, running);
+        return running;
+    }
 
+    private void handleRoundWin(Hero hero, Monster monster) {
         view.showFightSummary("the fight ended", monster.getXpReward());
-
-        if (result.levelup()) {
-            view.showLevelUp(hero);
+        try {
+            repository.update(hero);
+        } catch (RepositoryException e) {
+            view.showError(e.getMessage());
         }
-
-        if (result.drop() != null) {
-            final var keep = view.askKeepArtifact(result.drop(), hero);
-            if (keep) {
-                hero.setArtifact(result.drop());
-                try {
-                    repository.update(hero);
-                } catch (RepositoryException e) {
-                    view.showError(e.getMessage());
-                }
-            }
-        }
-
-        return true;
     }
 
-    public GameView getView() {
-        return this.view;
+    private void handleRoundLoss(Hero hero) {
+        view.showEndGame(false);
+        try {
+            repository.delete(hero);
+        } catch (RepositoryException e) {
+            view.showError(e.getMessage());
+        }
     }
 
-    public void setView(GameView view) {
-        this.view = view;
+    final void handleDrop(Artifact artifact, Hero hero) {
+        if (artifact == null) {
+            return;
+        }
+
+        if (!view.askKeepArtifact(artifact, hero)) {
+            return;
+        }
+
+        hero.setArtifact(artifact);
+        try {
+            repository.update(hero);
+        } catch (RepositoryException e) {
+            view.showError(e.getMessage());
+        }
     }
 }

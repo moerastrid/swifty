@@ -62,7 +62,7 @@ public class GameMap {
     //     return isMonster(this.heroX + dir.dx, this.heroY + dir.dy);
     // }
     private void generateMonsters(int heroLevel) {
-        final int total = size * size;
+        final int total =  (int)(0.23 * (size - 2) * (size - 2));
 
         for (int i = 0; i < total; i++) {
             final var monster = factory.generateMonster(heroLevel);
