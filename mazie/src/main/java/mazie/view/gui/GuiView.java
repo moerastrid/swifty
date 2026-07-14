@@ -40,7 +40,6 @@ public class GuiView implements GameView {
     private JFrame initFrame() {
         final var fr = new JFrame(TITLE);
 
-
         fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         fr.addWindowListener(new WindowAdapter() {
             @Override
