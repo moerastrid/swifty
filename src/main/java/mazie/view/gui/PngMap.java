@@ -1,7 +1,9 @@
 package mazie.view.gui;
 
+import java.awt.Image;
 import java.util.Map;
 import javax.swing.ImageIcon;
+import mazie.model.Hero;
 import mazie.model.HeroType;
 import mazie.model.monster.Monster;
 
@@ -24,12 +26,37 @@ public class PngMap {
         return new ImageIcon(url);
     }
 
-    public static ImageIcon getPng(HeroType type) {
+    private static ImageIcon scale(ImageIcon icon, int width, int height) {
+        final var image = icon.getImage();
+        final var scaledImage = image.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+        return new ImageIcon(scaledImage);
+    }
+
+    private static ImageIcon getPng(Hero hero) {
+        final var type = hero.getType();
         final var path = heroPngPath.get(type);
         if (path == null) {
             throw new IllegalStateException("Unexpected value: %s".formatted(type.name()));
         }
         return loadIcon(path);
+    }
+
+    public static ImageIcon getSidebarIcon(Hero hero) {
+        final var png = getPng(hero);
+        final var width = png.getIconWidth();
+        final var height = png.getIconHeight();
+        final var maxHeight = 150;
+
+        final var factor = (double) maxHeight / (double) height;
+        final var newWidth = (int) ((double) width * factor);
+
+        System.out.println("width: " + width);
+        System.out.println("height: " + height);
+        System.out.println("maxHeight: " + maxHeight);
+        System.out.println("factor: " + factor);
+        System.out.println("newWidth: " + newWidth);
+
+        return scale(png, newWidth, maxHeight);
     }
 
     // "your office kanteen", "/kanteen.png", #todo tekenen

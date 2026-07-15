@@ -26,8 +26,7 @@ public class GamePanel extends JPanel {
     private JLabel log;
 
     public GamePanel() {
-        this.setLayout(new BorderLayout(10, 10));
-        this.setBackground(ThemeColor.LILA);
+        this.setLayout(new BorderLayout());
     }
 
     public void setError(String error) {
@@ -103,11 +102,11 @@ public class GamePanel extends JPanel {
         JButton switchButton = new JButton("switch view");
         switchButton.setBackground(YELLOW);
         switchButton.setForeground(BLACK);
-        switchButton.setMargin(new Insets(2, 10, 2, 10));
+        switchButton.setMargin(new Insets(0, 10, 0, 10));
         switchButton.addActionListener(event -> switchListener.run());
         JPanel menuBar = new JPanel();
         menuBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        menuBar.setOpaque(true);
+        menuBar.setOpaque(false);
         menuBar.add(switchButton);
         this.add(menuBar, BorderLayout.NORTH);
         this.revalidate();
@@ -120,6 +119,7 @@ public class GamePanel extends JPanel {
         }
         subPanel = screen;
         this.add(screen, BorderLayout.CENTER);
+        this.setBackground(screen.getBackground());
         this.revalidate();
         this.repaint();
     }
