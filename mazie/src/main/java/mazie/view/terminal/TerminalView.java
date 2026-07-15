@@ -17,6 +17,7 @@ import mazie.view.GameView;
 public class TerminalView implements GameView {
 
     private final Scanner scanner;
+    private Runnable switchListener;
     private final static Map<String, Boolean> YES_NO = Map.of(
             "y", true,
             "yes", true,
@@ -25,6 +26,11 @@ public class TerminalView implements GameView {
 
     public TerminalView() {
         this.scanner = new Scanner(System.in);
+    }
+
+    @Override
+    public void setSwitchListener(Runnable switchListener) {
+        this.switchListener = switchListener;
     }
 
     @Override
@@ -218,17 +224,17 @@ public class TerminalView implements GameView {
     }
 
     @Override
-    public void showFightSummary(int damageToHero, String heroAction, String monsterAction, String monsterGoodbye, int xpGain) {
+    public void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain) {
         final var startSummary = "--- FIGHT SUMMARY ---";
         final var endSummary = "---------------------";
         final var damageSummary = "- %d hp".formatted(damageToHero);
 
         
         colorPrint(AnsiColor.BLUE, startSummary);
-        colorPrint(AnsiColor.GREEN, heroAction);
-        colorPrint(AnsiColor.PURPLE, monsterAction);
+        colorPrint(AnsiColor.GREEN, EmojiMap.getEmoji(hero.getType()) + hero.getAction());
+        colorPrint(AnsiColor.PURPLE, EmojiMap.getEmoji(monster) + monster.getAction());
         colorPrint(AnsiColor.BLUE, damageSummary);
-        colorPrint(AnsiColor.GREEN, monsterGoodbye);
+        colorPrint(AnsiColor.GREEN, monster.getFinalMessage());
         colorPrint(AnsiColor.BLUE, endSummary);
     }
 

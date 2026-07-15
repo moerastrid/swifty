@@ -1,5 +1,7 @@
 package mazie;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import mazie.controller.GameController;
 import mazie.exception.FatalException;
 import mazie.exception.ModelException;
@@ -18,6 +20,7 @@ public class Main {
     private static final int EX_SOFTWARE = 70;
 
     private static volatile boolean edtCrashed = false;
+    private static final AtomicBoolean shuttingDown = new AtomicBoolean(false);
 
     public static void main(final String[] args) {
         threadConfig();
@@ -25,26 +28,32 @@ public class Main {
         try {
             run(args);
         } catch (FatalException ex) {
-            System.err.println(ex.getMessage());
-            System.exit(EX_UNAVAILABLE);
+            safeExit(ex.getMessage(), EX_UNAVAILABLE);
         } catch (ModelException | IllegalArgumentException | IllegalStateException ex) {
-            System.err.println(ex.getMessage());
-            System.exit(EX_SOFTWARE);
+            safeExit(ex.getMessage(), EX_SOFTWARE);
         } catch (ParseException ex) {
-            System.err.println(ex.getMessage());
-            System.exit(EX_USAGE);
+            safeExit(ex.getMessage(), EX_USAGE);
         } catch (QuitException ex) {
-            System.err.println(ex.getMessage());
-            System.exit(EX_SUCCESS);
+            safeExit(ex.getMessage(), EX_SUCCESS);
         } catch (Throwable t) {
-            System.err.println(t.getMessage());
-            System.exit(EX_GENERAL);
+            safeExit(t.getMessage(), EX_GENERAL);
         }
 
         if (edtCrashed) {
-            System.exit(EX_SOFTWARE);
+            safeExit(EX_SOFTWARE);
         }
-        System.exit(EX_SUCCESS);
+        safeExit(EX_SUCCESS);
+    }
+
+    private static void safeExit(String message, int exitCode) {
+        System.err.println(message);
+        safeExit(exitCode);
+    }
+
+    private static void safeExit(int exitCode) {
+        if (shuttingDown.compareAndSet(false, true)) {
+            System.exit(exitCode);
+        }
     }
 
     private static void threadConfig() {
@@ -54,6 +63,17 @@ public class Main {
             edtCrashed = true;
             mainThread.interrupt();
         });
+
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            if (shuttingDown.compareAndSet(false, true)) {
+                mainThread.interrupt();
+                try {
+                    mainThread.join();
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }));
     }
 
     private static void run(final String[] args) {

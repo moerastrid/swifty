@@ -9,6 +9,9 @@ import mazie.model.monster.Monster;
 
 public interface GameView {
 
+    // switch listener om view te wisselen
+    void setSwitchListener(Runnable switchListener);
+
     // in case of error (invalid input for example)
     public void showError(String error);
 
@@ -46,9 +49,6 @@ public interface GameView {
     public void showEndGame(boolean win);
 
     // fightsummary has a string with what happened during the fight + how much xp was gained. only called when user won.
-    public void showFightSummary(int damageToHero, String heroAction, String monsterAction, String finalMessage, int xpGain);
-
-    // fightsummary has a string with what happened during the fight + how much xp was gained. only called when user won.
     public void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain);
 
     // show hero stats + congratz blabla
@@ -58,3 +58,16 @@ public interface GameView {
     public boolean askKeepArtifact(Artifact artifact, Hero hero);
 
 }
+
+/*
+todo: hero iig meegeven in:
+
+showStartGame()
+askDirection()
+showEmptyStep()
+askFightMonster(Monster)
+showRunSuccess(Monster, boolean)
+
+(als er een hero is)
+
+*/

@@ -1,6 +1,7 @@
 package mazie.controller;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
@@ -8,17 +9,20 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import mazie.exception.QuitException;
 import mazie.exception.RepositoryException;
+import mazie.exception.SwitchViewException;
 import mazie.game.GameEngine;
 import mazie.model.Artifact;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
+import mazie.view.gui.GuiView;
+import mazie.view.terminal.TerminalView;
 
 public class GameController {
 
     private GameEngine engine = null;
-    private GameView view;
+    private volatile GameView view;
     private final HeroRepository repository;
     private final Validator validator = Validation.byDefaultProvider()
             .configure()
@@ -28,14 +32,43 @@ public class GameController {
 
     public GameController(GameView view, HeroRepository repository) {
         this.view = view;
+        this.setListener(view);
         this.repository = repository;
     }
+
+    private void setListener(GameView view) {
+        view.setSwitchListener(this::switchView);
+    }
+
+    private void switchView() {
+        System.out.println("switching view"); //#todo remove debug message
+
+        GameView newView;
+        if (this.view instanceof TerminalView) {
+            newView = new GuiView();
+        } else if (this.view instanceof GuiView) {
+            newView = new TerminalView();
+        } else {
+            throw new IllegalStateException("view instance unknown");
+        }
+        this.setView(newView);
+        this.setListener(newView);
+        System.out.println("view switched"); //#todo remove debug message
+    }
+
+    private <T> T withSwitchRetry(Function<GameView, T> call) {
+    try {
+        return call.apply(this.view);
+    } catch (SwitchViewException e) {
+        return withSwitchRetry(call);  // opnieuw proberen, nu met de al-bijgewerkte this.view
+    }
+}
 
     public GameView getView() {
         return this.view;
     }
 
-    public void setView(GameView view) {
+    private void setView(GameView view) {
         this.view = view;
     }
 
@@ -82,7 +115,7 @@ public class GameController {
         if (heroes.isEmpty()) {
             return true;
         }
-        return view.askNewGame();
+        return withSwitchRetry(v -> v.askNewGame());
     }
 
     private Hero setupHero(boolean newGame, Map<Integer, Hero> heroes) {
@@ -194,7 +227,7 @@ public class GameController {
     }
 
     private void handleRoundWin(Hero hero, Monster monster, int damageToHero) {
-        view.showFightSummary(damageToHero, hero.getAction(), monster.getAction(), monster.getFinalMessage(), monster.getXpReward());
+        view.showFightSummary(damageToHero, hero, monster, monster.getXpReward());
         try {
             repository.update(hero);
         } catch (RepositoryException e) {
