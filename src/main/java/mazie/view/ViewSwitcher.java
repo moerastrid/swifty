@@ -105,11 +105,11 @@ public class ViewSwitcher implements GameView {
     }
 
     @Override
-    public Direction askDirection() {
+    public Direction askDirection(Hero hero) {
         try {
-            return view.askDirection();
+            return view.askDirection(hero);
         } catch (SwitchViewException se) {
-            return askDirection();
+            return askDirection(hero);
         }
     }
 
@@ -123,11 +123,11 @@ public class ViewSwitcher implements GameView {
     }
 
     @Override
-    public boolean askFightMonster(Monster monster) {
+    public boolean askFightMonster(Hero hero, Monster monster) {
         try {
-            return view.askFightMonster(monster);
+            return view.askFightMonster(hero, monster);
         } catch (SwitchViewException se) {
-            return askFightMonster(monster);
+            return askFightMonster(hero, monster);
         }
     }
 
@@ -141,11 +141,11 @@ public class ViewSwitcher implements GameView {
     }
 
     @Override
-    public void showEndGame(boolean win) {
+    public void showEndGame(Hero hero, boolean win) {
         try {
-            view.showEndGame(win);
+            view.showEndGame(hero, win);
         } catch (SwitchViewException se) {
-            this.showEndGame(win);
+            this.showEndGame(hero, win);
         }
     }
 

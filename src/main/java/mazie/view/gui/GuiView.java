@@ -168,10 +168,10 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public Direction askDirection() {
+    public Direction askDirection(Hero hero) {
         final var queue = new LinkedBlockingQueue<Direction>();
 
-        invokeLater(() -> panel.setDirectionPanel(queue));
+        invokeLater(() -> panel.setDirectionPanel(hero, queue));
         try {
             return queue.take();
         } catch (InterruptedException e) {
@@ -186,10 +186,10 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public boolean askFightMonster(Monster monster) {
+    public boolean askFightMonster(Hero hero, Monster monster) {
         final var queue = new SynchronousQueue<Boolean>();
 
-        invokeLater(() -> panel.setRunPanel(monster, queue));
+        invokeLater(() -> panel.setRunPanel(hero, monster, queue));
         try {
             return queue.take();
         } catch (InterruptedException e) {
@@ -204,10 +204,10 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public void showEndGame(boolean win) {
+    public void showEndGame(Hero hero, boolean win) {
         final var latch = new CountDownLatch(1);
 
-        invokeLater(() -> panel.setEndPanel(latch, win));
+        invokeLater(() -> panel.setEndPanel(hero, latch, win));
         try {
             latch.await();
         } catch (InterruptedException e) {

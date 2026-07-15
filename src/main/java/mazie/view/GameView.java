@@ -33,19 +33,19 @@ public interface GameView {
     void showStartGame();
 
     // get direction player wants to go
-    Direction askDirection();
+    Direction askDirection(Hero hero);
 
     // if no monster, show user took a step
     void showEmptyStep();
 
     // show monster, ask if user wants to fight or run
-    boolean askFightMonster(Monster monster);
+    boolean askFightMonster(Hero hero, Monster monster);
 
     // show if run attempt from monster was successful
     void showRunSuccess(Monster monster, boolean success);
 
     // show that the game ended, because either user is at map edge (win) or defeated by a monster (dead)
-    void showEndGame(boolean win);
+    void showEndGame(Hero hero, boolean win);
 
     // fight summary has a string with what happened during the fight + how much xp was gained. only called when user won.
     void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain);

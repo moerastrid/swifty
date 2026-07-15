@@ -137,12 +137,12 @@ public class GameController {
 
     private boolean turn(Hero hero) {
 
-        final var monster = takeStepOrMonster();
+        final var monster = takeStepOrMonster(hero);
         if (monster == null) {
             return true;
         }
 
-        if (runningAway(monster)) {
+        if (runningAway(hero, monster)) {
             return true;
         }
 
@@ -166,8 +166,8 @@ public class GameController {
         return true;
     }
 
-    private Monster takeStepOrMonster() {
-        final var dir = switcher.askDirection();
+    private Monster takeStepOrMonster(Hero hero) {
+        final var dir = switcher.askDirection(hero);
         final var monster = this.engine.move(dir);
         if (monster == null) {
             switcher.showEmptyStep();
@@ -175,8 +175,8 @@ public class GameController {
         return monster;
     }
 
-    private boolean runningAway(Monster monster) {
-        final boolean feelingAggressive = switcher.askFightMonster(monster);
+    private boolean runningAway(Hero hero, Monster monster) {
+        final boolean feelingAggressive = switcher.askFightMonster(hero, monster);
         if (feelingAggressive) {
             return false;
         }

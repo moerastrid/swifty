@@ -139,7 +139,8 @@ public class TerminalView implements GameView {
     }
 
     @Override
-    public Direction askDirection() {
+    public Direction askDirection(Hero hero) {
+        this.showHeroStats(hero);
         final var prompt = "where to go? (north/east/south/west)";
         final var options = new HashMap<String, Direction>();
 
@@ -161,7 +162,8 @@ public class TerminalView implements GameView {
     }
 
     @Override
-    public boolean askFightMonster(Monster monster) {
+    public boolean askFightMonster(Hero hero, Monster monster) {
+        this.showHeroStats(hero);
         final var prompt = "Straight from the ghetto, something walks towards you..\n%s\nAre you bout that action? (y/n)".formatted(monster.toString());
         return choose(prompt, YES_NO);
     }
@@ -183,8 +185,9 @@ public class TerminalView implements GameView {
     }
 
     @Override
-    public void showEndGame(boolean win) {
+    public void showEndGame(Hero hero, boolean win) {
         String prompt;
+        this.showHeroStats(hero);
 
         if (win) {
             prompt = """

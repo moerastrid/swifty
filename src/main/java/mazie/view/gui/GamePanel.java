@@ -1,12 +1,9 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.Insets;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import mazie.model.Artifact;
@@ -37,7 +34,8 @@ public class GamePanel extends JPanel {
         this.setSubPanel(new WelcomePanel(latch));
     }
 
-    public void setEndPanel(CountDownLatch latch, boolean win) {
+    public void setEndPanel(Hero hero, CountDownLatch latch, boolean win) {
+        this.setHeroPanel(hero);
         this.setSubPanel(new EndPanel(latch, win));
     }
 
@@ -63,16 +61,19 @@ public class GamePanel extends JPanel {
         setLog(text.formatted(monster.getName()));
     }
 
-    public void setDirectionPanel(BlockingQueue<Direction> queue) {
+    public void setDirectionPanel(Hero hero, BlockingQueue<Direction> queue) {
+        this.setHeroPanel(hero);
         this.setSubPanel(new DirectionPanel(queue));
     }
 
     public void setArtifactPanel(Artifact artifact, Hero hero, BlockingQueue<Boolean> queue) {
+        this.setHeroPanel(hero);
         this.setSubPanel(new ArtifactPanel(artifact, hero, queue));
     }
 
-    public void setRunPanel(Monster monster, BlockingQueue<Boolean> queue) {
+    public void setRunPanel(Hero hero, Monster monster, BlockingQueue<Boolean> queue) {
         this.clearLog();
+        this.setHeroPanel(hero);
         this.setSubPanel(new RunPanel(monster, queue));
     }
 
@@ -94,21 +95,7 @@ public class GamePanel extends JPanel {
     }
 
     public void setSwitchListener(Runnable switchListener) {
-        this.setMenuBar(switchListener);
-    }
-
-    private void setMenuBar(Runnable switchListener) {
-
-        JButton switchButton = new JButton("switch view");
-        switchButton.setBackground(YELLOW);
-        switchButton.setForeground(BLACK);
-        switchButton.setMargin(new Insets(0, 10, 0, 10));
-        switchButton.addActionListener(event -> switchListener.run());
-        JPanel menuBar = new JPanel();
-        menuBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        menuBar.setOpaque(false);
-        menuBar.add(switchButton);
-        this.add(menuBar, BorderLayout.NORTH);
+        this.add(new MenuBarPanel(switchListener), BorderLayout.NORTH);
         this.revalidate();
         this.repaint();
     }
@@ -122,6 +109,13 @@ public class GamePanel extends JPanel {
         this.setBackground(screen.getBackground());
         this.revalidate();
         this.repaint();
+    }
+
+    private void setHeroPanel(Hero hero) {
+        if (hero == null) {
+            return;
+        }
+        this.add(new HeroPanel(hero), BorderLayout.CENTER);
     }
 
     private void setLog(String text) {
