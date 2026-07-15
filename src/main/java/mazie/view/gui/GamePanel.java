@@ -15,7 +15,6 @@ import mazie.model.monster.Monster;
 
 import static mazie.view.gui.ThemeColor.BLACK;
 import static mazie.view.gui.ThemeColor.GREEN;
-import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.WHITE;
 import static mazie.view.gui.ThemeColor.YELLOW;
 
@@ -51,9 +50,8 @@ public class GamePanel extends JPanel {
         setLog("entering the maze...");
     }
 
-    public void setFightSummary(int damageToHero, String heroAction, String monsterAction, String finalMessage, int xpGain) {
-        final var fightSummary = "%s (-%d hp). %s. %s (+ %d xp)".formatted(monsterAction, damageToHero, heroAction, finalMessage, xpGain);
-        setLog(fightSummary);
+    public void setFightSummary(int damageToHero, Hero hero, Monster monster, CountDownLatch latch) {
+        this.setSubPanel(new FightSummaryPanel(monster, hero, latch, damageToHero));
     }
 
     public void setLevelUp(Hero hero, CountDownLatch latch) {

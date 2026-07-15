@@ -23,20 +23,33 @@ public class FightScenePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.drawImage(background, 0, 0,
-                getWidth(), getHeight(), this);
+        g.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
+        this.drawHero(g);
+    }
 
+    private void drawHero(Graphics g) {
         final var ogWidth = this.hero.getWidth(this);
         final var ogHeight = this.hero.getHeight(this);
-        final var heroHeight = getHeight() * 0.4;
 
-        final var factor = heroHeight / ogHeight;
+        final var factor = calculateScale(ogWidth, ogHeight);
+
         final var heroWidth = factor * ogWidth;
+        final var heroHeight = factor * ogHeight;
 
         final var heroX = (getWidth() - heroWidth) / 2;
         final var heroY = getHeight() - heroHeight - 10;
 
-        g.drawImage(hero, (int) heroX, (int) heroY, (int) heroHeight, (int ) heroWidth, this);
+        g.drawImage(hero, (int) heroX, (int) heroY, (int) heroWidth, (int ) heroHeight, this);
+    }
+
+    private double calculateScale(int width, int height) {
+        final var maxWidth = this.getWidth() * 0.3;
+        final var maxHeight = this.getHeight() * 0.6;
+
+        final var widthFactor = maxWidth / width;
+        final var heightFactor = maxHeight / height;
+
+        return Math.min(widthFactor, heightFactor);
     }
 }
 

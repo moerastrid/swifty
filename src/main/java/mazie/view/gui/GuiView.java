@@ -222,8 +222,16 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain) {
-        invokeLater(() -> panel.setFightSummary(damageToHero, hero.getAction(), monster.getAction(), monster.getFinalMessage(), xpGain));
+    public void showFightSummary(int damageToHero, Hero hero, Monster monster) {
+        final var latch = new CountDownLatch(1);
+
+        invokeLater(() -> panel.setFightSummary(damageToHero, hero, monster, latch));
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            handleInterruption(e);
+            throw new AssertionError(e);
+        }
     }
 
     @Override

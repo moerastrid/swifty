@@ -186,7 +186,7 @@ public class GameController {
     }
 
     private void handleRoundWin(Hero hero, Monster monster, int damageToHero) {
-        switcher.showFightSummary(damageToHero, hero, monster, monster.getXpReward());
+        switcher.showFightSummary(damageToHero, hero, monster);
         repository.update(hero);
     }
 

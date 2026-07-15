@@ -150,11 +150,11 @@ public class ViewSwitcher implements GameView {
     }
 
     @Override
-    public void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain) {
+    public void showFightSummary(int damageToHero, Hero hero, Monster monster) {
         try {
-            view.showFightSummary(damageToHero, hero, monster, xpGain);
+            view.showFightSummary(damageToHero, hero, monster);
         } catch (SwitchViewException se) {
-            this.showFightSummary(damageToHero, hero, monster, xpGain);
+            this.showFightSummary(damageToHero, hero, monster);
         }
     }
 

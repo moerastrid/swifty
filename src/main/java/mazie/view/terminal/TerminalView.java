@@ -226,10 +226,10 @@ public class TerminalView implements GameView {
     }
 
     @Override
-    public void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain) {
+    public void showFightSummary(int damageToHero, Hero hero, Monster monster) {
         final var startSummary = "--- FIGHT SUMMARY ---";
         final var endSummary = "---------------------";
-        final var damageSummary = "- %d hp".formatted(damageToHero);
+        final var damageSummary = "- %d hp     + %d xp".formatted(damageToHero, monster.getXpReward());
 
 
         colorPrint(AnsiColor.BLUE, startSummary);

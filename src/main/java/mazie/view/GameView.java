@@ -48,7 +48,7 @@ public interface GameView {
     void showEndGame(Hero hero, boolean win);
 
     // fight summary has a string with what happened during the fight + how much xp was gained. only called when user won.
-    void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain);
+    void showFightSummary(int damageToHero, Hero hero, Monster monster);
 
     // show hero stats + congratz blabla
     void showLevelUp(Hero hero);

@@ -4,7 +4,7 @@ public class Teams extends Monster {
 
     final static String NAME = "a teams meeting";
     final static String[] ACTIONS = {
-            "can everyone hear me?",
+            "someone asks: can everyone hear me?",
             "you're on mute",
             "you accidentally shared the wrong screen",
             "there's an awkward silence after a question.",
