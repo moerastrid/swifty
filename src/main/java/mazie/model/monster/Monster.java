@@ -45,6 +45,10 @@ public abstract class Monster {
         return this.attack;
     }
 
+    public int getDefence() {
+        return this.defence;
+    }
+
     public int getHp() {
         return this.hp;
     }

@@ -38,6 +38,7 @@ public class HeroPanel extends JPanel {
         final var image = PngMap.getSidebarIcon(hero);
         final var label = new JLabel(image);
         label.setAlignmentX(CENTER_ALIGNMENT);
+        label.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         return label;
     }
 

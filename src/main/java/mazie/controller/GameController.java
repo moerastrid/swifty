@@ -130,7 +130,7 @@ public class GameController {
             if (engine.win()) {
                 playing = false;
                 repository.update(hero);
-                switcher.showEndGame(true);
+                switcher.showEndGame(hero, true);
             }
         }
     }
@@ -191,7 +191,7 @@ public class GameController {
     }
 
     private void handleRoundLoss(Hero hero) {
-        switcher.showEndGame(false);
+        switcher.showEndGame(hero, false);
         repository.delete(hero);
     }
 

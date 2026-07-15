@@ -32,7 +32,7 @@ public class PngMap {
         return new ImageIcon(scaledImage);
     }
 
-    private static ImageIcon getPng(Hero hero) {
+    public static ImageIcon getPng(Hero hero) {
         final var type = hero.getType();
         final var path = heroPngPath.get(type);
         if (path == null) {
@@ -49,12 +49,6 @@ public class PngMap {
 
         final var factor = (double) maxHeight / (double) height;
         final var newWidth = (int) ((double) width * factor);
-
-        System.out.println("width: " + width);
-        System.out.println("height: " + height);
-        System.out.println("maxHeight: " + maxHeight);
-        System.out.println("factor: " + factor);
-        System.out.println("newWidth: " + newWidth);
 
         return scale(png, newWidth, maxHeight);
     }

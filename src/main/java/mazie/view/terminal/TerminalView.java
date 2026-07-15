@@ -173,13 +173,12 @@ public class TerminalView implements GameView {
         String prompt;
 
         if (success) {
-            prompt = "You've escaped! That %s got nothing on you!".formatted(monster.getName());
+            prompt = "You've escaped! %s got nothing on you!".formatted(monster.getName());
         } else {
             prompt = """
-                    	Before sneaking away, you lock eyes with the monster.
-                    	You realize, this %s makes you feel weak in the knees.
+                    	You can't find the exit?!
                     	Your heart starts beating faster. There's no escape now..."
-                    """.formatted(monster.getName());
+                    """;
         }
         colorPrint(AnsiColor.PURPLE, prompt);
     }

@@ -1,9 +1,11 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import mazie.model.Artifact;
@@ -12,6 +14,7 @@ import mazie.model.Hero;
 import mazie.model.monster.Monster;
 
 import static mazie.view.gui.ThemeColor.BLACK;
+import static mazie.view.gui.ThemeColor.GREEN;
 import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.WHITE;
 import static mazie.view.gui.ThemeColor.YELLOW;
@@ -20,6 +23,7 @@ import static mazie.view.gui.ThemeColor.YELLOW;
 public class GamePanel extends JPanel {
 
     private JPanel subPanel;
+    private JPanel sidePanel;
     private JLabel log;
 
     public GamePanel() {
@@ -57,7 +61,7 @@ public class GamePanel extends JPanel {
     }
 
     public void setRunSucces(Monster monster, boolean success) {
-        final var text = success ? "You've escaped! That %s got nothing on you" : "You lock eyes with the %s, there's no escaping now...";
+        final var text = success ? "You've escaped! %s got nothing on you" : "You can't find the exit of %s, there's no escaping now...";
         setLog(text.formatted(monster.getName()));
     }
 
@@ -74,7 +78,7 @@ public class GamePanel extends JPanel {
     public void setRunPanel(Hero hero, Monster monster, BlockingQueue<Boolean> queue) {
         this.clearLog();
         this.setHeroPanel(hero);
-        this.setSubPanel(new RunPanel(monster, queue));
+        this.setSubPanel(new RunPanel(monster, hero, queue));
     }
 
     public void setNewOrLoadGamePanel(BlockingQueue<Boolean> queue) {
@@ -105,40 +109,44 @@ public class GamePanel extends JPanel {
             this.remove(subPanel);
         }
         subPanel = screen;
-        this.add(screen, BorderLayout.CENTER);
-        this.setBackground(screen.getBackground());
+        this.add(subPanel, BorderLayout.CENTER);
+        this.setBackground(subPanel.getBackground());
         this.revalidate();
         this.repaint();
     }
 
     private void setHeroPanel(Hero hero) {
+        if (sidePanel != null) {
+            this.remove(sidePanel);
+        }
         if (hero == null) {
             return;
         }
-        this.add(new HeroPanel(hero), BorderLayout.CENTER);
+        final var panel = new JPanel();
+        panel.setLayout(new BorderLayout(20, 0));
+        panel.setBackground(WHITE);
+        panel.add(new HeroPanel(hero), BorderLayout.CENTER);
+        sidePanel = panel;
+        this.add(sidePanel, BorderLayout.WEST);
     }
 
     private void setLog(String text) {
-        if (log != null) {
-            this.remove(log);
-        }
-        log = new JLabel(text, JLabel.CENTER);
-        log.setForeground(WHITE);
-        log.setBackground(GREY);
-        log.setOpaque(true);
-        this.add(log, BorderLayout.SOUTH);
-        this.revalidate();
-        this.repaint();
+        setDefaultLog(text, WHITE, GREEN);
     }
 
     private void setErrorLog(String text) {
-        if (log != null) {
-            this.remove(log);
+        setDefaultLog(text, BLACK, YELLOW);
+    }
+
+    private void setDefaultLog(String text, Color foreground, Color background) {
+        if (this.log != null) {
+            this.remove(this.log);
         }
-        log = new JLabel(text, JLabel.CENTER);
-        log.setForeground(BLACK);
-        log.setBackground(YELLOW);
-        log.setOpaque(true);
+        this.log = new JLabel(text, JLabel.CENTER);
+        this.log.setForeground(foreground);
+        this.log.setBackground(background);
+        this.log.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        this.log.setOpaque(true);
         this.add(log, BorderLayout.SOUTH);
         this.revalidate();
         this.repaint();
