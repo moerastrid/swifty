@@ -17,38 +17,33 @@ public class EmojiMap {
     );
 
     public static String getEmoji(HeroType type) {
-        return heroEmojis.get(type);
+        final var emoji = heroEmojis.get(type);
+        if (emoji == null) {
+            throw new IllegalStateException("Unexpected value: %s".formatted(type.name()));
+        }
+        return emoji;
     }
 
+    private static final Map<String, String> monsterNameEmoji = Map.ofEntries(
+            Map.entry("the bus", "🚌"), 
+            Map.entry("a hairsalon", "✂️"),
+            Map.entry("IKEA", "🛋️"),
+            Map.entry("your office kanteen", "🍽️"),
+            Map.entry("the library", "📚"),
+            Map.entry("your office", "🏢"),
+            Map.entry("the park", "🌳"),
+            Map.entry("the supermarket (on a saturday)", "🛒"),
+            Map.entry("an indoor swimming pool", "🏊🏻‍♂️"),
+            Map.entry("a teambuilding event", "🤼‍♂️"),
+            Map.entry("a teams meeting", "👥"),
+            Map.entry("vim", "😈"));
+
     public static String getEmoji(Monster monster) {
-        return switch (monster.getName()) {
-            case "the bus" ->
-                "🚌";
-            case "a hairsalon" ->
-                "✂️";
-            case "IKEA" ->
-                "🛋️";
-            case "your office kapnteen" ->
-                "🍽️";
-            case "the library" ->
-                "📚";
-            case "your office" ->
-                "🏢";
-            case "the park" ->
-                "🌳";
-            case "the supermarket (on a saturday)" ->
-                "🛒";
-            case "an indoor swimming pool" ->
-                "🏊🏻‍♂️";
-            case "a teambuilding event" ->
-                "🤼‍♂️";
-            case "a teams meeting" ->
-                "👥";
-            case "vim" ->
-                "😈";
-            default ->
-                throw new IllegalStateException("Unexpected value: " + monster);
-        };
+        final var emoji = monsterNameEmoji.get(monster.getName());
+        if (emoji == null) {
+            throw new IllegalStateException("Unexpected value: %s".formatted(monster.getName()));
+        }
+        return emoji;
     }
 
 }
