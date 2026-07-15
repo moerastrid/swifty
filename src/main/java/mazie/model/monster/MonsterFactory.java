@@ -10,7 +10,7 @@ public class MonsterFactory {
     private enum Difficulty {
         EASY,
         MEDIUM,
-        HARD;
+        HARD
     }
 
     private MonsterFactory() {
@@ -54,7 +54,7 @@ public class MonsterFactory {
 
     private Monster newMediumMonster(int heroLevel) {
         return switch (random.nextInt(5)) {
-            case 0 -> new Hairsalon(heroLevel);
+            case 0 -> new HairSalon(heroLevel);
             case 1 -> new Kanteen(heroLevel);
             case 2 -> new Office(heroLevel);
             case 3 -> new Teams(heroLevel);

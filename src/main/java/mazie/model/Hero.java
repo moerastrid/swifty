@@ -16,10 +16,10 @@ public class Hero {
 
     @NotBlank(message = "Heroes need names")
     @Size(min = 2, max = 30)
-    private String name = "default";
+    private final String name;
 
     @NotNull(message = "You can't just be a 'hero'")
-    private HeroType type;
+    private final HeroType type;
 
     @Min(1)
     private int level = 1;
@@ -27,9 +27,9 @@ public class Hero {
     @Min(0)
     private int xp = 0;
 
-    private int attack = 10;
-    private int defence = 10;
-    private int hp = 100;
+    private int attack;
+    private int defence;
+    private int hp;
 
     private Artifact weapon = null;
     private Artifact armour = null;
@@ -56,7 +56,7 @@ public class Hero {
 
     public int takeDamage(int damage) {
         final var damageSum = damage - this.defence;
-        final var totalDamage = damageSum > 1 ? damageSum : 1;
+        final var totalDamage = Math.max(damageSum, 1);
         this.hp -= totalDamage;
         return totalDamage;
     }
@@ -82,14 +82,14 @@ public class Hero {
     private boolean lvlUp() {
         this.level += 1;
 
-        final var levelIncrement = Math.pow(1.1, (double) (this.level - 1));
+        final var levelIncrement = Math.pow(1.1, (this.level - 1));
 
         this.attack = (int) (type.baseAttack * levelIncrement);
         this.defence = (int) (type.baseDefence * levelIncrement);
         final var hpMax = (int) (type.baseHp * levelIncrement);
 
         final var newHp = this.hp + (hpMax / 2);
-        this.hp = (newHp > hpMax) ? hpMax : newHp;
+        this.hp = Math.min(newHp, hpMax);
 
         return true;
     }
@@ -157,18 +157,6 @@ public class Hero {
         return ("%d (%d + %d)".formatted(this.getTotalHp(), this.getHp(), bonus));
     }
 
-    public Artifact getWeapon() {
-        return this.weapon;
-    }
-
-    public Artifact getArmour() {
-        return this.armour;
-    }
-
-    public Artifact getHelmet() {
-        return this.helmet;
-    }
-
     public List<Artifact> getArtifacts() {
         final var artifacts = new ArrayList<Artifact>();
         if (this.weapon != null) {
@@ -210,7 +198,7 @@ public class Hero {
 
         final var artifacts = this.getArtifacts();
         if (!artifacts.isEmpty()) {
-            final var artifactActions = artifacts.stream().map(a -> a.getAction()).toList();
+            final var artifactActions = artifacts.stream().map(Artifact::getAction).toList();
             // (adding the artifact Actions twice for having a higher change of getting those)
             actions.addAll(artifactActions);
             actions.addAll(artifactActions);

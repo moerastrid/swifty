@@ -19,10 +19,9 @@ import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.WHITE;
 import static mazie.view.gui.ThemeColor.YELLOW;
 
-// gamePanel is persistent. hierin zitten kleinere panels die je kunt afwisselen, geloof ik?
+// gamePanel is persistent. Hierin zitten kleinere panels die je kunt afwisselen, geloof ik?
 public class GamePanel extends JPanel {
 
-    private JPanel menuBar;
     private JPanel subPanel;
     private JLabel log;
 
@@ -105,14 +104,12 @@ public class GamePanel extends JPanel {
         switchButton.setBackground(YELLOW);
         switchButton.setForeground(BLACK);
         switchButton.setMargin(new Insets(2, 10, 2, 10));
-        switchButton.addActionListener(event -> {
-            switchListener.run();
-        });
-        this.menuBar = new JPanel();
-        this.menuBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
-        this.menuBar.setOpaque(true);
-        this.menuBar.add(switchButton);
-        this.add(this.menuBar, BorderLayout.NORTH);
+        switchButton.addActionListener(event -> switchListener.run());
+        JPanel menuBar = new JPanel();
+        menuBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        menuBar.setOpaque(true);
+        menuBar.add(switchButton);
+        this.add(menuBar, BorderLayout.NORTH);
         this.revalidate();
         this.repaint();
     }

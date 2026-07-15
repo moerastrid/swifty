@@ -7,8 +7,8 @@ public enum ArtifactType {
     WEAPON(Map.of(
             "a fidget spinner", "spins the fidget spinner",
             "an emergency snack", "takes a bite of their favourite snack",
-            "a stress ball", "starts pulcking the stressball",
-            "your emotional support cucumber", "just loves cucumeber",
+            "a stress ball", "starts plucking the stressball",
+            "your emotional support cucumber", "just loves cucumber",
             "a pebble", "licks the pebble",
             "a spoon", "tries to stick the spoon to their nose",
             "a cool stick", "starts drawing shapes in the air with their stick",

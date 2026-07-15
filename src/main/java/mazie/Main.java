@@ -58,7 +58,7 @@ public class Main {
     private static void threadConfig() {
         final var mainThread = Thread.currentThread();
         Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            System.err.println("Thread [%s] error: %s".formatted(thread.getName(), throwable.getMessage()));
+            System.err.printf("Thread [%s] error: %s%n", thread.getName(), throwable.getMessage());
             edtCrashed = true;
             mainThread.interrupt();
         });
@@ -82,6 +82,7 @@ public class Main {
         final var controller = new GameController(view, repository);
 
         controller.start();
+        controller.close();
     }
 
     private static boolean parse(final String[] args) {

@@ -11,8 +11,8 @@ public class GameMap {
     private final int size;
     private final Monster[][] monsters;
     private final Random random;
-    private int heroX = 0;
-    private int heroY = 0;
+    private int heroX;
+    private int heroY;
 
     public GameMap(int heroLevel) {
         this.factory = MonsterFactory.getInstance();
@@ -83,10 +83,9 @@ public class GameMap {
             return false;
         } else if (isEdge(x, y)) {
             return false;
-        } else if (isMonster(x, y)) {
-            return false;
+        } else {
+            return !isMonster(x, y);
         }
-        return true;
     }
 
     private boolean isHeroPos(int x, int y) {

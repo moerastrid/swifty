@@ -37,9 +37,7 @@ public class SelectHeroPanel extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setBackground(PURPLE);
 
-        heroes.values().forEach(hero -> {
-            panel.add(heroRow(hero, queue));
-        });
+        heroes.values().forEach(hero -> panel.add(heroRow(hero, queue)));
 
         return panel;
     }

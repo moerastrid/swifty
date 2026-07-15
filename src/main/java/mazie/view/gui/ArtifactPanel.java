@@ -31,7 +31,7 @@ public class ArtifactPanel extends JPanel {
         question.setBorder(BorderFactory.createLineBorder(GREEN, 5, true));
         this.add(question);
 
-        final var artifacts = hero.getArtifacts().stream().map(a -> a.toString()).toList();
+        final var artifacts = hero.getArtifacts().stream().map(Artifact::toString).toList();
         final var info = artifacts.isEmpty() ? "nothing" : String.join("\n - ", artifacts);
         final var current = new JTextArea("\nyou're currently wearing:\n\n - %s".formatted(info));
         current.setBackground(GREY);

@@ -1,7 +1,10 @@
 package mazie.controller;
 
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
+import java.util.Map;
 import mazie.exception.QuitException;
 import mazie.exception.RepositoryException;
 import mazie.game.GameEngine;
@@ -10,20 +13,27 @@ import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
+import mazie.view.ViewSwitcher;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-
-import java.util.Map;
 
 public class GameController {
 
     private GameEngine engine = null;
     private final ViewSwitcher switcher;
     private final HeroRepository repository;
-    private final Validator validator = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory().getValidator();
+    private final Validator validator;
+    private final ValidatorFactory validatorFactory;
 
     public GameController(GameView view, HeroRepository repository) {
         this.switcher = new ViewSwitcher(view);
         this.repository = repository;
+
+        this.validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
+        this.validator = validatorFactory.getValidator();
+    }
+
+    public void close() {
+        this.validatorFactory.close();
     }
 
     public void start() {
@@ -101,7 +111,7 @@ public class GameController {
             return hero;
         }
 
-        switcher.showError(String.join(", ", violations.stream().map(v -> v.getMessage()).toList()));
+        switcher.showError(String.join(", ", violations.stream().map(ConstraintViolation::getMessage).toList()));
         return createValidHero();
     }
 
@@ -144,7 +154,7 @@ public class GameController {
         final var result = engine.fight();
 
         // #todo remove debugging string
-        System.out.println("fight result\nwin: %s\nlvlup: %s\ndrop: %s".formatted(result.win(), result.levelup(), result.drop()));
+        System.out.printf("fight result\nwin: %s\nlvlup: %s\ndrop: %s%n", result.win(), result.levelUp(), result.drop());
 
         if (result.win()) {
             handleRoundWin(hero, monster, result.damageToHero());
@@ -153,7 +163,7 @@ public class GameController {
             return false;
         }
 
-        if (result.levelup()) {
+        if (result.levelUp()) {
             switcher.showLevelUp(hero);
         }
 
@@ -171,8 +181,8 @@ public class GameController {
     }
 
     private boolean runningAway(Monster monster) {
-        final boolean feelingAgressive = switcher.askFightMonster(monster);
-        if (feelingAgressive) {
+        final boolean feelingAggressive = switcher.askFightMonster(monster);
+        if (feelingAggressive) {
             return false;
         }
         var running = this.engine.runAway();

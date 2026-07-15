@@ -66,7 +66,7 @@ public class GuiView implements GameView {
             final var icon = new ImageIcon(path);
             this.frame.setIconImage(icon.getImage());
         } else {
-            System.err.println("[WAARNING] url[%s] not available?".formatted(url));
+            System.err.printf("[WAARNING] url[%s] not available?%n", url);
         }
     }
 
@@ -85,13 +85,11 @@ public class GuiView implements GameView {
 
     @Override
     public void setSwitchListener(Runnable switchListener) {
-        invokeLater(() -> {
-            panel.setSwitchListener(() -> {
-                this.switchRequested = true;
-                switchListener.run();
-                controllerThread.interrupt();
-            });
-        });
+        invokeLater(() -> panel.setSwitchListener(() -> {
+            this.switchRequested = true;
+            switchListener.run();
+            controllerThread.interrupt();
+        }));
     }
 
     @Override
@@ -166,7 +164,7 @@ public class GuiView implements GameView {
 
     @Override
     public void showStartGame() {
-        invokeLater(() -> panel.setStartGame());
+        invokeLater(panel::setStartGame);
     }
 
     @Override
@@ -184,7 +182,7 @@ public class GuiView implements GameView {
 
     @Override
     public void showEmptyStep() {
-        invokeLater(() -> panel.setEmptyStep());
+        invokeLater(panel::setEmptyStep);
     }
 
     @Override

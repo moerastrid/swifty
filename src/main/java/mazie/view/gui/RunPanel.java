@@ -30,7 +30,7 @@ public class RunPanel extends JPanel {
         aboutMonster.setBorder(BorderFactory.createLineBorder(GREEN, 5, true));
         this.add(aboutMonster);
 
-        final var question = new JTextArea("\nare you bout that action?".formatted(monster.toString()));
+        final var question = new JTextArea("\nare you bout that action?");
         question.setBackground(GREY);
         question.setForeground(PURPLE);
         question.setBorder(BorderFactory.createLineBorder(GREEN, 5, true));

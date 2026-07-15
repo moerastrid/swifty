@@ -41,19 +41,19 @@ public interface GameView {
     // show monster, ask if user wants to fight or run
     boolean askFightMonster(Monster monster);
 
-    // show if run attempt from monster was succesfull
+    // show if run attempt from monster was successful
     void showRunSuccess(Monster monster, boolean success);
 
     // show that the game ended, because either user is at map edge (win) or defeated by a monster (dead)
     void showEndGame(boolean win);
 
-    // fightsummary has a string with what happened during the fight + how much xp was gained. only called when user won.
+    // fight summary has a string with what happened during the fight + how much xp was gained. only called when user won.
     void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain);
 
     // show hero stats + congratz blabla
     void showLevelUp(Hero hero);
 
-    // show artifact, ask if user wants to keep it, show current hero (+ artifacts) too so user can make choise
+    // show artifact, ask if user wants to keep it, show current hero (+ artifacts) too so user can make choice
     boolean askKeepArtifact(Artifact artifact, Hero hero);
 
 }

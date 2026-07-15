@@ -50,7 +50,7 @@ public class SQLiteHeroMapper {
                 return enumType;
             }
         }
-        throw new IllegalArgumentException("can't contvert hero type [%s]".formatted(type));
+        throw new IllegalArgumentException("can't convert hero type [%s]".formatted(type));
     }
 
     private static ArtifactType convertArtifactType(String type) {
@@ -59,6 +59,6 @@ public class SQLiteHeroMapper {
                 return enumType;
             }
         }
-        throw new RepositoryException("can't contvert artifact type [%s]".formatted(type));
+        throw new RepositoryException("can't convert artifact type [%s]".formatted(type));
     }
 }

@@ -24,9 +24,7 @@ public class EndPanel extends JPanel {
         okButton.setBackground(ThemeColor.PURPLE);
         okButton.setForeground(ThemeColor.YELLOW);
         okButton.setMargin(new Insets(2, 10, 2, 10));
-        okButton.addActionListener(event -> {
-            latch.countDown();
-        });
+        okButton.addActionListener(event -> latch.countDown());
         this.add(okButton, BorderLayout.SOUTH);
     }
 }

@@ -4,7 +4,7 @@ import mazie.model.Artifact;
 
 public record FightResult(
         boolean win,
-        boolean levelup,
+        boolean levelUp,
         Artifact drop,
         int damageToHero
 ) {

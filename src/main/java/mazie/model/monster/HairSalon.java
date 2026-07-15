@@ -1,6 +1,6 @@
 package mazie.model.monster;
 
-public class Hairsalon extends Monster {
+public class HairSalon extends Monster {
 
     final static String NAME = "a hairsalon";
     final static String[] ACTIONS = {
@@ -10,7 +10,7 @@ public class Hairsalon extends Monster {
     };
     final static String GOODBYE = "you leave with a new hairdo, not entirely sure if you like it yet.";
 
-    public Hairsalon(int lvl) {
+    public HairSalon(int lvl) {
         super(NAME, ACTIONS, GOODBYE, lvl, 12, 3, 18, 70);
     }
 }

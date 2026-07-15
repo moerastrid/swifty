@@ -70,7 +70,7 @@ public class TerminalView implements GameView {
         options.put("frog", HeroType.FROG);
         options.put("m", HeroType.MOUSE);
         options.put("mouse", HeroType.MOUSE);
-        // #todo waarom doe je dit hier handmatig putten? herotype.values()
+        // #todo waarom doe je dit hier handmatig putten? HeroType.values()
 
         HeroType type = choose(typePrompt, options);
 
@@ -105,7 +105,7 @@ public class TerminalView implements GameView {
 
     private void showHeroStats(Hero hero) {
 
-        final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(a -> a.toString()).toList());
+        final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(Artifact::toString).toList());
 
         final var stats = """
                 Hero(#%d) %s identifies as a %s,
@@ -189,7 +189,7 @@ public class TerminalView implements GameView {
         if (win) {
             prompt = """
                     
-                              ▄         ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄ 
+                              ▄         ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄
                              ▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░░▌      ▐░▌
                              ▐░▌       ▐░▌ ▀▀▀▀█░█▀▀▀▀ ▐░▌░▌     ▐░▌
                              ▐░▌       ▐░▌     ▐░▌     ▐░▌▐░▌    ▐░▌
@@ -199,25 +199,25 @@ public class TerminalView implements GameView {
                              ▐░▌▐░▌ ▐░▌▐░▌     ▐░▌     ▐░▌    ▐░▌▐░▌
                              ▐░▌░▌   ▐░▐░▌ ▄▄▄▄█░█▄▄▄▄ ▐░▌     ▐░▐░▌
                              ▐░░▌     ▐░░▌▐░░░░░░░░░░░▌▐░▌      ▐░░▌
-                              ▀▀       ▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀        ▀▀ 
+                              ▀▀       ▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀        ▀▀
                     """;
         } else {
             prompt = """
                     
                               ▄▀▀▀▀▄    ▄▀▀█▄   ▄▀▀▄ ▄▀▄  ▄▀▀█▄▄▄▄
-                             █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐  
-                             █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄   
-                             █     █ █  ▄▀   █   █    █    █    ▌   
-                             ▐▀▄▄▄▄▀ ▐ █   ▄▀  ▄▀   ▄▀    ▄▀▄▄▄▄    
-                             ▐         ▐   ▐   █    █     █    ▐    
-                                               ▐    ▐     ▐         
+                             █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐
+                             █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄
+                             █     █ █  ▄▀   █   █    █    █    ▌
+                             ▐▀▄▄▄▄▀ ▐ █   ▄▀  ▄▀   ▄▀    ▄▀▄▄▄▄
+                             ▐         ▐   ▐   █    █     █    ▐
+                                               ▐    ▐     ▐
                               ▄▀▀▀▀▄   ▄▀▀▄ ▄▀▀▄  ▄▀▀█▄▄▄▄  ▄▀▀▄▀▀▀▄
                              █      █ █   █    █ ▐  ▄▀   ▐ █   █   █
-                             █      █ ▐  █    █    █▄▄▄▄▄  ▐  █▀▀█▀ 
-                             ▀▄    ▄▀    █   ▄▀    █    ▌   ▄▀    █ 
-                               ▀▀▀▀       ▀▄▀     ▄▀▄▄▄▄   █     █  
-                                                 █    ▐   ▐     ▐  
-                                                 ▐                 
+                             █      █ ▐  █    █    █▄▄▄▄▄  ▐  █▀▀█▀
+                             ▀▄    ▄▀    █   ▄▀    █    ▌   ▄▀    █
+                               ▀▀▀▀       ▀▄▀     ▄▀▄▄▄▄   █     █
+                                                 █    ▐   ▐     ▐
+                                                 ▐
                     """;
         }
         colorPrint(AnsiColor.RED, prompt);
@@ -261,7 +261,7 @@ public class TerminalView implements GameView {
     @Override
     public boolean askKeepArtifact(Artifact artifact, Hero hero) {
 
-        final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(a -> a.toString()).toList());
+        final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(Artifact::toString).toList());
 
         final var prompt = """
                 	litty, an artifact!
@@ -307,7 +307,7 @@ public class TerminalView implements GameView {
             return options.get(answer);
         }
 
-        final var invalidPrompt = "not a valid choise, try again.";
+        final var invalidPrompt = "not a valid option, try again.";
         showError(invalidPrompt);
 
         return choose(prompt, options);
