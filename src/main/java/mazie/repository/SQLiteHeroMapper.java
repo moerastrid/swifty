@@ -1,6 +1,5 @@
 package mazie.repository;
 
-import mazie.exception.RepositoryException;
 import mazie.model.Artifact;
 import mazie.model.ArtifactType;
 import mazie.model.Hero;
@@ -31,34 +30,15 @@ public class SQLiteHeroMapper {
 
             var hero = heroMap.get(heroId);
             if (hero == null) {
-                hero = new Hero(heroId, heroName, convertHeroType(heroType), heroLevel, heroXp, heroAttack, heroDefence, heroHp);
+                hero = new Hero(heroId, heroName, HeroType.valueOf(heroType), heroLevel, heroXp, heroAttack, heroDefence, heroHp);
                 heroMap.put(heroId, hero);
             }
 
             if (artifactName != null) {
-                final var artifact = new Artifact(artifactName, convertArtifactType(artifactType), artifactValue);
+                final var artifact = new Artifact(artifactName, ArtifactType.valueOf(artifactType), artifactValue);
                 hero.setArtifact(artifact);
             }
         }
         return heroMap;
-    }
-
-    private static HeroType convertHeroType(String type) {
-
-        for (HeroType enumType : HeroType.values()) {
-            if (enumType.toString().equals(type)) {
-                return enumType;
-            }
-        }
-        throw new IllegalArgumentException("can't convert hero type [%s]".formatted(type));
-    }
-
-    private static ArtifactType convertArtifactType(String type) {
-        for (ArtifactType enumType : ArtifactType.values()) {
-            if (enumType.toString().equals(type)) {
-                return enumType;
-            }
-        }
-        throw new RepositoryException("can't convert artifact type [%s]".formatted(type));
     }
 }

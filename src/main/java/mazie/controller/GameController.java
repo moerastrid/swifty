@@ -27,7 +27,6 @@ public class GameController {
     public GameController(GameView view, HeroRepository repository) {
         this.switcher = new ViewSwitcher(view);
         this.repository = repository;
-
         this.validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
         this.validator = validatorFactory.getValidator();
     }
@@ -130,11 +129,7 @@ public class GameController {
 
             if (engine.win()) {
                 playing = false;
-                try {
-                    repository.update(hero);
-                } catch (RepositoryException e) {
-                    switcher.showError(e.getMessage());
-                }
+                repository.update(hero);
                 switcher.showEndGame(true);
             }
         }
@@ -192,20 +187,12 @@ public class GameController {
 
     private void handleRoundWin(Hero hero, Monster monster, int damageToHero) {
         switcher.showFightSummary(damageToHero, hero, monster, monster.getXpReward());
-        try {
-            repository.update(hero);
-        } catch (RepositoryException e) {
-            switcher.showError(e.getMessage());
-        }
+        repository.update(hero);
     }
 
     private void handleRoundLoss(Hero hero) {
         switcher.showEndGame(false);
-        try {
-            repository.delete(hero);
-        } catch (RepositoryException e) {
-            switcher.showError(e.getMessage());
-        }
+        repository.delete(hero);
     }
 
     final void handleDrop(Artifact artifact, Hero hero) {
@@ -218,10 +205,6 @@ public class GameController {
         }
 
         hero.setArtifact(artifact);
-        try {
-            repository.update(hero);
-        } catch (RepositoryException e) {
-            switcher.showError(e.getMessage());
-        }
+        repository.update(hero);
     }
 }

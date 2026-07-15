@@ -49,14 +49,6 @@ java -jar target/mazie.jar gui
 
 ---
 
-## Current status (2026-07-14)
-
-All mandatory requirements are implemented and match the subject (see checklist below). Console and GUI modes are both fully playable end-to-end. Bonus: SQLite persistence is done; runtime console/GUI switching is not started. Remaining work is the polish/quality wishlist below — nothing there is blocking or required for the mandatory grade.
-
-A SOLID/encapsulation pass (student-initiated, started from a "Tell, Don't Ask" refactor of `Hero`/`Monster.takeDamage()`) is done: `GameMap` now exposes one cohesive `advance(Direction)` command instead of separate ask-then-act calls, and `MonsterFactory.generateMonster(heroLevel)` owns the easy/medium/hard difficulty distribution (48/36/16%) while `GameMap` only handles placement on the grid. `GameController.turn()`/`setup()` have both been split into small, single-purpose private methods (`runningAway`, `handleRoundWin`/`handleRoundLoss`, `handleDrop`, `newGame`/`setupHero`/`confirmSetup`), and `GameEngine` is now a controller field instead of being threaded through every method call. A monster-count bug introduced during the `MonsterFactory` split (`GameMap` was generating `size*size` monsters — far more than available placement cells — causing an infinite loop on game start) is fixed by deriving the monster count from the same density the old easy/medium/hard split used, without `GameMap` needing to know the difficulty ratios itself.
-
----
-
 ## Wishlist — next up
 
 Organized by topic.
@@ -67,53 +59,110 @@ Organized by topic.
 - [ ] Write player-facing instructions / how-to-play text.
 - [ ] *(idea, not decided)* Consider `java.util.logging` instead of scattered `System.err.println(...)` calls.
 
+
 ### GitHub / submission
 
 - [ ] Write a README for GitHub.
 - [ ] Consider publishing builds under GitHub Releases.
 
+
 ### Persistence
 
 - [ ] Allow deleting a hero from the load-game / select-hero screen.
 
+
 ### High scores (new idea, not designed yet)
 
-- [ ] On win *or* loss, record something about the hero as a persistent "high score" entry (new SQLite table, same repository pattern as `HeroRepository`). Open questions: what counts as "the score" (level? xp? turns survived?), where it's shown, whether it's global or per hero type.
+- [ ] On win *or* loss, record something about the hero as a persistent "high score" entry (new SQLite table, same repository pattern as `HeroRepository`). 
+- Open questions: what counts as "the score" (level? xp? turns survived?), where it's shown, whether it's global or per hero type.
+
 
 ### Game engine
 
-- [ ] Reconsider exception type: `SQLiteHeroMapper.convertHeroType(...)` now throws `IllegalArgumentException` (was `RepositoryException`, still is in `convertArtifactType`) — `Main`'s catch merges `ModelException | IllegalArgumentException`, mixing bad-user-input with corrupt-persisted-data handling. Probably should stay a `RepositoryException`.
-- [ ] **Decide on `RepositoryException` handling strategy in `GameController`.** Discussed but not decided: currently every `repository.update/delete/save` call is individually wrapped in a local try/catch showing an error and continuing. Alternative considered: let it propagate up (it's already an unchecked `RuntimeException`) for the in-game-loop calls (`update`/`delete` failures here are realistically always genuine DB/infra problems, never recoverable user input, since a hero's name — the only `UNIQUE` constraint — never changes after creation), while keeping the local catch+retry only in `setup()`'s `save()` call (the one spot where a failure can be a recoverable, user-caused duplicate name). Would also need a dedicated `catch (RepositoryException ex)` branch in `Main` instead of falling into the generic `Throwable` catch.
-- [ ] **NEXT SESSION, START HERE (2026-07-14):** `GameView` now has a second `showFightSummary` overload — `showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain)` — added by the student to replace the old string-based one (`showFightSummary(int damageToHero, String heroAction, String monsterAction, String finalMessage, int xpGain)`), so `GuiView`/`TerminalView` can call `hero.getAction()`/`monster.getAction()` etc. themselves instead of `GameController` pre-building strings. **Not yet implemented anywhere** — `GameController` doesn't call the new overload yet, and neither `GuiView` nor `TerminalView` implement it (only the old string-based one is implemented, so the project still compiles). Both interface methods currently coexist — once the new one is wired up everywhere (`GameController` call site + both view implementations), delete the old string-based overload, don't leave both permanently. Subsumes the note below about monster-specific flavor text/equipped-weapon narration — do that as part of implementing the new overload's body, not separately.
-- [ ] Decide: does winning reward the player with anything besides "you win"? (see High scores idea above — might answer this.)
-- [ ] *(idea recovered from `old/`, not adopted)* `old/model/{Quality,util/QualityDefiner}.java` had a `BAD/NORMAL/GOOD` artifact-quality roll independent of monster stats — current `dropArtifact()` only scales off `monster.getXpReward()`. Could add a quality tier on top.
+- [ ] Decide: does winning reward the player with anything besides "you win"? 
+  - (see High scores idea above — might answer this.)
+
+- [ ] *(idea recovered from `old/`, not adopted)* 
+  - `old/model/{Quality,util/QualityDefiner}.java` had a `BAD/NORMAL/GOOD` artifact-quality roll 
+  - independent of monster stats — current `dropArtifact()` only scales off `monster.getXpReward()`. 
+  - Could add a quality tier on top.
 
 ### Builder pattern (deliberate learning goal, not just a feature)
 
-- [ ] Student wants to apply the Builder pattern somewhere and be able to explain it. Best candidate: `Hero`'s DB-loading constructor (8 positional params). Worth discussing honestly whether Builder is the textbook-correct fit here (all params required, no optionals) or a deliberate retrofit to practice the pattern — either is fine, but the student should be able to say which for peer-eval defense.
+- [ ] Student wants to apply the Builder pattern somewhere and be able to explain it. 
+  - Best candidate: `Hero`'s DB-loading constructor (8 positional params). 
+  - Worth discussing honestly whether Builder is the textbook-correct fit here (all params required, no optionals) 
+  - or a deliberate retrofit to practice the pattern — 
+  - either is fine, but the student should be able to say which for peer-eval defense.
 
 ### Swing GUI
 
-- [ ] **Keep the hero's stats visible at all times while playing.** Today `HeroPanel` only appears inside `ConfirmPanel`, `LevelUpPanel`, and `SelectHeroPanel` — not during `DirectionPanel`/`ArtifactPanel`/`RunPanel`. **Revised decision (2026-07-15, supersedes the "GamePanel stores one Hero reference, set once via confirmHero" plan from 2026-07-14)**: student wants views kept stateless — no stored `Hero` pointer anywhere in `GuiView`/`GamePanel`/`TerminalView`, every screen receives the current `Hero` fresh as a parameter instead. This also elegantly removes the runtime-view-switch risk noted in the Bonus checklist (a freshly-swapped-in view never needs a one-time hand-off if it never stores state to begin with). Concrete step: extend `GameView` with a `Hero` parameter on the methods still missing one during active gameplay — `showStartGame()`, `askDirection()`, `showEmptyStep()`, `askFightMonster(Monster)`, `showRunSuccess(Monster, boolean)` (compare to the existing `askKeepArtifact(Artifact, Hero)`, which already does this correctly). `GamePanel`'s `HeroPanel` slot (`BorderLayout.EAST`) still gets rebuilt fresh each time from whatever `Hero` a call provides, same as `setSubPanel(...)` already rebuilds the center panel from scratch each time — no `refresh()`/mutation-tracking needed.
+- [ ] **Keep the hero's stats visible at all times while playing.** 
+  - Today `HeroPanel` only appears inside `ConfirmPanel`, `LevelUpPanel`, and `SelectHeroPanel` — 
+  - not during `DirectionPanel`/`ArtifactPanel`/`RunPanel`. 
+  - **Revised decision (2026-07-15, supersedes the "GamePanel stores one Hero reference, set once via confirmHero" plan from 2026-07-14)**: 
+  - student wants views kept stateless — 
+  - no stored `Hero` pointer anywhere in `GuiView`/`GamePanel`/`TerminalView`, 
+  - every screen receives the current `Hero` fresh as a parameter instead. 
+  - This also elegantly removes the runtime-view-switch risk noted in the Bonus checklist 
+  - (a freshly-swapped-in view never needs a one-time hand-off if it never stores state to begin with). 
+  - Concrete step: extend `GameView` with a `Hero` parameter on the methods still missing one during active gameplay — 
+  - `showStartGame()`, `askDirection()`, `showEmptyStep()`, `askFightMonster(Monster)`, `showRunSuccess(Monster, boolean)` 
+  - (compare to the existing `askKeepArtifact(Artifact, Hero)`, which already does this correctly). 
+  - `GamePanel`'s `HeroPanel` slot (`BorderLayout.EAST`) still gets rebuilt fresh each time from whatever `Hero` a call provides, 
+  - same as `setSubPanel(...)` already rebuilds the center panel from scratch each time — no `refresh()`/mutation-tracking needed.
+
 - [ ] Arrow-key navigation for movement (N/E/S/W), and consider extending keyboard control to other screens.
-- [ ] **Give the fight summary its own dedicated blocking screen** (`FightSummaryPanel`), replacing the current `GamePanel.setFightSummary(...)` → footer `JLabel` (`BorderLayout.SOUTH`) approach — that text is long enough to fall off-screen. Reuse the existing `CountDownLatch`-based blocking pattern already used by `LevelUpPanel`/`EndPanel` (swap panel, wait for a "continue" click). Independent of the narrated-fight-summary wishlist item below — do this one first regardless of whether the narration text itself changes.
-- [ ] General look & feel pass — buttons use default OS chrome. *(Windows' native L&F ignores `setBackground()`/`setForeground()` on `JButton`/`JToggleButton` — `UIManager.setLookAndFeel(Metal/Nimbus...)` or a `Border` are the fixes.)*
+
+- [ ] **Give the fight summary its own dedicated blocking screen** (`FightSummaryPanel`), 
+  - replacing the current `GamePanel.setFightSummary(...)`
+  - → footer `JLabel` (`BorderLayout.SOUTH`) approach — that text is long enough to fall off-screen. 
+  - Reuse the existing `CountDownLatch`-based blocking pattern already used by `LevelUpPanel`/`EndPanel` 
+  - (swap panel, wait for a "continue" click). 
+  - Independent of the narrated-fight-summary wishlist item below — 
+  - do this one first regardless of whether the narration text itself changes.
+
+- [ ] General look & feel pass — buttons use default OS chrome. 
+  - *(Windows' native L&F ignores `setBackground()`/`setForeground()` on `JButton`/`JToggleButton` — `UIManager.setLookAndFeel(Metal/Nimbus...)` 
+  - or a `Border` are the fixes.)*
+
 - [ ] Win/lose screen artwork.
-- [ ] *(idea recovered from `oldold/`, not adopted)* OS-aware named system fonts instead of the L&F default (no font files exist anywhere in `old/`/`oldold/`, just a code pattern).
+
+- [ ] *(idea recovered from `oldold/`, not adopted)* OS-aware named system fonts instead of the L&F default 
+  - (no font files exist anywhere in `old/`/`oldold/`, just a code pattern).
+
 
 ### Visual assets
 
-- [ ] **Wire up the hero/monster PNGs (added 2026-07-08) into the actual views.** `mazie/src/main/resources/` has `frog.png`/`mouse.png`/`weevil.png` + one PNG per monster species — none are loaded by any view yet (only `mazie-logo.png`/`mazie-icon.png` are). Swing: show in `HeroPanel`/fight panels. Terminal still needs separate ASCII-art versions.
-- [ ] **Terminal: emoji per hero type + monster species.** Revised decision (2026-07-14, supersedes the earlier "add an `emoji` field to `HeroType`/`Monster`" plan — student correctly pushed back that emoji choice is a *terminal-view-specific* presentation concern, not model data, and putting it in `HeroType`/`Monster` would leak view knowledge into the model layer): keep the mapping entirely inside `mazie.view.terminal`, e.g. a small `Map<HeroType, String>` / `Map<Class<? extends Monster>, String>` (or an equivalent `switch`) living in a terminal-only helper or directly in `TerminalView` — not an `AnsiColor`-style enum-of-constants either, since this is a type→symbol lookup rather than a formatting toggle. Model classes stay platform-agnostic.
+- [ ] **Wire up the hero/monster PNGs (added 2026-07-08) into the actual views.
+  - ** `mazie/src/main/resources/` has `frog.png`/`mouse.png`/`weevil.png` + one PNG per monster species — 
+  - none are loaded by any view yet (only `mazie-logo.png`/`mazie-icon.png` are). 
+  - Swing: show in `HeroPanel`/fight panels. 
+  - Terminal still needs separate ASCII-art versions.
+
+- [ ] **Terminal: emoji per hero type + monster species.**
+  - Revised decision (2026-07-14, supersedes the earlier "add an `emoji` field to `HeroType`/`Monster`" plan — 
+  - student correctly pushed back that emoji choice is a *terminal-view-specific* presentation concern, not model data,
+  - and putting it in `HeroType`/`Monster` would leak view knowledge into the model layer): 
+  - keep the mapping entirely inside `mazie.view.terminal`, e.g. a small `Map<HeroType, String>` / `Map<Class<? extends Monster>, String>` 
+  - (or an equivalent `switch`) living in a terminal-only helper or directly in `TerminalView` — not an `AnsiColor`-style enum-of-constants either, 
+  - since this is a type→symbol lookup rather than a formatting toggle. Model classes stay platform-agnostic.
+
 
 ### Repo cleanup (`old/` + `oldold/`)
 
-Both folders are superseded prototypes — nothing essential is missing from `mazie/` (verified 2026-07-06; the only two reusable ideas, artifact quality tiers and OS-aware fonts, are already folded into the wishlist above). **Proposed, not yet done:** delete `old/` and `oldold/`, flatten `mazie/` up to the repo root — needs student go-ahead first (touches build commands, this file, and repo memory).
+Both folders are superseded prototypes — nothing essential is missing from `mazie/` 
+(verified 2026-07-06; the only two reusable ideas, artifact quality tiers and OS-aware fonts, are already folded into the wishlist above). 
+**Proposed, not yet done:** delete `old/` and `oldold/`, flatten `mazie/` up to the repo root — 
+needs student go-ahead first (touches build commands, this file, and repo memory).
+
 
 ### Open questions / other
 
 - [ ] Reconcile Hibernate Validator's rules with what `GameController`/the repository actually check — any duplication or gaps?
+
 - [ ] Re-verify MVC separation once more against the subject's "only a good and clear implementation will be accepted" — a full, deliberate pass.
+
 - [ ] Re-verify "best practices suited for this problem" — no concrete checklist for this yet.
 
 ---
@@ -154,6 +203,7 @@ SQLite (bonus, replaces the text-file requirement). `HeroRepository` interface (
 - `delete()` order: `artifact` rows first (FK constraint), then `hero`.
 - Do **not** run Hibernate Validator on heroes loaded from the DB — validation is for fresh user input only.
 - All writes use `PreparedStatement` with `?` placeholders (SQL-injection safety) — see the JDBC/SQLite cheat-sheet in user memory for exact syntax if needed again.
+
 
 ### Notes worth remembering for peer-evaluation defense
 

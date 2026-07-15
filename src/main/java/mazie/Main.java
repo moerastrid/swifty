@@ -6,6 +6,7 @@ import mazie.exception.FatalException;
 import mazie.exception.ModelException;
 import mazie.exception.ParseException;
 import mazie.exception.QuitException;
+import mazie.exception.RepositoryException;
 import mazie.repository.SQLiteHeroRepository;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
@@ -26,7 +27,7 @@ public class Main {
 
         try {
             run(args);
-        } catch (FatalException ex) {
+        } catch (FatalException | RepositoryException ex) {
             safeExit(ex.getMessage(), EX_UNAVAILABLE);
         } catch (ModelException | IllegalArgumentException | IllegalStateException ex) {
             safeExit(ex.getMessage(), EX_SOFTWARE);
