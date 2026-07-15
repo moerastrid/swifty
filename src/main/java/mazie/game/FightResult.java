@@ -7,5 +7,5 @@ public record FightResult(
         boolean levelup,
         Artifact drop,
         int damageToHero
-        ) {
+) {
 }

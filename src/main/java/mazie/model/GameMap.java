@@ -1,9 +1,9 @@
 package mazie.model;
 
-import java.util.Random;
-
 import mazie.model.monster.Monster;
 import mazie.model.monster.MonsterFactory;
+
+import java.util.Random;
 
 public class GameMap {
 
@@ -59,7 +59,7 @@ public class GameMap {
     }
 
     private void generateMonsters(int heroLevel) {
-        final int total =  (int)(0.23 * (size - 2) * (size - 2));
+        final int total = (int) (0.23 * (size - 2) * (size - 2));
 
         for (int i = 0; i < total; i++) {
             final var monster = factory.generateMonster(heroLevel);

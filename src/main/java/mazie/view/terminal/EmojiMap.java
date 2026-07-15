@@ -1,7 +1,6 @@
 package mazie.view.terminal;
 
 import java.util.Map;
-
 import mazie.model.HeroType;
 import mazie.model.monster.Monster;
 
@@ -25,7 +24,7 @@ public class EmojiMap {
     }
 
     private static final Map<String, String> monsterNameEmoji = Map.ofEntries(
-            Map.entry("the bus", "🚌"), 
+            Map.entry("the bus", "🚌"),
             Map.entry("a hairsalon", "✂️"),
             Map.entry("IKEA", "🛋️"),
             Map.entry("your office kanteen", "🍽️"),

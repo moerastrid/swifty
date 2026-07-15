@@ -1,9 +1,7 @@
 package mazie.view.gui;
 
 import java.util.Map;
-
 import javax.swing.ImageIcon;
-
 import mazie.model.HeroType;
 import mazie.model.monster.Monster;
 
@@ -36,7 +34,7 @@ public class PngMap {
 
     // "your office kanteen", "/kanteen.png", #todo tekenen
     private static final Map<String, String> monsterNamePngPath = Map.ofEntries(
-            Map.entry("the bus", "/bus.png"), 
+            Map.entry("the bus", "/bus.png"),
             Map.entry("a hairsalon", "/hairsalon.png"),
             Map.entry("IKEA", "/ikea.png"),
             Map.entry("your office kanteen", "/office.png"),

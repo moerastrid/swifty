@@ -17,7 +17,7 @@ public class YesNoButton extends JButton {
 
         final var text = yes ? "yes" : "no";
         this.setText(text);
-        
+
         final var color = yes ? PURPLE : GREEN;
         this.setBackground(color);
         this.setForeground(BLACK);

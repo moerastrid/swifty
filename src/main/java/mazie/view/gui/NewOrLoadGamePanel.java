@@ -3,7 +3,6 @@ package mazie.view.gui;
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.util.concurrent.BlockingQueue;
-
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -20,7 +19,7 @@ public class NewOrLoadGamePanel extends JPanel {
         this.setBackground(GREY);
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BorderLayout(10, 10));
-        
+
         final var image = new ImageIcon(getClass().getResource("/mazie-logo.png"));
         final var imageLabel = new JLabel(image);
         this.add(imageLabel, BorderLayout.CENTER);
@@ -31,7 +30,7 @@ public class NewOrLoadGamePanel extends JPanel {
         final var panel = new JPanel();
         panel.setBackground(GREY);
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
+
         final var newButton = new JButton("new game");
         final var loadButton = new JButton("load game");
         newButton.setSize(60, 60);
@@ -44,7 +43,7 @@ public class NewOrLoadGamePanel extends JPanel {
         newButton.addActionListener(event -> {
             try {
                 queue.put(true);
-            }  catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.out.println("gui view interrupted: " + e.getMessage());
             }
@@ -53,7 +52,7 @@ public class NewOrLoadGamePanel extends JPanel {
         loadButton.addActionListener(event -> {
             try {
                 queue.put(false);
-            }  catch (InterruptedException e) {
+            } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 System.out.println("gui view interrupted: " + e.getMessage());
             }

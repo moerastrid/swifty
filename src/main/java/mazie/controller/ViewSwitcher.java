@@ -1,7 +1,5 @@
 package mazie.controller;
 
-import java.util.Map;
-
 import mazie.exception.FatalException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
@@ -11,6 +9,8 @@ import mazie.model.monster.Monster;
 import mazie.view.GameView;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
+
+import java.util.Map;
 
 public class ViewSwitcher implements GameView {
 

@@ -1,5 +1,11 @@
 package mazie.repository;
 
+import mazie.exception.FatalException;
+import mazie.exception.RepositoryException;
+import mazie.model.ArtifactType;
+import mazie.model.Hero;
+import mazie.model.HeroType;
+
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -7,14 +13,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Map;
-
 import java.util.stream.Collectors;
-
-import mazie.exception.FatalException;
-import mazie.exception.RepositoryException;
-import mazie.model.Hero;
-import mazie.model.HeroType;
-import mazie.model.ArtifactType;
 
 public class SQLiteHeroRepository implements HeroRepository {
     private static final String DB_URL = "jdbc:sqlite:data/swingy.db";
@@ -29,58 +28,58 @@ public class SQLiteHeroRepository implements HeroRepository {
 
     private static final String HERO_TYPE = Arrays.stream(HeroType.values()).map(type -> "'%s'".formatted(type.name())).collect(Collectors.joining(", "));
     private static final String ARTIFACT_TYPE = Arrays.stream(ArtifactType.values()).map(type -> "'%s'".formatted(type.name())).collect(Collectors.joining(", "));
-    
+
 
     // #todo artifact types ook zo
 
     private static final String CREATE_HERO_TABLE_SQL = """
-            CREATE TABLE IF NOT EXISTS hero(
-                id      INTEGER PRIMARY KEY AUTOINCREMENT,
-                name    TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 2 AND 30),
-                type    TEXT NOT NULL CHECK(type IN (%s)),
-                level   INTEGER NOT NULL CHECK(level >= 1),
-                xp      INTEGER NOT NULL CHECK(xp >= 0),
-                attack  INTEGER NOT NULL CHECK(attack >= 0),
-                defence INTEGER NOT NULL CHECK(defence >= 0),
-                hp      INTEGER NOT NULL
-            );
-        """.formatted(HERO_TYPE);
+                CREATE TABLE IF NOT EXISTS hero(
+                    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name    TEXT NOT NULL UNIQUE CHECK(length(name) BETWEEN 2 AND 30),
+                    type    TEXT NOT NULL CHECK(type IN (%s)),
+                    level   INTEGER NOT NULL CHECK(level >= 1),
+                    xp      INTEGER NOT NULL CHECK(xp >= 0),
+                    attack  INTEGER NOT NULL CHECK(attack >= 0),
+                    defence INTEGER NOT NULL CHECK(defence >= 0),
+                    hp      INTEGER NOT NULL
+                );
+            """.formatted(HERO_TYPE);
     private static final String CREATE_ARTIFACT_TABLE_SQL = """
-            CREATE TABLE IF NOT EXISTS artifact(
-                id      INTEGER PRIMARY KEY AUTOINCREMENT,
-                name    TEXT NOT NULL,
-                type    TEXT NOT NULL CHECK(type IN (%s)),
-                value   INTEGER NOT NULL CHECK(value >= 0),
-                hero_id INTEGER NOT NULL,
-                FOREIGN KEY(hero_id) REFERENCES hero(id)
-            );
-        """.formatted(ARTIFACT_TYPE);
+                CREATE TABLE IF NOT EXISTS artifact(
+                    id      INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name    TEXT NOT NULL,
+                    type    TEXT NOT NULL CHECK(type IN (%s)),
+                    value   INTEGER NOT NULL CHECK(value >= 0),
+                    hero_id INTEGER NOT NULL,
+                    FOREIGN KEY(hero_id) REFERENCES hero(id)
+                );
+            """.formatted(ARTIFACT_TYPE);
     private static final String LOAD_HEROES_SQL = """
-                SELECT h.*, a.name AS a_name, a.type AS a_type, a.value AS a_value, a.hero_id AS a_hero_id
-                FROM hero h
-                LEFT JOIN artifact a ON a.hero_id = h.id;
-                """;
+            SELECT h.*, a.name AS a_name, a.type AS a_type, a.value AS a_value, a.hero_id AS a_hero_id
+            FROM hero h
+            LEFT JOIN artifact a ON a.hero_id = h.id;
+            """;
     private static final String INSERT_HERO_SQL = """
-                INSERT INTO hero(name, type, level, xp, attack, defence, hp)
-                VALUES (?, ?, ?, ?, ?, ?, ?);
-                """;
+            INSERT INTO hero(name, type, level, xp, attack, defence, hp)
+            VALUES (?, ?, ?, ?, ?, ?, ?);
+            """;
     private static final String INSERT_ARTIFACT_SQL = """
-                INSERT INTO artifact(name, type, value, hero_id)
-                VALUES (?, ?, ?, ?);
-                """;
+            INSERT INTO artifact(name, type, value, hero_id)
+            VALUES (?, ?, ?, ?);
+            """;
     private static final String UPDATE_HERO_SQL = """
-                UPDATE hero
-                SET name = ?, type = ?, level = ?, xp = ?, attack = ?, defence = ?, hp = ?
-                WHERE id = ?;
-                """;
+            UPDATE hero
+            SET name = ?, type = ?, level = ?, xp = ?, attack = ?, defence = ?, hp = ?
+            WHERE id = ?;
+            """;
     private static final String DELETE_HERO_SQL = """
-                DELETE FROM hero
-                WHERE id = ?;
-                """;
+            DELETE FROM hero
+            WHERE id = ?;
+            """;
     private static final String DELETE_ARTIFACTS_SQL = """
-                DELETE FROM artifact
-                WHERE hero_id = ?;
-                """;
+            DELETE FROM artifact
+            WHERE hero_id = ?;
+            """;
 
     private final Connection connection;
 
@@ -194,7 +193,7 @@ public class SQLiteHeroRepository implements HeroRepository {
             this.commitConnection();
         } catch (SQLException e) {
             this.rollbackConnection();
-            throw new RepositoryException( e.getMessage(), e);
+            throw new RepositoryException(e.getMessage(), e);
         }
     }
 

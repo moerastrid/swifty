@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-
 import mazie.exception.QuitException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
@@ -58,11 +57,11 @@ public class TerminalView implements GameView {
     @Override
     public Hero createHero() {
         final var typePrompt = """
-		What do you want to be?
-			- bear (b)
-			- frog (f)
-			- hare (h)
-		""";
+                What do you want to be?
+                	- bear (b)
+                	- frog (f)
+                	- hare (h)
+                """;
 
         final var options = new HashMap<String, HeroType>();
         options.put("w", HeroType.WEEVIL);
@@ -109,15 +108,15 @@ public class TerminalView implements GameView {
         final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(a -> a.toString()).toList());
 
         final var stats = """
-			Hero(#%d) %s identifies as a %s,
-			  lvl     :%d
-			  xp      :%d
-			  attack  :%d  (total %d)
-			  defence :%d  (total %d)
-			  hp      :%d  (total %d)
-			and is wearing:
-			- %s
-			""".formatted(hero.getId(), hero.getName(), hero.getType().toString().toLowerCase(),
+                Hero(#%d) %s identifies as a %s,
+                  lvl     :%d
+                  xp      :%d
+                  attack  :%d  (total %d)
+                  defence :%d  (total %d)
+                  hp      :%d  (total %d)
+                and is wearing:
+                - %s
+                """.formatted(hero.getId(), hero.getName(), hero.getType().toString().toLowerCase(),
                 hero.getLevel(),
                 hero.getXp(),
                 hero.getAttack(), hero.getTotalAttack(),
@@ -131,11 +130,11 @@ public class TerminalView implements GameView {
     @Override
     public void showStartGame() {
         final var prompt = """
-        
-        ╔═╝╔═ ═╔╝╔═╝╔═║  ═╔╝║ ║╔═╝  ╔╔ ╔═║══║╝╔═╝
-        ╔═╝║ ║ ║ ╔═╝╔╔╝   ║ ╔═║╔═╝  ║║║╔═║╔╝ ║╔═╝
-        ══╝╝ ╝ ╝ ══╝╝ ╝   ╝ ╝ ╝══╝  ╝╝╝╝ ╝══╝╝══╝
-		""";
+                
+                      ╔═╝╔═ ═╔╝╔═╝╔═║  ═╔╝║ ║╔═╝  ╔╔ ╔═║══║╝╔═╝
+                      ╔═╝║ ║ ║ ╔═╝╔╔╝   ║ ╔═║╔═╝  ║║║╔═║╔╝ ║╔═╝
+                      ══╝╝ ╝ ╝ ══╝╝ ╝   ╝ ╝ ╝══╝  ╝╝╝╝ ╝══╝╝══╝
+                """;
         colorPrint(AnsiColor.BLUE, prompt);
     }
 
@@ -175,10 +174,10 @@ public class TerminalView implements GameView {
             prompt = "You've escaped! That %s got nothing on you!".formatted(monster.getName());
         } else {
             prompt = """
-				Before sneaking away, you lock eyes with the monster.
-				You realize, this %s makes you feel weak in the knees.
-				Your heart starts beating faster. There's no escape now..."
-			""".formatted(monster.getName());
+                    	Before sneaking away, you lock eyes with the monster.
+                    	You realize, this %s makes you feel weak in the knees.
+                    	Your heart starts beating faster. There's no escape now..."
+                    """.formatted(monster.getName());
         }
         colorPrint(AnsiColor.PURPLE, prompt);
     }
@@ -189,37 +188,37 @@ public class TerminalView implements GameView {
 
         if (win) {
             prompt = """
-
-             ▄         ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄ 
-            ▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░░▌      ▐░▌
-            ▐░▌       ▐░▌ ▀▀▀▀█░█▀▀▀▀ ▐░▌░▌     ▐░▌
-            ▐░▌       ▐░▌     ▐░▌     ▐░▌▐░▌    ▐░▌
-            ▐░▌   ▄   ▐░▌     ▐░▌     ▐░▌ ▐░▌   ▐░▌
-            ▐░▌  ▐░▌  ▐░▌     ▐░▌     ▐░▌  ▐░▌  ▐░▌
-            ▐░▌ ▐░▌░▌ ▐░▌     ▐░▌     ▐░▌   ▐░▌ ▐░▌
-            ▐░▌▐░▌ ▐░▌▐░▌     ▐░▌     ▐░▌    ▐░▌▐░▌
-            ▐░▌░▌   ▐░▐░▌ ▄▄▄▄█░█▄▄▄▄ ▐░▌     ▐░▐░▌
-            ▐░░▌     ▐░░▌▐░░░░░░░░░░░▌▐░▌      ▐░░▌
-             ▀▀       ▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀        ▀▀ 
-			""";
+                    
+                              ▄         ▄  ▄▄▄▄▄▄▄▄▄▄▄  ▄▄        ▄ 
+                             ▐░▌       ▐░▌▐░░░░░░░░░░░▌▐░░▌      ▐░▌
+                             ▐░▌       ▐░▌ ▀▀▀▀█░█▀▀▀▀ ▐░▌░▌     ▐░▌
+                             ▐░▌       ▐░▌     ▐░▌     ▐░▌▐░▌    ▐░▌
+                             ▐░▌   ▄   ▐░▌     ▐░▌     ▐░▌ ▐░▌   ▐░▌
+                             ▐░▌  ▐░▌  ▐░▌     ▐░▌     ▐░▌  ▐░▌  ▐░▌
+                             ▐░▌ ▐░▌░▌ ▐░▌     ▐░▌     ▐░▌   ▐░▌ ▐░▌
+                             ▐░▌▐░▌ ▐░▌▐░▌     ▐░▌     ▐░▌    ▐░▌▐░▌
+                             ▐░▌░▌   ▐░▐░▌ ▄▄▄▄█░█▄▄▄▄ ▐░▌     ▐░▐░▌
+                             ▐░░▌     ▐░░▌▐░░░░░░░░░░░▌▐░▌      ▐░░▌
+                              ▀▀       ▀▀  ▀▀▀▀▀▀▀▀▀▀▀  ▀        ▀▀ 
+                    """;
         } else {
             prompt = """
-
-             ▄▀▀▀▀▄    ▄▀▀█▄   ▄▀▀▄ ▄▀▄  ▄▀▀█▄▄▄▄  
-            █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐  
-            █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄   
-            █     █ █  ▄▀   █   █    █    █    ▌   
-            ▐▀▄▄▄▄▀ ▐ █   ▄▀  ▄▀   ▄▀    ▄▀▄▄▄▄    
-            ▐         ▐   ▐   █    █     █    ▐    
-                              ▐    ▐     ▐         
-             ▄▀▀▀▀▄   ▄▀▀▄ ▄▀▀▄  ▄▀▀█▄▄▄▄  ▄▀▀▄▀▀▀▄
-            █      █ █   █    █ ▐  ▄▀   ▐ █   █   █
-            █      █ ▐  █    █    █▄▄▄▄▄  ▐  █▀▀█▀ 
-            ▀▄    ▄▀    █   ▄▀    █    ▌   ▄▀    █ 
-              ▀▀▀▀       ▀▄▀     ▄▀▄▄▄▄   █     █  
-                                █    ▐   ▐     ▐  
-                                ▐                 
-			""";
+                    
+                              ▄▀▀▀▀▄    ▄▀▀█▄   ▄▀▀▄ ▄▀▄  ▄▀▀█▄▄▄▄
+                             █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐  
+                             █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄   
+                             █     █ █  ▄▀   █   █    █    █    ▌   
+                             ▐▀▄▄▄▄▀ ▐ █   ▄▀  ▄▀   ▄▀    ▄▀▄▄▄▄    
+                             ▐         ▐   ▐   █    █     █    ▐    
+                                               ▐    ▐     ▐         
+                              ▄▀▀▀▀▄   ▄▀▀▄ ▄▀▀▄  ▄▀▀█▄▄▄▄  ▄▀▀▄▀▀▀▄
+                             █      █ █   █    █ ▐  ▄▀   ▐ █   █   █
+                             █      █ ▐  █    █    █▄▄▄▄▄  ▐  █▀▀█▀ 
+                             ▀▄    ▄▀    █   ▄▀    █    ▌   ▄▀    █ 
+                               ▀▀▀▀       ▀▄▀     ▄▀▄▄▄▄   █     █  
+                                                 █    ▐   ▐     ▐  
+                                                 ▐                 
+                    """;
         }
         colorPrint(AnsiColor.RED, prompt);
     }
@@ -230,7 +229,7 @@ public class TerminalView implements GameView {
         final var endSummary = "---------------------";
         final var damageSummary = "- %d hp".formatted(damageToHero);
 
-        
+
         colorPrint(AnsiColor.BLUE, startSummary);
         colorPrint(AnsiColor.GREEN, EmojiMap.getEmoji(hero.getType()) + hero.getAction());
         colorPrint(AnsiColor.PURPLE, EmojiMap.getEmoji(monster) + monster.getAction());
@@ -242,18 +241,18 @@ public class TerminalView implements GameView {
     @Override
     public void showLevelUp(Hero hero) {
         final var prompt = """
-
-         ██▓    ▓█████ ██▒   █▓▓█████  ██▓        █    ██  ██▓███  
-        ▓██▒    ▓█   ▀▓██░   █▒▓█   ▀ ▓██▒        ██  ▓██▒▓██░  ██▒
-        ▒██░    ▒███   ▓██  █▒░▒███   ▒██░       ▓██  ▒██░▓██░ ██▓▒
-        ▒██░    ▒▓█  ▄  ▒██ █░░▒▓█  ▄ ▒██░       ▓▓█  ░██░▒██▄█▓▒ ▒
-        ░██████▒░▒████▒  ▒▀█░  ░▒████▒░██████▒   ▒▒█████▓ ▒██▒ ░  ░
-        ░ ▒░▓  ░░░ ▒░ ░  ░ ▐░  ░░ ▒░ ░░ ▒░▓  ░   ░▒▓▒ ▒ ▒ ▒▓▒░ ░  ░
-        ░ ░ ▒  ░ ░ ░  ░  ░ ░░   ░ ░  ░░ ░ ▒  ░   ░░▒░ ░ ░ ░▒ ░     
-          ░ ░      ░       ░░     ░     ░ ░       ░░░ ░ ░ ░░       
-            ░  ░   ░  ░     ░     ░  ░    ░  ░      ░              
-                           ░                                        
-		""";
+                
+                       ██▓    ▓█████ ██▒   █▓▓█████  ██▓        █    ██  ██▓███
+                      ▓██▒    ▓█   ▀▓██░   █▒▓█   ▀ ▓██▒        ██  ▓██▒▓██░  ██▒
+                      ▒██░    ▒███   ▓██  █▒░▒███   ▒██░       ▓██  ▒██░▓██░ ██▓▒
+                      ▒██░    ▒▓█  ▄  ▒██ █░░▒▓█  ▄ ▒██░       ▓▓█  ░██░▒██▄█▓▒ ▒
+                      ░██████▒░▒████▒  ▒▀█░  ░▒████▒░██████▒   ▒▒█████▓ ▒██▒ ░  ░
+                      ░ ▒░▓  ░░░ ▒░ ░  ░ ▐░  ░░ ▒░ ░░ ▒░▓  ░   ░▒▓▒ ▒ ▒ ▒▓▒░ ░  ░
+                      ░ ░ ▒  ░ ░ ░  ░  ░ ░░   ░ ░  ░░ ░ ▒  ░   ░░▒░ ░ ░ ░▒ ░
+                        ░ ░      ░       ░░     ░     ░ ░       ░░░ ░ ░ ░░
+                          ░  ░   ░  ░     ░     ░  ░    ░  ░      ░
+                                         ░
+                """;
 
         colorPrint(AnsiColor.GREEN, prompt);
         this.showHeroStats(hero);
@@ -265,12 +264,12 @@ public class TerminalView implements GameView {
         final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(a -> a.toString()).toList());
 
         final var prompt = """
-			litty, an artifact!
-			%s
-			Do you want to keep it? (y/n)
-			You're currently wearing:
-			- %s
-		""".formatted(artifact.toString(), artifacts);
+                	litty, an artifact!
+                	%s
+                	Do you want to keep it? (y/n)
+                	You're currently wearing:
+                	- %s
+                """.formatted(artifact.toString(), artifacts);
 
         return choose(prompt, YES_NO);
     }

@@ -1,14 +1,14 @@
 package mazie.model;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import mazie.exception.ModelException;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class Hero {
 
@@ -189,12 +189,9 @@ public class Hero {
         }
 
         switch (artifact.type()) {
-            case WEAPON ->
-                this.weapon = artifact;
-            case ARMOUR ->
-                this.armour = artifact;
-            case HELMET ->
-                this.helmet = artifact;
+            case WEAPON -> this.weapon = artifact;
+            case ARMOUR -> this.armour = artifact;
+            case HELMET -> this.helmet = artifact;
         }
     }
 

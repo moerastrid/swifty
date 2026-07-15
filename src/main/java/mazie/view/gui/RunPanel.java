@@ -2,13 +2,12 @@ package mazie.view.gui;
 
 import java.awt.GridLayout;
 import java.util.concurrent.BlockingQueue;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-
 import mazie.model.monster.Monster;
+
 import static mazie.view.gui.ThemeColor.GREEN;
 import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.PURPLE;

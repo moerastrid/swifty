@@ -4,11 +4,11 @@ public class Vim extends Monster {
 
     final static String NAME = "vim";
     final static String[] ACTIONS = {
-        "you google: \"how to leave vim?\"",
-        "*restarts pc*",
-        "escape?",
-        "you accidentally opened another vim.",
-        "why would you ever want to leave?"
+            "you google: \"how to leave vim?\"",
+            "*restarts pc*",
+            "escape?",
+            "you accidentally opened another vim.",
+            "why would you ever want to leave?"
     };
     final static String GOODBYE = ":wq";
 

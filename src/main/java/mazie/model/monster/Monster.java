@@ -1,8 +1,8 @@
 package mazie.model.monster;
 
-import java.util.Random;
-
 import mazie.exception.ModelException;
+
+import java.util.Random;
 
 public abstract class Monster {
 
@@ -75,17 +75,17 @@ public abstract class Monster {
     }
 
     private int calcForLevel(int val, int level) {
-        final var levelIncrement = Math.pow(1.10, (double)(level - 1)) + 0.1;
-        return (int)(val * levelIncrement);
+        final var levelIncrement = Math.pow(1.10, (double) (level - 1)) + 0.1;
+        return (int) (val * levelIncrement);
     }
 
     @Override
     public String toString() {
         return String.format(
                 """
-            Monster: %s
-             attack:%d, defence:%d, hp:%d
-            """, this.name, this.attack, this.defence, this.hp
+                        Monster: %s
+                         attack:%d, defence:%d, hp:%d
+                        """, this.name, this.attack, this.defence, this.hp
         );
     }
 }

@@ -3,18 +3,17 @@ package mazie.view.gui;
 import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.util.concurrent.CountDownLatch;
-
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import mazie.model.Hero;
+
 import static mazie.view.gui.ThemeColor.BLACK;
 import static mazie.view.gui.ThemeColor.YELLOW;
 
 public class LevelUpPanel extends JPanel {
-    
+
     public LevelUpPanel(Hero hero, CountDownLatch latch) {
         this.setBackground(YELLOW);
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

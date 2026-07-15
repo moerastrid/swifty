@@ -4,15 +4,14 @@ import java.awt.BorderLayout;
 import java.awt.Insets;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-
 import mazie.model.Hero;
+
 import static mazie.view.gui.ThemeColor.PURPLE;
 import static mazie.view.gui.ThemeColor.WHITE;
 
@@ -26,10 +25,10 @@ public class SelectHeroPanel extends JPanel {
         final var question = new JLabel("who do you want to be?", JLabel.CENTER);
         question.setForeground(WHITE);
         this.add(question, BorderLayout.NORTH);
-        
+
         final var scrollPane = new JScrollPane(listPanel(heroes, queue));
 
-        this.add(scrollPane, BorderLayout.CENTER); 
+        this.add(scrollPane, BorderLayout.CENTER);
     }
 
     private JPanel listPanel(Map<Integer, Hero> heroes, BlockingQueue<Hero> queue) {
@@ -37,7 +36,7 @@ public class SelectHeroPanel extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.setBackground(PURPLE);
-        
+
         heroes.values().forEach(hero -> {
             panel.add(heroRow(hero, queue));
         });

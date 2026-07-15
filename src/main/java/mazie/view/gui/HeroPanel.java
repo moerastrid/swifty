@@ -2,20 +2,19 @@ package mazie.view.gui;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
-
 import mazie.model.Hero;
+
 import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.LILA;
 import static mazie.view.gui.ThemeColor.PURPLE;
 import static mazie.view.gui.ThemeColor.WHITE;
 
 public class HeroPanel extends JPanel {
-    
+
     public HeroPanel(Hero hero) {
         this.setBackground(GREY);
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

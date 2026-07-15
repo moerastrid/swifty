@@ -6,16 +6,14 @@ import java.awt.Insets;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
-import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
+
 import static mazie.view.gui.ThemeColor.BLACK;
 import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.WHITE;
@@ -102,7 +100,7 @@ public class GamePanel extends JPanel {
     }
 
     private void setMenuBar(Runnable switchListener) {
-        
+
         JButton switchButton = new JButton("switch view");
         switchButton.setBackground(YELLOW);
         switchButton.setForeground(BLACK);

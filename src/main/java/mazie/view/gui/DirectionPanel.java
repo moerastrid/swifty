@@ -2,11 +2,9 @@ package mazie.view.gui;
 
 import java.awt.BorderLayout;
 import java.util.concurrent.BlockingQueue;
-
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import mazie.model.Direction;
 
 public class DirectionPanel extends JPanel {

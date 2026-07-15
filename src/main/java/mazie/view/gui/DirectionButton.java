@@ -2,8 +2,8 @@ package mazie.view.gui;
 
 import java.awt.Insets;
 import javax.swing.JButton;
-
 import mazie.model.Direction;
+
 import static mazie.view.gui.ThemeColor.TEAL;
 import static mazie.view.gui.ThemeColor.YELLOW;
 

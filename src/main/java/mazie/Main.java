@@ -1,7 +1,6 @@
 package mazie;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import mazie.controller.GameController;
 import mazie.exception.FatalException;
 import mazie.exception.ModelException;
@@ -95,12 +94,9 @@ public class Main {
         }
 
         return switch (args[0].strip().toLowerCase()) {
-            case "console", "c" ->
-                true;
-            case "gui", "g" ->
-                false;
-            default ->
-                throw new ParseException("unknown argument: [%s]".formatted(args[0]));
+            case "console", "c" -> true;
+            case "gui", "g" -> false;
+            default -> throw new ParseException("unknown argument: [%s]".formatted(args[0]));
         };
     }
 }

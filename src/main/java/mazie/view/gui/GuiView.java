@@ -3,17 +3,12 @@ package mazie.view.gui;
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import static java.lang.Thread.currentThread;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
-
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
-import static javax.swing.SwingUtilities.invokeLater;
-
 import mazie.exception.QuitException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
@@ -21,6 +16,9 @@ import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.view.GameView;
+
+import static java.lang.Thread.currentThread;
+import static javax.swing.SwingUtilities.invokeLater;
 
 public class GuiView implements GameView {
 
@@ -56,7 +54,7 @@ public class GuiView implements GameView {
         fr.setSize(800, 600);
         fr.setLayout(new BorderLayout(10, 10));
         fr.setLocationRelativeTo(null);
-        
+
         return fr;
     }
 
@@ -226,7 +224,7 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain){
+    public void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain) {
         invokeLater(() -> panel.setFightSummary(damageToHero, hero.getAction(), monster.getAction(), monster.getFinalMessage(), xpGain));
     }
 

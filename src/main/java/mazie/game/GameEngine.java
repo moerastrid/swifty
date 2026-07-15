@@ -1,12 +1,12 @@
 package mazie.game;
 
-import java.util.Random;
-
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.GameMap;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
+
+import java.util.Random;
 
 public class GameEngine {
 
