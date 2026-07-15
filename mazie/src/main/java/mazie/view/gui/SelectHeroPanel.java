@@ -1,6 +1,7 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 
@@ -54,6 +55,7 @@ public class SelectHeroPanel extends JPanel {
 
         final var selectButton = new JButton("select");
         selectButton.setSize(60, 40);
+        selectButton.setMargin(new Insets(2, 10, 2, 10));
 
         selectButton.addActionListener(event -> {
             try {

@@ -1,6 +1,7 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.util.concurrent.CountDownLatch;
 
 import javax.swing.BorderFactory;
@@ -27,6 +28,7 @@ public class WelcomePanel extends JPanel {
         final var startButton = new JButton("Start");
         startButton.setBackground(PURPLE);
         startButton.setForeground(YELLOW);
+        startButton.setMargin(new Insets(2, 10, 2, 10));
         startButton.addActionListener(event -> latch.countDown());
         this.add(startButton, BorderLayout.SOUTH);
     }

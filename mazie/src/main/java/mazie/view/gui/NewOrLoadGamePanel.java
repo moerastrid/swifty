@@ -1,6 +1,7 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Insets;
 import java.util.concurrent.BlockingQueue;
 
 import javax.swing.BorderFactory;
@@ -37,6 +38,8 @@ public class NewOrLoadGamePanel extends JPanel {
         loadButton.setSize(60, 60);
         newButton.setBackground(TEAL);
         loadButton.setBackground(YELLOW);
+        newButton.setMargin(new Insets(2, 10, 2, 10));
+        loadButton.setMargin(new Insets(2, 10, 2, 10));
 
         newButton.addActionListener(event -> {
             try {

@@ -1,7 +1,6 @@
 package mazie.controller;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
@@ -9,20 +8,17 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import mazie.exception.QuitException;
 import mazie.exception.RepositoryException;
-import mazie.exception.SwitchViewException;
 import mazie.game.GameEngine;
 import mazie.model.Artifact;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
-import mazie.view.gui.GuiView;
-import mazie.view.terminal.TerminalView;
 
 public class GameController {
 
     private GameEngine engine = null;
-    private volatile GameView view;
+    private final ViewSwitcher switcher;
     private final HeroRepository repository;
     private final Validator validator = Validation.byDefaultProvider()
             .configure()
@@ -31,50 +27,13 @@ public class GameController {
             .getValidator();
 
     public GameController(GameView view, HeroRepository repository) {
-        this.view = view;
-        this.setListener(view);
+        this.switcher = new ViewSwitcher(view);
         this.repository = repository;
-    }
-
-    private void setListener(GameView view) {
-        view.setSwitchListener(this::switchView);
-    }
-
-    private void switchView() {
-        System.out.println("switching view"); //#todo remove debug message
-
-        GameView newView;
-        if (this.view instanceof TerminalView) {
-            newView = new GuiView();
-        } else if (this.view instanceof GuiView) {
-            newView = new TerminalView();
-        } else {
-            throw new IllegalStateException("view instance unknown");
-        }
-        this.setView(newView);
-        this.setListener(newView);
-        System.out.println("view switched"); //#todo remove debug message
-    }
-
-    private <T> T withSwitchRetry(Function<GameView, T> call) {
-    try {
-        return call.apply(this.view);
-    } catch (SwitchViewException e) {
-        return withSwitchRetry(call);  // opnieuw proberen, nu met de al-bijgewerkte this.view
-    }
-}
-
-    public GameView getView() {
-        return this.view;
-    }
-
-    private void setView(GameView view) {
-        this.view = view;
     }
 
     public void start() {
 
-        view.showWelcome();
+        switcher.showWelcome();
 
         Hero hero = null;
 
@@ -82,7 +41,7 @@ public class GameController {
             hero = setup();
             gameLoop(hero);
         } catch (QuitException e) {
-            view.showError("You're such a Quitter");
+            switcher.showError("You're such a Quitter");
             if (hero == null) {
                 return;
             }
@@ -106,7 +65,7 @@ public class GameController {
             return this.confirmSetup(hero);
 
         } catch (RepositoryException e) {
-            view.showError(e.getMessage());
+            switcher.showError(e.getMessage());
         }
         return setup();
     }
@@ -115,15 +74,15 @@ public class GameController {
         if (heroes.isEmpty()) {
             return true;
         }
-        return withSwitchRetry(v -> v.askNewGame());
+        return switcher.askNewGame();
     }
 
     private Hero setupHero(boolean newGame, Map<Integer, Hero> heroes) {
-        return newGame ? this.createValidHero() : view.selectHero(heroes);
+        return newGame ? this.createValidHero() : switcher.selectHero(heroes);
     }
 
     private Hero confirmSetup(Hero hero) {
-        if (hero == null || !view.confirmHero(hero)) {
+        if (hero == null || !switcher.confirmHero(hero)) {
             return this.setup();
         }
         System.out.println("the chosen one:"); //#todo remove (debugging)
@@ -132,7 +91,7 @@ public class GameController {
             try {
                 repository.save(hero);
             } catch (RepositoryException e) {
-                view.showError("try again: " + e.getMessage());
+                switcher.showError("try again: " + e.getMessage());
                 return setup();
             }
         }
@@ -140,14 +99,14 @@ public class GameController {
     }
 
     private Hero createValidHero() {
-        Hero hero = view.createHero();
+        Hero hero = switcher.createHero();
 
         final var violations = validator.validate(hero);
         if (violations.isEmpty()) {
             return hero;
         }
 
-        view.showError(String.join(", ", violations.stream().map(v -> v.getMessage()).toList()));
+        switcher.showError(String.join(", ", violations.stream().map(v -> v.getMessage()).toList()));
         return createValidHero();
     }
 
@@ -156,7 +115,7 @@ public class GameController {
         this.engine = new GameEngine(hero);
         var playing = true;
 
-        view.showStartGame();
+        switcher.showStartGame();
 
         while (playing) {
 
@@ -169,9 +128,9 @@ public class GameController {
                 try {
                     repository.update(hero);
                 } catch (RepositoryException e) {
-                    view.showError(e.getMessage());
+                    switcher.showError(e.getMessage());
                 }
-                view.showEndGame(true);
+                switcher.showEndGame(true);
             }
         }
     }
@@ -200,7 +159,7 @@ public class GameController {
         }
 
         if (result.levelup()) {
-            view.showLevelUp(hero);
+            switcher.showLevelUp(hero);
         }
 
         this.handleDrop(result.drop(), hero);
@@ -208,39 +167,39 @@ public class GameController {
     }
 
     private Monster takeStepOrMonster() {
-        final var dir = view.askDirection();
+        final var dir = switcher.askDirection();
         final var monster = this.engine.move(dir);
         if (monster == null) {
-            view.showEmptyStep();
+            switcher.showEmptyStep();
         }
         return monster;
     }
 
     private boolean runningAway(Monster monster) {
-        final boolean feelingAgressive = view.askFightMonster(monster);
+        final boolean feelingAgressive = switcher.askFightMonster(monster);
         if (feelingAgressive) {
             return false;
         }
         var running = this.engine.runAway();
-        view.showRunSuccess(monster, running);
+        switcher.showRunSuccess(monster, running);
         return running;
     }
 
     private void handleRoundWin(Hero hero, Monster monster, int damageToHero) {
-        view.showFightSummary(damageToHero, hero, monster, monster.getXpReward());
+        switcher.showFightSummary(damageToHero, hero, monster, monster.getXpReward());
         try {
             repository.update(hero);
         } catch (RepositoryException e) {
-            view.showError(e.getMessage());
+            switcher.showError(e.getMessage());
         }
     }
 
     private void handleRoundLoss(Hero hero) {
-        view.showEndGame(false);
+        switcher.showEndGame(false);
         try {
             repository.delete(hero);
         } catch (RepositoryException e) {
-            view.showError(e.getMessage());
+            switcher.showError(e.getMessage());
         }
     }
 
@@ -249,7 +208,7 @@ public class GameController {
             return;
         }
 
-        if (!view.askKeepArtifact(artifact, hero)) {
+        if (!switcher.askKeepArtifact(artifact, hero)) {
             return;
         }
 
@@ -257,7 +216,7 @@ public class GameController {
         try {
             repository.update(hero);
         } catch (RepositoryException e) {
-            view.showError(e.getMessage());
+            switcher.showError(e.getMessage());
         }
     }
 }

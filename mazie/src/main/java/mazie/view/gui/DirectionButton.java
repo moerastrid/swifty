@@ -1,5 +1,6 @@
 package mazie.view.gui;
 
+import java.awt.Insets;
 import javax.swing.JButton;
 
 import mazie.model.Direction;
@@ -13,6 +14,7 @@ public class DirectionButton extends JButton {
     public DirectionButton(Direction dir) {
         this.dir = dir;
         this.setText(dir.toString().toLowerCase());
+        this.setMargin(new Insets(2, 10, 2, 10));
         final var color = switch (dir) {
             case NORTH, SOUTH -> YELLOW;
             case EAST, WEST -> TEAL;

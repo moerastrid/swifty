@@ -3,6 +3,7 @@ package mazie.view.gui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.util.concurrent.BlockingQueue;
 
 import javax.swing.BorderFactory;
@@ -94,6 +95,8 @@ public class NewHeroPanel extends JPanel {
     private JButton okButton(BlockingQueue<Hero> queue) {
         final var button = new JButton("ok");
         button.setForeground(PURPLE);
+        button.setBackground(WHITE);
+        button.setMargin(new Insets(2, 10, 2, 10));
 
         button.addActionListener(event -> {
             try {

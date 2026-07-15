@@ -1,6 +1,6 @@
 package mazie.exception;
 
-public class SwitchViewException extends Throwable {
+public class SwitchViewException extends RuntimeException {
 
     private static final String MESSAGE = "switching view";
 

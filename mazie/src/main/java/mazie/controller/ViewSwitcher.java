@@ -1,0 +1,179 @@
+package mazie.controller;
+
+import java.util.Map;
+
+import mazie.exception.FatalException;
+import mazie.exception.SwitchViewException;
+import mazie.model.Artifact;
+import mazie.model.Direction;
+import mazie.model.Hero;
+import mazie.model.monster.Monster;
+import mazie.view.GameView;
+import mazie.view.gui.GuiView;
+import mazie.view.terminal.TerminalView;
+
+public class ViewSwitcher implements GameView {
+
+    private volatile GameView view;
+
+    public ViewSwitcher(GameView initial) {
+        this.view = initial;
+        this.setListener(initial);
+    }
+
+    private void setListener(GameView v) {
+        v.setSwitchListener(this::switchView);
+    }
+
+    private void switchView() {
+        System.out.println("switching view"); //#todo remove debug message
+
+        final var newView = (view instanceof TerminalView) ? new GuiView() : new TerminalView();
+
+        this.view = newView;
+        this.setListener(newView);
+
+        System.out.println("view switched"); //#todo remove debug message
+    }
+
+    @Override
+    public void setSwitchListener(Runnable switchListener) {
+        // internal, not used in ViewSwitcher
+        throw new FatalException("not allowed to call setSwitchListener on ViewSwitcher");
+    }
+
+    @Override
+    public void showError(String error) {
+        try {
+            view.showError(error);
+        } catch (SwitchViewException se) {
+            this.showError(error);
+        }
+    }
+
+    @Override
+    public void showWelcome() {
+        try {
+            view.showWelcome();
+        } catch (SwitchViewException se) {
+            this.showWelcome();
+        }
+    }
+
+    @Override
+    public boolean askNewGame() {
+        try {
+            return view.askNewGame();
+        } catch (SwitchViewException se) {
+            return this.askNewGame();
+        }
+    }
+
+    @Override
+    public Hero createHero() {
+        try {
+            return view.createHero();
+        } catch (SwitchViewException se) {
+            return this.createHero();
+        }
+    }
+
+    @Override
+    public Hero selectHero(Map<Integer, Hero> heroes) {
+        try {
+            return view.selectHero(heroes);
+        } catch (SwitchViewException se) {
+            return this.selectHero(heroes);
+        }
+    }
+
+    @Override
+    public boolean confirmHero(Hero hero) {
+        try {
+            return view.confirmHero(hero);
+        } catch (SwitchViewException se) {
+            return this.confirmHero(hero);
+        }
+    }
+
+    @Override
+    public void showStartGame() {
+        try {
+            view.showStartGame();
+        } catch (SwitchViewException se) {
+            this.showStartGame();
+        }
+    }
+
+    @Override
+    public Direction askDirection() {
+        try {
+            return view.askDirection();
+        } catch (SwitchViewException se) {
+            return askDirection();
+        }
+    }
+
+    @Override
+    public void showEmptyStep() {
+        try {
+            view.showEmptyStep();
+        } catch (SwitchViewException se) {
+            this.showEmptyStep();
+        }
+    }
+
+    @Override
+    public boolean askFightMonster(Monster monster) {
+        try {
+            return view.askFightMonster(monster);
+        } catch (SwitchViewException se) {
+            return askFightMonster(monster);
+        }
+    }
+
+    @Override
+    public void showRunSuccess(Monster monster, boolean success) {
+        try {
+            view.showRunSuccess(monster, success);
+        } catch (SwitchViewException se) {
+            this.showRunSuccess(monster, success);
+        }
+    }
+
+    @Override
+    public void showEndGame(boolean win) {
+        try {
+            view.showEndGame(win);
+        } catch (SwitchViewException se) {
+            this.showEndGame(win);
+        }
+    }
+
+    @Override
+    public void showFightSummary(int damageToHero, Hero hero, Monster monster, int xpGain) {
+        try {
+            view.showFightSummary(damageToHero, hero, monster, xpGain);
+        } catch (SwitchViewException se) {
+            this.showFightSummary(damageToHero, hero, monster, xpGain);
+        }
+    }
+
+    @Override
+    public void showLevelUp(Hero hero) {
+        try {
+            view.showLevelUp(hero);
+        } catch (SwitchViewException se) {
+            this.showLevelUp(hero);
+        }
+    }
+
+    @Override
+    public boolean askKeepArtifact(Artifact artifact, Hero hero) {
+        try {
+            return view.askKeepArtifact(artifact, hero);
+        } catch (SwitchViewException se) {
+            return askKeepArtifact(artifact, hero);
+        }
+    }
+}

@@ -1,24 +1,30 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Insets;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import static mazie.view.gui.ThemeColor.BLACK;
+import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.WHITE;
 import static mazie.view.gui.ThemeColor.YELLOW;
 
 // gamePanel is persistent. hierin zitten kleinere panels die je kunt afwisselen, geloof ik?
 public class GamePanel extends JPanel {
 
+    private JPanel menuBar;
     private JPanel subPanel;
     private JLabel log;
 
@@ -66,7 +72,6 @@ public class GamePanel extends JPanel {
     }
 
     public void setArtifactPanel(Artifact artifact, Hero hero, BlockingQueue<Boolean> queue) {
-        // this.clearLog();
         this.setSubPanel(new ArtifactPanel(artifact, hero, queue));
     }
 
@@ -76,7 +81,6 @@ public class GamePanel extends JPanel {
     }
 
     public void setNewOrLoadGamePanel(BlockingQueue<Boolean> queue) {
-        // this.clearLog();
         this.setSubPanel(new NewOrLoadGamePanel(queue));
     }
 
@@ -91,6 +95,28 @@ public class GamePanel extends JPanel {
     public void setConfirmPanel(Hero hero, BlockingQueue<Boolean> queue) {
         this.clearLog();
         this.setSubPanel(new ConfirmPanel(hero, queue));
+    }
+
+    public void setSwitchListener(Runnable switchListener) {
+        this.setMenuBar(switchListener);
+    }
+
+    private void setMenuBar(Runnable switchListener) {
+        
+        JButton switchButton = new JButton("switch view");
+        switchButton.setBackground(YELLOW);
+        switchButton.setForeground(BLACK);
+        switchButton.setMargin(new Insets(2, 10, 2, 10));
+        switchButton.addActionListener(event -> {
+            switchListener.run();
+        });
+        this.menuBar = new JPanel();
+        this.menuBar.setLayout(new FlowLayout(FlowLayout.RIGHT));
+        this.menuBar.setOpaque(true);
+        this.menuBar.add(switchButton);
+        this.add(this.menuBar, BorderLayout.NORTH);
+        this.revalidate();
+        this.repaint();
     }
 
     private void setSubPanel(JPanel screen) {
@@ -109,6 +135,8 @@ public class GamePanel extends JPanel {
         }
         log = new JLabel(text, JLabel.CENTER);
         log.setForeground(WHITE);
+        log.setBackground(GREY);
+        log.setOpaque(true);
         this.add(log, BorderLayout.SOUTH);
         this.revalidate();
         this.repaint();

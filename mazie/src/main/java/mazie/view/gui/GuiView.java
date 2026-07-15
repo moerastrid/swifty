@@ -3,16 +3,19 @@ package mazie.view.gui;
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import static java.lang.Thread.currentThread;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import static javax.swing.SwingUtilities.invokeLater;
 
 import mazie.exception.QuitException;
+import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
@@ -23,12 +26,14 @@ public class GuiView implements GameView {
 
     private static final String TITLE = "Mazie - an a-maze-ing RPG";
 
+    private volatile boolean switchRequested = false;
+
     private final Thread controllerThread;
     private final JFrame frame;
     private final GamePanel panel;
 
     public GuiView() {
-        this.controllerThread = Thread.currentThread();
+        this.controllerThread = currentThread();
         this.panel = new GamePanel();
         this.frame = initFrame();
         this.setIcon();
@@ -67,6 +72,30 @@ public class GuiView implements GameView {
         }
     }
 
+    private void handleInterruption(InterruptedException e) {
+        if (this.switchRequested) {
+            this.switchRequested = false;
+            invokeLater(() -> {
+                this.frame.setVisible(false);
+                this.frame.dispose();
+            });
+            throw new SwitchViewException();
+        }
+        Thread.currentThread().interrupt();
+        throw new QuitException("thread interruption", e);
+    }
+
+    @Override
+    public void setSwitchListener(Runnable switchListener) {
+        invokeLater(() -> {
+            panel.setSwitchListener(() -> {
+                this.switchRequested = true;
+                switchListener.run();
+                controllerThread.interrupt();
+            });
+        });
+    }
+
     @Override
     public void showError(String error) {
         invokeLater(() -> panel.setError(error));
@@ -80,8 +109,8 @@ public class GuiView implements GameView {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -93,8 +122,8 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -106,8 +135,8 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -119,8 +148,8 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -132,8 +161,8 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -150,8 +179,8 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -168,8 +197,8 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -186,8 +215,8 @@ public class GuiView implements GameView {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         } finally {
             invokeLater(() -> {
                 this.frame.setVisible(false);
@@ -208,8 +237,8 @@ public class GuiView implements GameView {
         try {
             latch.await();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 
@@ -221,8 +250,8 @@ public class GuiView implements GameView {
         try {
             return queue.take();
         } catch (InterruptedException e) {
-            controllerThread.interrupt();
-            throw new QuitException("thread interruption", e);
+            handleInterruption(e);
+            throw new AssertionError(e);
         }
     }
 }

@@ -10,7 +10,7 @@ import mazie.model.monster.Monster;
 public interface GameView {
 
     // switch listener om view te wisselen
-    void setSwitchListener(Runnable switchListener);
+    public void setSwitchListener(Runnable switchListener);
 
     // in case of error (invalid input for example)
     public void showError(String error);
@@ -70,4 +70,4 @@ showRunSuccess(Monster, boolean)
 
 (als er een hero is)
 
-*/
+ */

@@ -159,6 +159,7 @@ public class SwingGui implements GameView {
         button.setBackground(ThemeColor.PURPLE);
         button.setFont(fontInput);
         button.setForeground(ThemeColor.YELLOW);
+        button.setMargin(new Insets(2, 10, 2, 10));
         button.addActionListener(event -> {
             frame.remove(startPanel);
             frame.add(gamePanel, BorderLayout.CENTER);

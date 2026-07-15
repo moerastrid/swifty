@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import mazie.exception.QuitException;
+import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
@@ -278,18 +279,25 @@ public class TerminalView implements GameView {
         System.out.println(color + text + AnsiColor.RESET);
     }
 
-    private String scanNextLine() throws QuitException {
+    private String scanNextLine() throws QuitException, SwitchViewException {
         try {
             final var line = scanner.nextLine();
             final var answer = line.strip().toLowerCase();
             if (answer.equals("q") || answer.equals("quit") || answer.equals("exit")) {
                 throw new QuitException("user is a quitter\ndeveloper is disappointed");
+            } else if (answer.equals("switch")) {
+                this.switchView();
             }
             return answer;
         } catch (NoSuchElementException e) {
             showError("?user entered ^C or ^D in terminal?");
             throw new QuitException("?user entered ^C or ^D in terminal?", e);
         }
+    }
+
+    private void switchView() {
+        this.switchListener.run();
+        throw new SwitchViewException();
     }
 
     private <T> T choose(String prompt, Map<String, T> options) {
