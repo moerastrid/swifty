@@ -20,26 +20,39 @@ public class HeroPanel extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        final var name = new JLabel(hero.getName());
-        name.setAlignmentX(CENTER_ALIGNMENT);
-        name.setForeground(PURPLE);
-        name.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
-        this.add(name);
-
-        final var image = PngMap.getSidebarIcon(hero);
-        final var imageLabel = new JLabel(image);
-        imageLabel.setAlignmentX(CENTER_ALIGNMENT);
-        this.add(imageLabel);
-
+        this.add(this.nameLabel(hero.getName()));
+        this.add(this.imageLabel(hero));
         this.add(this.statsPanel(hero));
+        this.add(this.artifactTextArea(hero));
+    }
 
+    private JLabel nameLabel(String name) {
+        final var label = new JLabel(name);
+        label.setAlignmentX(CENTER_ALIGNMENT);
+        label.setForeground(PURPLE);
+        label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        return label;
+    }
+
+    private JLabel imageLabel(Hero hero) {
+        final var image = PngMap.getSidebarIcon(hero);
+        final var label = new JLabel(image);
+        label.setAlignmentX(CENTER_ALIGNMENT);
+        return label;
+    }
+
+    private JTextArea artifactTextArea(Hero hero) {
         final var artifacts = hero.getArtifacts().stream().map(a -> "%s(%d)".formatted(a.name(), a.value())).toList();
         final var info = artifacts.isEmpty() ? "nothing" : String.join("\n - ", artifacts);
 
-        final var current = new JTextArea("\ncurrently wearing:\n\n - %s".formatted(info));
-        current.setBackground(GREY);
-        current.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        this.add(current);
+        final var textArea = new JTextArea("\ncurrently wearing:\n\n - %s".formatted(info));
+        textArea.setBackground(GREY);
+        textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        textArea.setEditable(false);
+        textArea.setFocusable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        return textArea;
     }
 
     private JPanel statsPanel(Hero hero) {
@@ -50,27 +63,18 @@ public class HeroPanel extends JPanel {
         panel.setBackground(LILA);
         panel.setForeground(WHITE);
 
-        // level
-        panel.add(tag("level"));
-        panel.add(tag(Integer.toString(hero.getLevel())));
-
-        // xp
-        panel.add(tag("xp"));
-        panel.add(tag(Integer.toString(hero.getXp())));
-
-        // attack
-        panel.add(tag("attack"));
-        panel.add(tag(hero.getAttackString()));
-
-        // defence
-        panel.add(tag("defence"));
-        panel.add(tag(hero.getDefenceString()));
-
-        // hp
-        panel.add(tag("hp"));
-        panel.add(tag(hero.getHpString()));
+        this.addStat(panel, "level", String.valueOf(hero.getLevel()));
+        this.addStat(panel, "xp", String.valueOf(hero.getXp()));
+        this.addStat(panel, "attack", hero.getAttackString());
+        this.addStat(panel, "defence", hero.getDefenceString());
+        this.addStat(panel, "hp", hero.getHpString());
 
         return panel;
+    }
+
+    private void addStat(JPanel panel, String label, String value) {
+        panel.add(this.tag(label));
+        panel.add(this.tag(value));
     }
 
     private JLabel tag(String text) {
