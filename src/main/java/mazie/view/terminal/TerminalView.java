@@ -58,9 +58,9 @@ public class TerminalView implements GameView {
     public Hero createHero() {
         final var typePrompt = """
                 What do you want to be?
-                	- bear (b)
+                	- weevil (w)
                 	- frog (f)
-                	- hare (h)
+                	- mouse (m)
                 """;
 
         final var options = new HashMap<String, HeroType>();
