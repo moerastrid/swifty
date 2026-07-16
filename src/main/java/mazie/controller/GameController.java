@@ -23,42 +23,38 @@ public class GameController {
     private final HeroRepository repository;
     private final Validator validator;
     private final ValidatorFactory validatorFactory;
+    private Hero hero;
 
     public GameController(GameView view, HeroRepository repository) {
         this.switcher = new ViewSwitcher(view);
         this.repository = repository;
         this.validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
         this.validator = validatorFactory.getValidator();
+        this.hero = null;
     }
 
     public void close() {
         this.validatorFactory.close();
+        if (hero == null) {
+            return;
+        }
+        if (hero.getId() == 0) {
+            repository.save(hero);
+        } else {
+            repository.update(hero);
+        }
     }
 
     public void start() {
 
         switcher.showWelcome();
-
-        Hero hero = null;
-
+        hero = null;
         try {
             hero = setup();
             gameLoop(hero);
         } catch (QuitException e) {
             switcher.showError("You're such a Quitter");
-            if (hero == null) {
-                return;
-            }
-
-            try {
-                if (hero.getId() == 0) {
-                    repository.save(hero);
-                } else {
-                    repository.update(hero);
-                }
-            } catch (RepositoryException ex) {
-                System.err.println("[WARNIGN]" + ex.getMessage());
-            }
+            this.close();
         }
     }
 

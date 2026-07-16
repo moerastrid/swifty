@@ -33,7 +33,7 @@ The goal is that after this project the student can sit in front of a peer evalu
 Mandatory subject requirements: complete
 .
 Bonus requirements: complete.
-
+ 
 Remaining work is polish, UX and optional features.
 
 ---
