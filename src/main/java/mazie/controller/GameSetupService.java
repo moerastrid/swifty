@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import java.util.Map;
 import java.util.stream.Collectors;
+import mazie.exception.RepositoryException;
 import mazie.model.Hero;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
@@ -31,7 +32,12 @@ public class GameSetupService {
             };
         }
         if (hero.getId() == 0) {
-            repository.save(hero);
+            try {
+                repository.save(hero);
+            } catch (RepositoryException ex) {
+                view.showError(ex.getMessage());
+                return setupHero();
+            }
         }
         return hero;
     }

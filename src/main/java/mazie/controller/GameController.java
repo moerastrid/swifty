@@ -31,13 +31,8 @@ public class GameController {
     }
 
     public void close() {
-        if (this.session == null) {
-            return;
-        }
-        if (this.session.getHero().getId() == 0) {
-            repository.save(this.session.getHero());
-        } else {
-            repository.update(this.session.getHero());
+        if (this.session != null) {
+            this.session.close();
         }
     }
 }

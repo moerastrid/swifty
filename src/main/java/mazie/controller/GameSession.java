@@ -39,6 +39,14 @@ public class GameSession {
         }
     }
 
+    public void close() {
+        if (this.hero.getId() == 0) {
+            repository.save(this.hero);
+        } else {
+            repository.update(this.hero);
+        }
+    }
+
     // returns true when keep playing, false when game is finito
     private boolean turn() {
 
