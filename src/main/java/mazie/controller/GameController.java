@@ -1,10 +1,9 @@
 package mazie.controller;
 
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 import java.util.Map;
+import java.util.stream.Collectors;
 import mazie.exception.QuitException;
 import mazie.exception.RepositoryException;
 import mazie.game.GameEngine;
@@ -14,27 +13,23 @@ import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
 import mazie.view.ViewSwitcher;
-import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 public class GameController {
 
+    private final Validator validator;
     private GameEngine engine = null;
     private final ViewSwitcher switcher;
     private final HeroRepository repository;
-    private final Validator validator;
-    private final ValidatorFactory validatorFactory;
     private Hero hero;
 
-    public GameController(GameView view, HeroRepository repository) {
+    public GameController(Validator validator, GameView view, HeroRepository repository) {
+        this.validator = validator;
         this.switcher = new ViewSwitcher(view);
         this.repository = repository;
-        this.validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
-        this.validator = validatorFactory.getValidator();
         this.hero = null;
     }
 
     public void close() {
-        this.validatorFactory.close();
         if (hero == null) {
             return;
         }
@@ -78,7 +73,7 @@ public class GameController {
     }
 
     private Hero setupHero(boolean newGame, Map<Integer, Hero> heroes) {
-        return newGame ? this.createValidHero() : switcher.selectHero(heroes);
+        return newGame ? this.createHero() : switcher.selectHero(heroes);
     }
 
     private Hero confirmSetup(Hero hero) {
@@ -98,16 +93,20 @@ public class GameController {
         return hero;
     }
 
-    private Hero createValidHero() {
+    private Hero createHero() {
         Hero hero = switcher.createHero();
 
         final var violations = validator.validate(hero);
         if (violations.isEmpty()) {
             return hero;
         }
+        final var errorMessage = "Hero not valid: %s".formatted(
+                violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(", "))
+        );
 
-        switcher.showError(String.join(", ", violations.stream().map(ConstraintViolation::getMessage).toList()));
-        return createValidHero();
+        switcher.showError(errorMessage);
+
+        return this.createHero();
     }
 
     private void gameLoop(Hero hero) {

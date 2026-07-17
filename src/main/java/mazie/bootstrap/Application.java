@@ -1,5 +1,8 @@
 package mazie.bootstrap;
 
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import mazie.controller.GameController;
 import mazie.exception.ParseException;
 import mazie.repository.HeroRepository;
@@ -7,9 +10,12 @@ import mazie.repository.SQLiteHeroRepository;
 import mazie.view.GameView;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 public class Application {
 
+    private final ValidatorFactory validatorFactory;
+    private final Validator validator;
     private final GameController controller;
     private final GameView view;
     private final HeroRepository repository;
@@ -20,6 +26,8 @@ public class Application {
     };
 
     public Application(String[] args) {
+        this.validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
+        this.validator = validatorFactory.getValidator();
 
         this.view = switch (parse(args)) {
             case TERMINAL -> new TerminalView();
@@ -28,7 +36,7 @@ public class Application {
 
         this.repository = new SQLiteHeroRepository();
 
-        this.controller = new GameController(view, repository);
+        this.controller = new GameController(validator, view, repository);
     }
 
     public void start() {
@@ -36,6 +44,7 @@ public class Application {
     }
 
     public void shutDownGracefully() {
+        this.validatorFactory.close();
         this.controller.close();
     }
 
