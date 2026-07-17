@@ -7,17 +7,15 @@ import java.util.Random;
 
 public class GameMap {
 
-    private final MonsterFactory factory;
+    private final int internalSize;
     private final int size;
     private final Monster[][] monsters;
-    private final Random random;
     private int heroX;
     private int heroY;
 
     public GameMap(int heroLevel) {
-        this.factory = MonsterFactory.getInstance();
-        this.random = new Random();
-        this.size = ((heroLevel - 1) * 5 + 10 - (heroLevel % 2) + 2);
+        this.internalSize = (heroLevel - 1) * 5 + 10 - (heroLevel % 2);
+        this.size = this.internalSize + 2;
         this.heroX = size / 2;
         this.heroY = size / 2;
         this.monsters = new Monster[size][size];
@@ -28,52 +26,53 @@ public class GameMap {
         return isEdge(this.heroX, this.heroY);
     }
 
-    public Monster advance(Direction dir) {
-        final var monster = this.getMonsterInDirection(dir);
-        if (monster == null) {
-            this.moveHero(dir);
-        } else if (monster.isDead()) {
-            this.removeMonster(dir);
-            return advance(dir);
-        }
-        return monster;
-    }
-
-    private Monster getMonsterInDirection(Direction dir) {
+    public Monster getMonsterInDirection(Direction dir) {
         final var x = this.heroX + dir.dx;
         final var y = this.heroY + dir.dy;
 
         return (monsters[x][y]);
     }
 
-    private void moveHero(Direction dir) {
-        this.heroX += dir.dx;
-        this.heroY += dir.dy;
-    }
-
-    private void removeMonster(Direction dir) {
+    public void moveHero(Direction dir) {
         final var x = this.heroX + dir.dx;
         final var y = this.heroY + dir.dy;
 
+        if (isHeroOnEdge() || isMonster(x, y)) {
+            throw new IllegalStateException("GameMap: invalid hero move");
+        }
+
+        this.heroX = x;
+        this.heroY = y;
+    }
+
+    public void removeMonster(Direction dir) {
+        final var x = this.heroX + dir.dx;
+        final var y = this.heroY + dir.dy;
+
+        if (!isMonster(x, y)) {
+            throw new IllegalStateException("Can't remove a monster that doesn't exist");
+        }
         monsters[x][y] = null;
     }
 
     private void generateMonsters(int heroLevel) {
-        final int total = (int) (0.23 * (size - 2) * (size - 2));
+        final int total = (int) (0.23 * internalSize * internalSize);
+        final var factory = MonsterFactory.getInstance();
+        final var random = new Random();
 
         for (int i = 0; i < total; i++) {
             final var monster = factory.generateMonster(heroLevel);
-            this.placeOnMap(monster);
+            this.placeOnMap(monster, random);
         }
     }
 
-    private void placeOnMap(Monster monster) {
-        int x = random.nextInt(1, size - 2);
-        int y = random.nextInt(1, size - 2);
+    private void placeOnMap(Monster monster, Random random) {
+        int x = random.nextInt(1, size - 1);
+        int y = random.nextInt(1, size - 1);
 
         while (!isAvailable(x, y)) {
-            x = random.nextInt(1, size - 2);
-            y = random.nextInt(1, size - 2);
+            x = random.nextInt(1, size - 1);
+            y = random.nextInt(1, size - 1);
         }
         this.monsters[x][y] = monster;
     }

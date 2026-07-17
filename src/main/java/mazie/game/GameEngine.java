@@ -27,8 +27,9 @@ public class GameEngine {
 
     public Monster move(Direction dir) {
         this.currentDir = dir;
-        this.currentMonster = map.advance(dir);
+        this.currentMonster = this.map.getMonsterInDirection(this.currentDir);
         if (this.currentMonster == null) {
+            this.map.moveHero(dir);
             this.currentDir = null;
         }
         return currentMonster;
@@ -60,10 +61,12 @@ public class GameEngine {
         }
 
         // yes win
+
         final var levelUp = hero.gainXp(monster.getXpReward());
         final var drop = dropArtifact(monster);
 
-        map.advance(currentDir);
+        this.map.removeMonster(currentDir);
+        this.map.moveHero(currentDir);
 
         currentDir = null;
         currentMonster = null;
