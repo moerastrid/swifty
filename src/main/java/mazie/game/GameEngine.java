@@ -13,8 +13,7 @@ public class GameEngine {
     private final Hero hero;
     private final GameMap map;
     private final Random random = new Random();
-    private Direction currentDir = null;
-    private Monster currentMonster = null;
+    private Direction pendingDir = null;
 
     public GameEngine(Hero hero) {
         this.hero = hero;
@@ -26,19 +25,19 @@ public class GameEngine {
     }
 
     public Monster move(Direction dir) {
-        this.currentDir = dir;
-        this.currentMonster = this.map.getMonsterInDirection(this.currentDir);
-        if (this.currentMonster == null) {
+        final var monster = this.map.getMonsterInDirection(this.pendingDir);
+        if (monster == null) {
             this.map.moveHero(dir);
-            this.currentDir = null;
+            return null;
         }
-        return currentMonster;
+        this.pendingDir = dir;
+        return monster;
     }
 
     public boolean runAway() {
         final var escaped = this.random.nextBoolean();
         if (escaped) {
-            currentDir = null;
+            pendingDir = null;
         }
         return escaped;
     }
@@ -48,28 +47,24 @@ public class GameEngine {
     }
 
     public FightResult fight() {
-        final var monster = this.currentMonster;
+        final var monster = this.map.getMonsterInDirection(this.pendingDir);
 
         var totalDamageToHero = 0;
         while (!this.hero.isDead() && !monster.isDead()) {
             totalDamageToHero += fightRound(monster);
         }
 
-        // no win
         if (this.hero.isDead()) {
             return new FightResult(false, false, null, totalDamageToHero);
         }
 
-        // yes win
-
         final var levelUp = hero.gainXp(monster.getXpReward());
         final var drop = dropArtifact(monster);
 
-        this.map.removeMonster(currentDir);
-        this.map.moveHero(currentDir);
+        this.map.removeMonster(pendingDir);
+        this.map.moveHero(pendingDir);
 
-        currentDir = null;
-        currentMonster = null;
+        pendingDir = null;
 
         return new FightResult(true, levelUp, drop, totalDamageToHero);
     }

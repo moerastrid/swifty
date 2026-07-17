@@ -14,40 +14,40 @@ public class GameMap {
     private int heroY;
 
     public GameMap(int heroLevel) {
-        this.internalSize = (heroLevel - 1) * 5 + 10 - (heroLevel % 2);
-        this.size = this.internalSize + 2;
-        this.heroX = size / 2;
-        this.heroY = size / 2;
-        this.monsters = new Monster[size][size];
-        this.generateMonsters(heroLevel);
+        internalSize = (heroLevel - 1) * 5 + 10 - (heroLevel % 2);
+        size = internalSize + 2;
+        heroX = size / 2;
+        heroY = size / 2;
+        monsters = new Monster[size][size];
+        generateMonsters(heroLevel);
     }
 
     public boolean isHeroOnEdge() {
-        return isEdge(this.heroX, this.heroY);
+        return isEdge(heroX, heroY);
     }
 
     public Monster getMonsterInDirection(Direction dir) {
-        final var x = this.heroX + dir.dx;
-        final var y = this.heroY + dir.dy;
+        final var x = heroX + dir.dx;
+        final var y = heroY + dir.dy;
 
         return (monsters[x][y]);
     }
 
     public void moveHero(Direction dir) {
-        final var x = this.heroX + dir.dx;
-        final var y = this.heroY + dir.dy;
+        final var x = heroX + dir.dx;
+        final var y = heroY + dir.dy;
 
         if (isHeroOnEdge() || isMonster(x, y)) {
             throw new IllegalStateException("GameMap: invalid hero move");
         }
 
-        this.heroX = x;
-        this.heroY = y;
+        heroX = x;
+        heroY = y;
     }
 
     public void removeMonster(Direction dir) {
-        final var x = this.heroX + dir.dx;
-        final var y = this.heroY + dir.dy;
+        final var x = heroX + dir.dx;
+        final var y = heroY + dir.dy;
 
         if (!isMonster(x, y)) {
             throw new IllegalStateException("Can't remove a monster that doesn't exist");
@@ -62,7 +62,7 @@ public class GameMap {
 
         for (int i = 0; i < total; i++) {
             final var monster = factory.generateMonster(heroLevel);
-            this.placeOnMap(monster, random);
+            placeOnMap(monster, random);
         }
     }
 
@@ -74,7 +74,7 @@ public class GameMap {
             x = random.nextInt(1, size - 1);
             y = random.nextInt(1, size - 1);
         }
-        this.monsters[x][y] = monster;
+        monsters[x][y] = monster;
     }
 
     private boolean isAvailable(int x, int y) {
@@ -88,7 +88,7 @@ public class GameMap {
     }
 
     private boolean isHeroPos(int x, int y) {
-        return (this.heroX == x && this.heroY == y);
+        return (heroX == x && heroY == y);
     }
 
     private boolean isEdge(int x, int y) {
