@@ -6,10 +6,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import mazie.exception.QuitException;
 import mazie.exception.RepositoryException;
-import mazie.game.GameEngine;
-import mazie.model.Artifact;
 import mazie.model.Hero;
-import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
 import mazie.view.ViewSwitcher;
@@ -17,7 +14,6 @@ import mazie.view.ViewSwitcher;
 public class GameController {
 
     private final Validator validator;
-    private GameEngine engine = null;
     private final ViewSwitcher switcher;
     private final HeroRepository repository;
     private Hero hero;
@@ -29,6 +25,19 @@ public class GameController {
         this.hero = null;
     }
 
+    public void start() {
+        switcher.showWelcome();
+        hero = null;
+        try {
+            hero = setup();
+            final var gameSession = new GameSession(switcher, repository, hero);
+            gameSession.start();
+        } catch (QuitException e) {
+            switcher.showError("You're such a Quitter");
+            this.close();
+        }
+    }
+
     public void close() {
         if (hero == null) {
             return;
@@ -37,19 +46,6 @@ public class GameController {
             repository.save(hero);
         } else {
             repository.update(hero);
-        }
-    }
-
-    public void start() {
-
-        switcher.showWelcome();
-        hero = null;
-        try {
-            hero = setup();
-            gameLoop(hero);
-        } catch (QuitException e) {
-            switcher.showError("You're such a Quitter");
-            this.close();
         }
     }
 
@@ -107,99 +103,5 @@ public class GameController {
         switcher.showError(errorMessage);
 
         return this.createHero();
-    }
-
-    private void gameLoop(Hero hero) {
-
-        this.engine = new GameEngine(hero);
-        var playing = true;
-
-        switcher.showStartGame();
-
-        while (playing) {
-
-            System.out.println("current map:\n" + engine.getMapString()); //#todo remove
-
-            playing = turn(hero);
-
-            if (engine.win()) {
-                playing = false;
-                repository.update(hero);
-                switcher.showEndGame(hero, true);
-            }
-        }
-    }
-
-    private boolean turn(Hero hero) {
-
-        final var monster = takeStepOrMonster(hero);
-        if (monster == null) {
-            return true;
-        }
-
-        if (runningAway(hero, monster)) {
-            return true;
-        }
-
-        final var result = engine.fight();
-
-        // #todo remove debugging string
-        System.out.printf("fight result\nwin: %s\nlvlup: %s\ndrop: %s%n", result.win(), result.levelUp(), result.drop());
-
-        if (result.win()) {
-            handleRoundWin(hero, monster, result.damageToHero());
-        } else {
-            handleRoundLoss(hero);
-            return false;
-        }
-
-        if (result.levelUp()) {
-            switcher.showLevelUp(hero);
-        }
-
-        this.handleDrop(result.drop(), hero);
-        return true;
-    }
-
-    private Monster takeStepOrMonster(Hero hero) {
-        final var dir = switcher.askDirection(hero);
-        final var monster = this.engine.move(dir);
-        if (monster == null) {
-            switcher.showEmptyStep();
-        }
-        return monster;
-    }
-
-    private boolean runningAway(Hero hero, Monster monster) {
-        final boolean feelingAggressive = switcher.askFightMonster(hero, monster);
-        if (feelingAggressive) {
-            return false;
-        }
-        var running = this.engine.runAway();
-        switcher.showRunSuccess(monster, running);
-        return running;
-    }
-
-    private void handleRoundWin(Hero hero, Monster monster, int damageToHero) {
-        switcher.showFightSummary(damageToHero, hero, monster);
-        repository.update(hero);
-    }
-
-    private void handleRoundLoss(Hero hero) {
-        switcher.showEndGame(hero, false);
-        repository.delete(hero);
-    }
-
-    final void handleDrop(Artifact artifact, Hero hero) {
-        if (artifact == null) {
-            return;
-        }
-
-        if (!switcher.askKeepArtifact(artifact, hero)) {
-            return;
-        }
-
-        hero.setArtifact(artifact);
-        repository.update(hero);
     }
 }
