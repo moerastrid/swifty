@@ -123,11 +123,11 @@ public class ViewSwitcher implements GameView {
     }
 
     @Override
-    public boolean askFightMonster(Hero hero, Monster monster) {
+    public boolean wantToFightMonster(Hero hero, Monster monster) {
         try {
-            return view.askFightMonster(hero, monster);
+            return view.wantToFightMonster(hero, monster);
         } catch (SwitchViewException se) {
-            return askFightMonster(hero, monster);
+            return wantToFightMonster(hero, monster);
         }
     }
 

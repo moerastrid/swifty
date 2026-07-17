@@ -39,7 +39,7 @@ public interface GameView {
     void showEmptyStep();
 
     // show monster, ask if user wants to fight or run
-    boolean askFightMonster(Hero hero, Monster monster);
+    boolean wantToFightMonster(Hero hero, Monster monster);
 
     // show if run attempt from monster was successful
     void showRunSuccess(Monster monster, boolean success);
@@ -64,7 +64,7 @@ todo: hero iig meegeven in:
 showStartGame()
 askDirection()
 showEmptyStep()
-askFightMonster(Monster)
+wantToFightMonster(Monster)
 showRunSuccess(Monster, boolean)
 
 (als er een hero is)

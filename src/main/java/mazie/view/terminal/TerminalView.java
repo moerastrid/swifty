@@ -162,7 +162,7 @@ public class TerminalView implements GameView {
     }
 
     @Override
-    public boolean askFightMonster(Hero hero, Monster monster) {
+    public boolean wantToFightMonster(Hero hero, Monster monster) {
         this.showHeroStats(hero);
         final var prompt = "Straight from the ghetto, something walks towards you..\n%s\nAre you bout that action? (y/n)".formatted(monster.toString());
         return choose(prompt, YES_NO);

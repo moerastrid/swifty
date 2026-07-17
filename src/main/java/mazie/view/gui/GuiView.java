@@ -186,7 +186,7 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public boolean askFightMonster(Hero hero, Monster monster) {
+    public boolean wantToFightMonster(Hero hero, Monster monster) {
         final var queue = new SynchronousQueue<Boolean>();
 
         invokeLater(() -> panel.setRunPanel(hero, monster, queue));

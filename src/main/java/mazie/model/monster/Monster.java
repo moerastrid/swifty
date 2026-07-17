@@ -49,6 +49,13 @@ public abstract class Monster {
         return this.attack;
     }
 
+    public int counterAttack() {
+        final var miss = random.nextInt(3);
+        if (isDead() || miss == 1)
+            return 0;
+        return this.attack;
+    }
+
     public int getDefence() {
         return this.defence;
     }
