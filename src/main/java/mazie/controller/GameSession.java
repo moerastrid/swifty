@@ -21,6 +21,10 @@ public class GameSession {
         this.engine = new GameEngine(hero);
     }
 
+    public Hero getHero() {
+        return this.hero;
+    }
+
     public void start() {
         this.view.showStartGame();
 

@@ -8,6 +8,7 @@ import mazie.exception.ParseException;
 import mazie.repository.HeroRepository;
 import mazie.repository.SQLiteHeroRepository;
 import mazie.view.GameView;
+import mazie.view.ViewSwitcher;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
@@ -29,10 +30,11 @@ public class Application {
         this.validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
         this.validator = validatorFactory.getValidator();
 
-        this.view = switch (parse(args)) {
+        final var initialView = switch (parse(args)) {
             case TERMINAL -> new TerminalView();
             case GUI -> new GuiView();
         };
+        this.view = new ViewSwitcher(initialView);
 
         this.repository = new SQLiteHeroRepository();
 

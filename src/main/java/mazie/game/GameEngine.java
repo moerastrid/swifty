@@ -85,11 +85,6 @@ public class GameEngine {
         return hero.takeDamage(monster.getAttack());
     }
 
-    // misschien vanuit monster ook? → gaat om de interne toestand van het monster
-    // monster zou je een soort 'get artifact value' aan vragen oid.
-    // berekening is monster. drop kans is game engine.
-    // je kunt ook zeggen dat monster altijd een artifact heeft en je die soms krijgt
-    // dan kun je al zien wat het monster heeft ook.
     private Artifact dropArtifact(Monster monster) {
         final var value = monster.getArtifactValue();
         return Artifact.createArtifact(value);
