@@ -1,6 +1,5 @@
 package mazie.game;
 
-import mazie.model.Artifact;
 import mazie.model.GameMap;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
@@ -104,17 +103,13 @@ public class GameEngine {
     }
 
     private void handleArtifact(Monster monster) {
-        final var value = monster.getArtifactValue();
-        final var artifact = Artifact.createArtifact(value);
-
+        final var artifact = monster.getArtifact();
         if (artifact == null) {
             return;
         }
-
         if (!view.askKeepArtifact(artifact, hero)) {
             return;
         }
-
         hero.setArtifact(artifact);
     }
 }

@@ -3,6 +3,8 @@ package mazie.model.monster;
 import mazie.exception.ModelException;
 
 import java.util.Random;
+import mazie.model.Artifact;
+import mazie.model.ArtifactType;
 
 public abstract class Monster {
 
@@ -13,8 +15,9 @@ public abstract class Monster {
     private final int defence;
     private int hp;
     private final int xpReward;
+    private final Artifact artifact;
 
-    private final Random random = new Random();
+    private static final Random random = new Random();
 
     protected Monster(String name, String[] actions, String finalMessage, int heroLevel, int baseAttack, int baseDefence, int baseHp, int baseXpReward) {
         this.name = name;
@@ -24,6 +27,7 @@ public abstract class Monster {
         this.defence = calcForLevel(baseDefence, heroLevel);
         this.hp = calcForLevel(baseHp, heroLevel);
         this.xpReward = calcForLevel(baseXpReward, heroLevel);
+        this.artifact = createArtifact();
     }
 
     public String getName() {
@@ -58,7 +62,26 @@ public abstract class Monster {
         return this.xpReward + xpBonus;
     }
 
-    public int getArtifactValue() {
+    public Artifact getArtifact() {
+        return this.artifact;
+    }
+
+    private Artifact createArtifact() {
+        final var drop = random.nextInt(5);
+
+        final var type = switch (drop) {
+            case 0 -> ArtifactType.WEAPON;
+            case 1 -> ArtifactType.ARMOUR;
+            case 2 -> ArtifactType.HELMET;
+            default -> null;
+        };
+        if (type == null) {
+            return null;
+        }
+        return new Artifact(type.randomName(), type, calcArtifactValue());
+    }
+
+    private int calcArtifactValue() {
         final var value = this.xpReward / 20;
         return Math.max(value, 1);
     }
