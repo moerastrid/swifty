@@ -1,7 +1,9 @@
 package mazie.controller;
 
-import mazie.game.GameEngine;
+import java.util.Random;
 import mazie.model.Artifact;
+import mazie.model.Direction;
+import mazie.model.GameMap;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
@@ -12,112 +14,125 @@ public class GameSession {
     private final GameView view;
     private final HeroRepository repository;
     private final Hero hero;
-    private final GameEngine engine;
+    private final GameMap map;
+    private final Random random = new Random();
 
     public GameSession(GameView view, HeroRepository repository, Hero hero) {
         this.view = view;
         this.repository = repository;
         this.hero = hero;
-        this.engine = new GameEngine(hero);
+        map = new GameMap(hero.getLevel());
     }
 
     public Hero getHero() {
-        return this.hero;
+        return hero;
     }
 
     public void start() {
-        this.view.showStartGame();
+        view.showStartGame();
 
         while (turn()) {
-            System.out.println("current map:\n" + this.engine.getMapString()); //#todo remove
+            System.out.println("current map:\n" + map.toString()); //#todo remove
 
-            if (this.engine.win()) {
+            if (heroWins()) {
                 repository.update(hero);
-                this.view.showEndGame(hero, true);
+                view.showEndGame(hero, true);
                 return;
             }
         }
     }
 
+    private boolean heroWins() {
+        return map.isHeroOnEdge();
+    }
+
     public void close() {
-        if (this.hero.getId() == 0) {
-            repository.save(this.hero);
+        if (hero.getId() == 0) {
+            repository.save(hero);
         } else {
-            repository.update(this.hero);
+            repository.update(hero);
         }
     }
 
     // returns true when keep playing, false when game is finito
     private boolean turn() {
 
-        final var monster = takeStepOrMonster();
+        final var dir = view.askDirection(hero);
+        final var monster = map.getMonsterInDirection(dir);
         if (monster == null) {
+            map.moveHero(dir);
+            view.showEmptyStep();
             return true;
         }
 
-        if (runningAway(monster)) {
-            return true;
+        final boolean feelingAggressive = view.askFightMonster(hero, monster);
+        if (!feelingAggressive) {
+            final var escaped = random.nextBoolean();
+            view.showRunSuccess(monster, escaped);
+            if (escaped) {
+                return true;
+            }
         }
 
-        final var result = this.engine.fight();
+        final var damageToHero = fight(monster);
 
-        // #todo remove debugging string
-        System.out.printf("fight result\nwin: %s\nlvlup: %s\ndrop: %s%n", result.win(), result.levelUp(), result.drop());
-
-        if (result.win()) {
-            handleRoundWin(monster, result.damageToHero());
-        } else {
-            handleRoundLoss();
+        if (hero.isDead()) {
+            view.showEndGame(hero, false);
+            repository.delete(hero);
             return false;
         }
 
-        if (result.levelUp()) {
-            this.view.showLevelUp(hero);
+        map.removeMonster(dir);
+        map.moveHero(dir);
+        view.showFightSummary(damageToHero, hero, monster);
+
+        final var lvlUp = hero.gainXp(monster.getXpReward());
+        repository.update(hero);
+
+        if (lvlUp) {
+            view.showLevelUp(hero);
         }
 
-        this.handleDrop(result.drop());
+        handleArtifact(monster);
         return true;
     }
 
-    private Monster takeStepOrMonster() {
-        final var dir = this.view.askDirection(this.hero);
-        final var monster = this.engine.move(dir);
-        if (monster == null) {
-            this.view.showEmptyStep();
+    private int fight(Monster monster) {
+        var damageToHero = 0;
+        while (!hero.isDead() && !monster.isDead()) {
+            damageToHero += fightRound(monster);
         }
-        return monster;
+        return damageToHero;
     }
 
-    private boolean runningAway(Monster monster) {
-        final boolean feelingAggressive = this.view.askFightMonster(this.hero, monster);
-        if (feelingAggressive) {
-            return false;
+    private int fightRound(Monster monster) {
+        // hero attacks monster
+        monster.takeDamage(hero.getTotalAttack());
+        if (monster.isDead()) {
+            return 0;
         }
-        var running = this.engine.runAway();
-        this.view.showRunSuccess(monster, running);
-        return running;
+
+        // monster 50% chance attacks hero
+        if (random.nextBoolean()) {
+            return 0;
+        }
+        return hero.takeDamage(monster.getAttack());
     }
 
-    private void handleRoundWin(Monster monster, int damageToHero) {
-        this.view.showFightSummary(damageToHero, this.hero, monster);
-        repository.update(this.hero);
-    }
 
-    private void handleRoundLoss() {
-        this.view.showEndGame(this.hero, false);
-        repository.delete(this.hero);
-    }
+    private void handleArtifact(Monster monster) {
+        final var value = monster.getArtifactValue();
+        final var artifact = Artifact.createArtifact(value);
 
-    final void handleDrop(Artifact artifact) {
         if (artifact == null) {
             return;
         }
 
-        if (!this.view.askKeepArtifact(artifact, this.hero)) {
+        if (!view.askKeepArtifact(artifact, hero)) {
             return;
         }
 
-        this.hero.setArtifact(artifact);
-        repository.update(this.hero);
+        hero.setArtifact(artifact);
+        repository.update(hero);
     }
 }
