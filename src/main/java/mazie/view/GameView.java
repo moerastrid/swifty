@@ -57,16 +57,3 @@ public interface GameView {
     boolean askKeepArtifact(Artifact artifact, Hero hero);
 
 }
-
-/*
-todo: hero iig meegeven in:
-
-showStartGame()
-askDirection()
-showEmptyStep()
-wantToFightMonster(Monster)
-showRunSuccess(Monster, boolean)
-
-(als er een hero is)
-
- */

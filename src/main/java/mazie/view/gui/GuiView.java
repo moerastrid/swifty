@@ -4,9 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
+import java.util.function.Consumer;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import mazie.exception.QuitException;
@@ -23,12 +24,10 @@ import static javax.swing.SwingUtilities.invokeLater;
 public class GuiView implements GameView {
 
     private static final String TITLE = "Mazie - an a-maze-ing RPG";
-
-    private volatile boolean switchRequested = false;
-
     private final Thread controllerThread;
     private final JFrame frame;
     private final GamePanel panel;
+    private volatile boolean switchRequested = false;
 
     public GuiView() {
         this.controllerThread = currentThread();
@@ -98,86 +97,8 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public void showWelcome() {
-        final var latch = new CountDownLatch(1);
-
-        invokeLater(() -> panel.setWelcomePanel(latch));
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
-    }
-
-    @Override
-    public boolean askNewGame() {
-        final var queue = new SynchronousQueue<Boolean>();
-
-        invokeLater(() -> panel.setNewOrLoadGamePanel(queue));
-        try {
-            return queue.take();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
-    }
-
-    @Override
-    public Hero createHero() {
-        final var queue = new SynchronousQueue<Hero>();
-
-        invokeLater(() -> panel.setNewHeroPanel(queue));
-        try {
-            return queue.take();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
-    }
-
-    @Override
-    public Hero selectHero(Map<Integer, Hero> heroes) {
-        final var queue = new SynchronousQueue<Hero>();
-
-        invokeLater(() -> panel.setSelectHeroPanel(heroes, queue));
-        try {
-            return queue.take();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
-    }
-
-    @Override
-    public boolean confirmHero(Hero hero) {
-        final var queue = new SynchronousQueue<Boolean>();
-
-        invokeLater(() -> panel.setConfirmPanel(hero, queue));
-        try {
-            return queue.take();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
-    }
-
-    @Override
     public void showStartGame() {
         invokeLater(panel::setStartGame);
-    }
-
-    @Override
-    public Direction askDirection(Hero hero) {
-        final var queue = new LinkedBlockingQueue<Direction>();
-
-        invokeLater(() -> panel.setDirectionPanel(hero, queue));
-        try {
-            return queue.take();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
     }
 
     @Override
@@ -186,33 +107,29 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public boolean wantToFightMonster(Hero hero, Monster monster) {
-        final var queue = new SynchronousQueue<Boolean>();
-
-        invokeLater(() -> panel.setRunPanel(hero, monster, queue));
-        try {
-            return queue.take();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
-    }
-
-    @Override
     public void showRunSuccess(Monster monster, boolean success) {
         invokeLater(() -> panel.setRunSucces(monster, success));
     }
 
     @Override
-    public void showEndGame(Hero hero, boolean win) {
-        final var latch = new CountDownLatch(1);
+    public void showWelcome() {
+        showBlockingPanel(panel::setWelcomePanel);
+    }
 
-        invokeLater(() -> panel.setEndPanel(hero, latch, win));
+    @Override
+    public void showFightSummary(int damageToHero, Hero hero, Monster monster) {
+        showBlockingPanel(latch -> panel.setFightSummary(damageToHero, hero, monster, latch));
+    }
+
+    @Override
+    public void showLevelUp(Hero hero) {
+        showBlockingPanel(latch -> panel.setLevelUp(hero, latch));
+    }
+
+    @Override
+    public void showEndGame(Hero hero, boolean win) {
         try {
-            latch.await();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
+            showBlockingPanel(latch -> panel.setEndPanel(hero, latch, win));
         } finally {
             invokeLater(() -> {
                 this.frame.setVisible(false);
@@ -222,35 +139,54 @@ public class GuiView implements GameView {
     }
 
     @Override
-    public void showFightSummary(int damageToHero, Hero hero, Monster monster) {
-        final var latch = new CountDownLatch(1);
-
-        invokeLater(() -> panel.setFightSummary(damageToHero, hero, monster, latch));
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
+    public boolean askNewGame() {
+        return askUser(panel::setNewOrLoadGamePanel);
     }
 
     @Override
-    public void showLevelUp(Hero hero) {
-        final var latch = new CountDownLatch(1);
-        invokeLater(() -> panel.setLevelUp(hero, latch));
-        try {
-            latch.await();
-        } catch (InterruptedException e) {
-            handleInterruption(e);
-            throw new AssertionError(e);
-        }
+    public Hero createHero() {
+        return askUser(panel::setNewHeroPanel);
+    }
+
+    @Override
+    public Hero selectHero(Map<Integer, Hero> heroes) {
+        return askUser(queue -> panel.setSelectHeroPanel(heroes, queue));
+    }
+
+    @Override
+    public boolean confirmHero(Hero hero) {
+        return askUser(queue -> panel.setConfirmPanel(hero, queue));
+    }
+
+    @Override
+    public Direction askDirection(Hero hero) {
+        return askUser(queue -> panel.setDirectionPanel(hero, queue));
+    }
+
+    @Override
+    public boolean wantToFightMonster(Hero hero, Monster monster) {
+        return askUser(queue -> panel.setRunPanel(hero, monster, queue));
     }
 
     @Override
     public boolean askKeepArtifact(Artifact artifact, Hero hero) {
-        final var queue = new SynchronousQueue<Boolean>();
+        return askUser(queue -> panel.setArtifactPanel(artifact, hero, queue));
+    }
 
-        invokeLater(() -> panel.setArtifactPanel(artifact, hero, queue));
+    private void showBlockingPanel(Consumer<CountDownLatch> consumer) {
+        final var latch = new CountDownLatch(1);
+        invokeLater(() -> consumer.accept(latch));
+        try {
+            latch.await();
+        } catch (InterruptedException e) {
+            handleInterruption(e);
+            throw new AssertionError(e);
+        }
+    }
+
+    private <T> T askUser(Consumer<BlockingQueue<T>> consumer) {
+        final var queue = new SynchronousQueue<T>();
+        invokeLater(() -> consumer.accept(queue));
         try {
             return queue.take();
         } catch (InterruptedException e) {
