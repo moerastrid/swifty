@@ -9,23 +9,13 @@ import mazie.model.Hero;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
 
-public class GameSetupService {
-
-    private final Validator validator;
-    private final GameView view;
-    private final HeroRepository repository;
-
-    public GameSetupService(Validator validator, GameView view, HeroRepository repository) {
-        this.validator = validator;
-        this.view = view;
-        this.repository = repository;
-    }
+public record GameSetupService(Validator validator, GameView view, HeroRepository repository) {
 
     public Hero setupHero() {
         final var heroes = repository.loadAllHeroes();
 
         Hero hero = null;
-        while(!this.confirm(hero)) {
+        while (!this.confirm(hero)) {
             hero = switch (defineGameType(heroes)) {
                 case NEW -> this.createHero();
                 case EXISTING -> view.selectHero(heroes);

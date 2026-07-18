@@ -6,8 +6,4 @@ public class ModelException extends RuntimeException {
     public ModelException(String message) {
         super(ERROR_MESSAGE.formatted(message));
     }
-
-    public ModelException(String message, Exception e) {
-        super(ERROR_MESSAGE.formatted(message), e);
-    }
 }

@@ -20,9 +20,12 @@ public class WelcomePanel extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BorderLayout(10, 10));
 
-        final var image = new ImageIcon(getClass().getResource("/mazie-logo.png"));
-        final var imageLabel = new JLabel(image);
-        this.add(imageLabel, BorderLayout.CENTER);
+        final var url = getClass().getResource("/mazie-logo.png");
+        if (url != null) {
+            final var image = new ImageIcon(url);
+            final var imageLabel = new JLabel(image);
+            this.add(imageLabel, BorderLayout.CENTER);
+        }
 
         final var startButton = new JButton("Start");
         startButton.setBackground(PURPLE);

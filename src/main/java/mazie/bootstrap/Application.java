@@ -24,7 +24,7 @@ public class Application {
     private enum ViewType {
         TERMINAL,
         GUI
-    };
+    }
 
     public Application(String[] args) {
         this.validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();

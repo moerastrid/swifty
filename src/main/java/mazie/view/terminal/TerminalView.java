@@ -41,8 +41,10 @@ public class TerminalView implements GameView {
     @Override
     public void showWelcome() {
         try (var inputstream = getClass().getResourceAsStream("/mazie-icon-ascii.txt")) {
-            String content = new String(inputstream.readAllBytes());
-            System.out.print(content);
+            if (inputstream != null) {
+                String content = new String(inputstream.readAllBytes());
+                System.out.print(content);
+            }
         } catch (IOException ex) {
             showError(ex.getMessage());
         }

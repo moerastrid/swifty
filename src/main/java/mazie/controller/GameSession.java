@@ -6,22 +6,10 @@ import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
 
-public class GameSession {
-
-    private final GameView view;
-    private final HeroRepository repository;
-    private final GameEngine engine;
-    private final Hero hero;
+public record GameSession(GameView view, HeroRepository repository, GameEngine engine, Hero hero) {
 
     public GameSession(GameView view, HeroRepository repository, Hero hero) {
         this(view, repository, new GameEngine(hero), hero);
-    }
-
-    public GameSession(GameView view, HeroRepository repository, GameEngine engine, Hero hero) {
-        this.view = view;
-        this.repository = repository;
-        this.engine = engine;
-        this.hero = hero;
     }
 
     public void start() {

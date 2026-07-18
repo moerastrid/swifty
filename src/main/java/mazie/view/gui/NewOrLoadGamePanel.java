@@ -19,11 +19,17 @@ public class NewOrLoadGamePanel extends JPanel {
         this.setBackground(GREY);
         this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BorderLayout(10, 10));
-
-        final var image = new ImageIcon(getClass().getResource("/mazie-logo.png"));
-        final var imageLabel = new JLabel(image);
-        this.add(imageLabel, BorderLayout.CENTER);
+        this.setLogo();
         this.add(buttonPanel(queue), BorderLayout.SOUTH);
+    }
+
+    private void setLogo() {
+        final var url = getClass().getResource("/mazie-logo.png");
+        if (url != null) {
+            final var image = new ImageIcon(url);
+            final var imageLabel = new JLabel(image);
+            this.add(imageLabel, BorderLayout.CENTER);
+        }
     }
 
     private JPanel buttonPanel(BlockingQueue<Boolean> queue) {

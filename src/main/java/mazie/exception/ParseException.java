@@ -6,8 +6,4 @@ public class ParseException extends RuntimeException {
     public ParseException(String message) {
         super(ERROR_MESSAGE.formatted(message));
     }
-
-    public ParseException(String message, Exception e) {
-        super(ERROR_MESSAGE.formatted(message), e);
-    }
 }
