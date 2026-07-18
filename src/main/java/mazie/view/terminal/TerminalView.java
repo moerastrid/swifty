@@ -29,6 +29,11 @@ public class TerminalView implements GameView {
     }
 
     @Override
+    public void close() {
+        // nothing (terminal stays open)
+    }
+
+    @Override
     public void setSwitchListener(Runnable switchListener) {
         this.switchListener = switchListener;
     }

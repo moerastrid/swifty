@@ -20,6 +20,11 @@ public class ViewSwitcher implements GameView {
         this.setListener(initial);
     }
 
+    @Override
+    public void close() {
+        view.close();
+    }
+
     private void setListener(GameView v) {
         v.setSwitchListener(this::switchView);
     }

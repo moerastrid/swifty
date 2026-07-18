@@ -8,6 +8,8 @@ import mazie.model.monster.Monster;
 
 public interface GameView {
 
+    void close();
+
     // switch listener om view te wisselen
     void setSwitchListener(Runnable switchListener);
 

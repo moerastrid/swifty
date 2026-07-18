@@ -69,13 +69,16 @@ public class GuiView implements GameView {
         }
     }
 
+    @Override
+    public void close() {
+        this.frame.setVisible(false);
+        this.frame.dispose();
+    }
+
     private void handleInterruption(InterruptedException e) {
         if (this.switchRequested) {
             this.switchRequested = false;
-            invokeLater(() -> {
-                this.frame.setVisible(false);
-                this.frame.dispose();
-            });
+            invokeLater(this::close);
             throw new SwitchViewException();
         }
         Thread.currentThread().interrupt();
@@ -131,10 +134,7 @@ public class GuiView implements GameView {
         try {
             showBlockingPanel(latch -> panel.setEndPanel(hero, latch, win));
         } finally {
-            invokeLater(() -> {
-                this.frame.setVisible(false);
-                this.frame.dispose();
-            });
+            invokeLater(this::close);
         }
     }
 
