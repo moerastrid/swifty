@@ -8,6 +8,8 @@ public interface HeroRepository {
 
     Map<Integer, Hero> loadAllHeroes();
 
+    void close();
+
     void save(Hero hero);
 
     void update(Hero hero);

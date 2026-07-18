@@ -48,6 +48,7 @@ public class Application {
     public void shutDownGracefully() {
         this.validatorFactory.close();
         this.controller.close();
+        this.repository.close();
     }
 
     private static ViewType parse(final String[] args) {

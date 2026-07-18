@@ -2,6 +2,7 @@ package mazie.controller;
 
 import mazie.game.GameEngine;
 import mazie.model.Hero;
+import mazie.model.monster.Monster;
 import mazie.repository.HeroRepository;
 import mazie.view.GameView;
 
@@ -13,33 +14,40 @@ public class GameSession {
     private final Hero hero;
 
     public GameSession(GameView view, HeroRepository repository, Hero hero) {
+        this(view, repository, new GameEngine(hero), hero);
+    }
+
+    public GameSession(GameView view, HeroRepository repository, GameEngine engine, Hero hero) {
         this.view = view;
         this.repository = repository;
-        this.engine = new GameEngine(hero);
+        this.engine = engine;
         this.hero = hero;
     }
 
     public void start() {
         view.showStartGame();
 
-        while (engine.isPlaying()) {
+        while (!engine.gameOver()) {
             playTurn();
-            repository.update(hero);
-
-            if (engine.heroWins()) {
-                view.showEndGame(hero, true);
-                return;
-            }
-            if (engine.heroDies()) {
-                view.showEndGame(hero, false);
-                repository.delete(hero);
-                return;
-            }
         }
+        endGame();
     }
 
     public void close() {
-        repository.update(hero);
+        if (hero.isDead()) {
+            repository.delete(hero);
+        } else {
+            repository.update(hero);
+        }
+    }
+
+    private void endGame() {
+        if (engine.heroWins()) {
+            view.showEndGame(hero, true);
+        }
+        if (engine.heroDies()) {
+            view.showEndGame(hero, false);
+        }
     }
 
     private void playTurn() {
@@ -51,8 +59,6 @@ public class GameSession {
         }
 
         final var monster = engine.getMonster(dir);
-        final var xp = monster.getXpReward();
-        final var artifact = monster.getArtifact();
 
         if (!view.wantToFightMonster(hero, monster)) {
             final var escape = engine.escape();
@@ -62,12 +68,23 @@ public class GameSession {
             }
         }
 
-        final var damageToHero = engine.fight(dir);
+        if (handleFight(monster)) {
+            engine.takeStep(dir);
+            repository.update(hero);
+        } else {
+            repository.delete(hero);
+        }
+    }
+
+    private boolean handleFight(Monster monster) {
+        final var xp = monster.getXpReward();
+        final var artifact = monster.getArtifact();
+
+        final var damageToHero = engine.fight(monster);
         if (engine.heroDies()) {
-            return;
+            return false;
         }
         view.showFightSummary(damageToHero, hero, monster);
-        engine.takeStep(dir);
 
         final var levelUp = engine.gainXp(xp);
         if (levelUp) {
@@ -77,6 +94,6 @@ public class GameSession {
         if (artifact != null && view.askKeepArtifact(artifact, hero)) {
             hero.setArtifact(artifact);
         }
-
+        return true;
     }
 }

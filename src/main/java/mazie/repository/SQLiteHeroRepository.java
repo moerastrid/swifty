@@ -20,7 +20,7 @@ public class SQLiteHeroRepository implements HeroRepository {
     private static final String DATA_DIR = "data";
 
     private static final String FATAL_DATABASE_CONNECTION = "Database connection fail";
-    private static final String FATAL_DATABASE_ACCESS = "Database no read & write access?";
+    private static final String FATAL_DATABASE_ACCESS = "Database folder issue";
     private static final String FATAL_DATABASE_TABLES = "Database create tables";
     private static final String HERO_NO_ID = "hero with no ID";
 
@@ -28,9 +28,6 @@ public class SQLiteHeroRepository implements HeroRepository {
 
     private static final String HERO_TYPE = Arrays.stream(HeroType.values()).map(type -> "'%s'".formatted(type.name())).collect(Collectors.joining(", "));
     private static final String ARTIFACT_TYPE = Arrays.stream(ArtifactType.values()).map(type -> "'%s'".formatted(type.name())).collect(Collectors.joining(", "));
-
-
-    // #todo artifact types ook zo
 
     private static final String CREATE_HERO_TABLE_SQL = """
                 CREATE TABLE IF NOT EXISTS hero(
@@ -90,18 +87,25 @@ public class SQLiteHeroRepository implements HeroRepository {
     }
 
     private Connection setupConnection() {
-        File dataDir = new File(DATA_DIR);
-        if (!dataDir.exists()) {
-            dataDir.mkdir();
-        }
-        if (!dataDir.canRead() || !dataDir.canWrite()) {
+        try {
+            setupDataDir();
+        } catch (SecurityException e) {
             throw new FatalException(FATAL_DATABASE_ACCESS);
         }
-
         try {
             return DriverManager.getConnection(DB_URL);
         } catch (SQLException e) {
             throw new FatalException(FATAL_DATABASE_CONNECTION, e);
+        }
+    }
+
+    private void setupDataDir() {
+        final var dataDir = new File(DATA_DIR);
+        if (!dataDir.exists() && !dataDir.mkdirs()) {
+            throw new FatalException(FATAL_DATABASE_ACCESS);
+        }
+        if (!dataDir.isDirectory() || !dataDir.canRead() || !dataDir.canWrite()) {
+            throw new FatalException(FATAL_DATABASE_ACCESS);
         }
     }
 
@@ -121,6 +125,15 @@ public class SQLiteHeroRepository implements HeroRepository {
             commitConnection();
         } catch (SQLException e) {
             throw new FatalException(FATAL_DATABASE_TABLES, e);
+        }
+    }
+
+    @Override
+    public void close() {
+        try {
+            connection.close();
+        } catch (SQLException e) {
+            throw new FatalException(FATAL_DATABASE_CONNECTION, e);
         }
     }
 
@@ -160,6 +173,8 @@ public class SQLiteHeroRepository implements HeroRepository {
             final var keys = statement.getGeneratedKeys();
             if (keys.next()) {
                 hero.setId(keys.getInt(1));
+            } else {
+                throw new SQLException(HERO_NO_ID);
             }
         }
     }
@@ -168,15 +183,15 @@ public class SQLiteHeroRepository implements HeroRepository {
         if (hero.getArtifacts().isEmpty()) {
             return;
         }
-
-        for (final var artifact : hero.getArtifacts()) {
-            try (final var statement = connection.prepareStatement(INSERT_ARTIFACT_SQL, Statement.RETURN_GENERATED_KEYS)) {
+        try (final var statement = connection.prepareStatement(INSERT_ARTIFACT_SQL)) {
+            for (final var artifact : hero.getArtifacts()) {
                 statement.setString(1, artifact.name());
                 statement.setString(2, artifact.type().name());
                 statement.setInt(3, artifact.value());
                 statement.setInt(4, hero.getId());
-                statement.executeUpdate();
+                statement.addBatch();
             }
+            statement.executeBatch();
         }
     }
 

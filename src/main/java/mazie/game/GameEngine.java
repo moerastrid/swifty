@@ -12,8 +12,6 @@ public class GameEngine {
     private final Random random;
     private final GameMap map;
 
-    private boolean playing = true;
-
     public GameEngine(Hero hero) {
         this(hero, new Random());
     }
@@ -24,8 +22,8 @@ public class GameEngine {
         this.map = new GameMap(hero.getLevel());
     }
 
-    public boolean isPlaying() {
-        return playing;
+    public boolean gameOver() {
+        return (heroWins() || heroDies());
     }
 
     public boolean heroWins() {
@@ -38,14 +36,16 @@ public class GameEngine {
 
     public boolean takeStep(Direction dir) {
         final var monster = map.getMonsterInDirection(dir);
-        if (monster != null) {
-            return false;
+        if (monster == null) {
+            map.moveHero(dir);
+            return true;
         }
-        map.moveHero(dir);
-        if (heroWins()) {
-            playing = false;
+        if (monster.isDead()) {
+            map.removeMonster(dir);
+            map.moveHero(dir);
+            return true;
         }
-        return true;
+        return false;
     }
 
     public Monster getMonster(Direction dir) {
@@ -56,21 +56,12 @@ public class GameEngine {
         return random.nextBoolean();
     }
 
-    public int fight(Direction dir) {
-        final var monster = map.getMonsterInDirection(dir);
+    public int fight(Monster monster) {
 
         var damageToHero = 0;
         while (!hero.isDead() && !monster.isDead()) {
             damageToHero += fightRound(monster);
         }
-
-        if (hero.isDead()) {
-            playing = false;
-        }
-        if (monster.isDead()) {
-            map.removeMonster(dir);
-        }
-
         return damageToHero;
     }
 
@@ -83,6 +74,3 @@ public class GameEngine {
         return hero.takeDamage(monster.counterAttack());
     }
 }
-
-
-
