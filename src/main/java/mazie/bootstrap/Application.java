@@ -25,28 +25,35 @@ public class Application {
     }
 
     public Application(String[] args) {
-        this.validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
 
-        final var initialView = switch (parse(args)) {
+        final var viewType = parse(args);
+
+        validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
+
+        final var initialView = switch (viewType) {
             case TERMINAL -> new TerminalView();
             case GUI -> new GuiView();
         };
-        this.view = new ViewSwitcher(initialView);
 
-        this.repository = new SQLiteHeroRepository();
-
-        this.controller = new GameController(validatorFactory.getValidator(), view, repository);
+        view = new ViewSwitcher(initialView);
+        repository = new SQLiteHeroRepository();
+        controller = new GameController(validatorFactory.getValidator(), view, repository);
     }
 
     public void start() {
-        this.controller.start();
+        controller.start();
     }
 
     public void shutDownGracefully() {
-        this.controller.close();
-        this.repository.close();
-        this.view.close();
-        this.validatorFactory.close();
+        System.err.println("Shutting down gracefully");
+        System.err.println("close controller");
+        controller.close();
+        System.err.println("close view");
+        view.close();
+        System.err.println("close repository");
+        repository.close();
+        System.err.println("close validatorFactory");
+        validatorFactory.close();
     }
 
     private static ViewType parse(final String[] args) {

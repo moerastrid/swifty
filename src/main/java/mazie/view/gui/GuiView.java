@@ -10,6 +10,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.function.Consumer;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import mazie.exception.QuitException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
@@ -71,14 +72,26 @@ public class GuiView implements GameView {
 
     @Override
     public void close() {
-        this.frame.setVisible(false);
-        this.frame.dispose();
+        if (SwingUtilities.isEventDispatchThread()) {
+            closeFrame();
+        } else {
+            invokeLater(this::closeFrame);
+        }
+    }
+
+    private void closeFrame() {
+        if (this.frame != null) {
+            this.frame.setVisible(false);
+            this.frame.dispose();
+        }
     }
 
     private void handleInterruption(InterruptedException e) {
+        System.out.println("INTERRUPTED");
+
         if (this.switchRequested) {
             this.switchRequested = false;
-            invokeLater(this::close);
+            invokeLater(this::closeFrame);
             throw new SwitchViewException();
         }
         Thread.currentThread().interrupt();

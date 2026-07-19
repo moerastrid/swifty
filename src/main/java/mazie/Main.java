@@ -50,18 +50,34 @@ public class Main {
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+
+            System.err.println("HALLO 1");
             if (shuttingDown.compareAndSet(false, true)) {
+                System.err.println("HALLO 2");
                 mainThread.interrupt();
-                if (application != null) {
-                    application.shutDownGracefully();
-                }
+                shutDownApp();
                 try {
+                    System.err.println("HALLO 3");
                     mainThread.join();
                 } catch (InterruptedException e) {
+                    System.err.println("HALLO 4");
                     Thread.currentThread().interrupt();
                 }
             }
         }));
+        System.err.println("HALLO 5");
+    }
+
+    private static void shutDownApp() {
+        if (application == null) {
+            return;
+        }
+        try {
+            application.shutDownGracefully();
+        } catch (Exception ex) {
+            System.err.printf("WARNER: shutdown failed: %s%n", ex.getMessage());
+            throw ex;
+        }
     }
 
     private static int setExitCode(Exception ex) {
