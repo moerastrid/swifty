@@ -1,7 +1,6 @@
 package mazie.view.gui;
 
 import java.awt.Font;
-import java.awt.Insets;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
@@ -18,12 +17,11 @@ import static mazie.view.gui.ThemeColor.WHITE;
 import static mazie.view.gui.ThemeColor.YELLOW;
 
 public class FightSummaryPanel extends JPanel {
-    final static Random random = new Random();
+    private static final Random RANDOM = new Random();
 
     public FightSummaryPanel(Monster monster, Hero hero, CountDownLatch latch, int damageToHero) {
         this.setBackground(PURPLE);
         this.setForeground(WHITE);
-        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         this.add(note(monster));
@@ -72,11 +70,8 @@ public class FightSummaryPanel extends JPanel {
 
     private JButton okButton(CountDownLatch latch) {
         final var buttonTexts = List.of("ok", "alright", "OK", "whatever", "yes", "understandable", "si claro");
-        final var button = new JButton(buttonTexts.get(random.nextInt(buttonTexts.size())));
-        button.setBackground(PURPLE);
-        button.setForeground(YELLOW);
+        final var button = new JButton(buttonTexts.get(RANDOM.nextInt(buttonTexts.size())));
         button.setAlignmentX(CENTER_ALIGNMENT);
-        button.setMargin(new Insets(2, 10, 2, 10));
         button.addActionListener(event -> latch.countDown());
         return (button);
     }

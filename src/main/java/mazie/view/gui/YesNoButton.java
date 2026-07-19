@@ -1,11 +1,10 @@
 package mazie.view.gui;
 
-import java.awt.Insets;
 import javax.swing.JButton;
 
-import static mazie.view.gui.ThemeColor.BLACK;
 import static mazie.view.gui.ThemeColor.GREEN;
 import static mazie.view.gui.ThemeColor.PURPLE;
+import static mazie.view.gui.ThemeColor.WHITE;
 
 public class YesNoButton extends JButton {
 
@@ -20,8 +19,7 @@ public class YesNoButton extends JButton {
 
         final var color = yes ? PURPLE : GREEN;
         this.setBackground(color);
-        this.setForeground(BLACK);
-        this.setMargin(new Insets(2, 10, 2, 10));
+        this.setForeground(WHITE);
     }
 
     public Boolean getYes() {

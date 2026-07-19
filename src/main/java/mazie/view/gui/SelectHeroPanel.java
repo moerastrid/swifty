@@ -1,7 +1,6 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Insets;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.BorderFactory;
@@ -35,6 +34,7 @@ public class SelectHeroPanel extends JPanel {
 
     private JPanel listPanel(Map<Integer, Hero> heroes, BlockingQueue<Hero> queue) {
         final var panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder());
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 
         heroes.values().forEach(hero -> panel.add(heroCard(hero, queue)));
@@ -61,9 +61,6 @@ public class SelectHeroPanel extends JPanel {
         final var selectButton = new JButton("select");
         selectButton.setForeground(LILA);
         selectButton.setBackground(WHITE);
-
-        selectButton.setMargin(new Insets(2, 10, 2, 10));
-
         selectButton.addActionListener(event -> queue.offer(hero));
         return selectButton;
     }

@@ -1,9 +1,7 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Insets;
 import java.util.concurrent.CountDownLatch;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,7 +14,6 @@ public class LevelUpPanel extends JPanel {
 
     public LevelUpPanel(Hero hero, CountDownLatch latch) {
         this.setBackground(YELLOW);
-        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BorderLayout());
 
         final var label = new JLabel("level up", JLabel.CENTER);
@@ -28,7 +25,6 @@ public class LevelUpPanel extends JPanel {
         final var okButton = new JButton("ok");
         okButton.setForeground(YELLOW);
         okButton.setBackground(BLACK);
-        okButton.setMargin(new Insets(2, 10, 2, 10));
         okButton.addActionListener(event -> latch.countDown());
         this.add(okButton, BorderLayout.SOUTH);
     }

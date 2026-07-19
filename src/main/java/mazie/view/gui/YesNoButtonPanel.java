@@ -4,9 +4,6 @@ import java.awt.FlowLayout;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.JPanel;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.GREY;
-
 public class YesNoButtonPanel extends JPanel {
 
     public YesNoButtonPanel(BlockingQueue<Boolean> queue) {
@@ -18,8 +15,6 @@ public class YesNoButtonPanel extends JPanel {
         setListener(noButton, queue);
 
         this.setLayout(new FlowLayout());
-        this.setForeground(BLACK);
-        this.setBackground(GREY);
         this.add(yesButton);
         this.add(noButton);
     }

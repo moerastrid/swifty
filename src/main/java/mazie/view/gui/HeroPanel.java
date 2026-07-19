@@ -8,7 +8,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import mazie.model.Hero;
 
-import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.LILA;
 import static mazie.view.gui.ThemeColor.PURPLE;
 import static mazie.view.gui.ThemeColor.WHITE;
@@ -16,7 +15,6 @@ import static mazie.view.gui.ThemeColor.WHITE;
 public class HeroPanel extends JPanel {
 
     public HeroPanel(Hero hero) {
-        this.setBackground(GREY);
         this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -47,8 +45,6 @@ public class HeroPanel extends JPanel {
         final var info = artifacts.isEmpty() ? "nothing" : String.join("\n - ", artifacts);
 
         final var textArea = new JTextArea("\ncurrently wearing:\n\n - %s".formatted(info));
-        textArea.setBackground(GREY);
-        textArea.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         textArea.setEditable(false);
         textArea.setFocusable(false);
         textArea.setLineWrap(true);

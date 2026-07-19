@@ -26,6 +26,7 @@ public class GamePanel extends JPanel {
     private JLabel log;
 
     public GamePanel() {
+        this.setBorder(BorderFactory.createEmptyBorder());
         this.setLayout(new BorderLayout());
     }
 

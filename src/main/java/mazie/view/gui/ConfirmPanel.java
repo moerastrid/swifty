@@ -10,8 +10,6 @@ import mazie.model.Hero;
 public class ConfirmPanel extends JPanel {
 
     public ConfirmPanel(Hero hero, BlockingQueue<Boolean> queue) {
-        this.setBackground(ThemeColor.GREY);
-        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BorderLayout(10, 10));
 
         final var question = new JLabel("confirm hero?", JLabel.CENTER);

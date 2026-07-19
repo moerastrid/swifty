@@ -3,6 +3,7 @@ package mazie.view.gui;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
@@ -13,6 +14,7 @@ public class FightScenePanel extends JPanel {
     private final Image hero;
 
     public FightScenePanel(Monster monster, Hero hero) {
+        this.setBorder(BorderFactory.createEmptyBorder());
         this.setOpaque(true);
         this.setPreferredSize(new Dimension(600, 400));
         this.background = PngMap.getPng(monster).getImage();
@@ -39,7 +41,7 @@ public class FightScenePanel extends JPanel {
         final var heroX = (getWidth() - heroWidth) / 2;
         final var heroY = getHeight() - heroHeight - 10;
 
-        g.drawImage(hero, (int) heroX, (int) heroY, (int) heroWidth, (int ) heroHeight, this);
+        g.drawImage(hero, (int) heroX, (int) heroY, (int) heroWidth, (int) heroHeight, this);
     }
 
     private double calculateScale(int width, int height) {

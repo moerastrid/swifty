@@ -17,7 +17,6 @@ public class RunPanel extends JPanel {
     public RunPanel(Monster monster, Hero hero, BlockingQueue<Boolean> queue) {
         this.setBackground(PURPLE);
         this.setForeground(WHITE);
-        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
         this.add(note(monster));

@@ -3,7 +3,6 @@ package mazie.view.gui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
-import java.awt.Insets;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -30,7 +29,6 @@ public class NewHeroPanel extends JPanel {
 
     public NewHeroPanel(BlockingQueue<Hero> queue) {
         this.setBackground(TEAL);
-        this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.setLayout(new GridLayout(5, 1));
 
         errorLabel.setForeground(BLACK);
@@ -47,9 +45,9 @@ public class NewHeroPanel extends JPanel {
 
     private JPanel namePanel(JTextField nameField) {
         final var panel = new JPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.setBackground(TEAL);
         panel.setLayout(new BorderLayout());
+        panel.setBorder(BorderFactory.createEmptyBorder());
 
         final var nameLabel = new JLabel("give it a name: ", JLabel.CENTER);
         nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -64,8 +62,8 @@ public class NewHeroPanel extends JPanel {
 
     private JPanel typeButtons() {
         final var panel = new JPanel();
+        panel.setBorder(BorderFactory.createEmptyBorder());
         panel.setLayout(new FlowLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel.setBackground(TEAL);
 
         final var group = new ButtonGroup();
@@ -94,8 +92,7 @@ public class NewHeroPanel extends JPanel {
     private JButton okButton(BlockingQueue<Hero> queue) {
         final var button = new JButton("ok");
         button.setForeground(PURPLE);
-        button.setBackground(WHITE);
-        button.setMargin(new Insets(2, 10, 2, 10));
+        button.setBackground(YELLOW);
 
         button.addActionListener(event -> {
             if (type != null) {

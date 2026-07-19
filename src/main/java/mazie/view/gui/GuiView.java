@@ -32,9 +32,12 @@ public class GuiView implements GameView {
 
     public GuiView() {
         this.controllerThread = currentThread();
+
+        Theme.configure();
+
         this.panel = new GamePanel();
         this.frame = initFrame();
-        this.setIcon();
+        setIcon();
         this.frame.getContentPane().add(this.panel);
 
         invokeLater(() -> this.frame.setVisible(true));
