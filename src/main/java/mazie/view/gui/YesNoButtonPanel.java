@@ -1,25 +1,41 @@
 package mazie.view.gui;
 
-import java.awt.FlowLayout;
+import java.awt.Dimension;
 import java.util.concurrent.BlockingQueue;
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
+
+import static mazie.view.gui.ThemeColor.BLACK;
+import static mazie.view.gui.ThemeColor.GREEN;
+import static mazie.view.gui.ThemeColor.PURPLE;
+import static mazie.view.gui.ThemeColor.YELLOW;
 
 public class YesNoButtonPanel extends JPanel {
+    private static final Dimension DI = new Dimension(100, 35);
+    private static final Border LINE = BorderFactory.createLineBorder(YELLOW, 2, true);
 
     public YesNoButtonPanel(BlockingQueue<Boolean> queue) {
-
-        final var yesButton = new YesNoButton(true);
-        final var noButton = new YesNoButton(false);
-
-        setListener(yesButton, queue);
-        setListener(noButton, queue);
-
-        this.setLayout(new FlowLayout());
-        this.add(yesButton);
-        this.add(noButton);
+        this.add(yes(queue));
+        this.add(no(queue));
     }
 
-    private void setListener(YesNoButton button, BlockingQueue<Boolean> queue) {
-        button.addActionListener(event -> queue.offer(button.getYes()));
+    private JButton yes(BlockingQueue<Boolean> queue) {
+        final var button = new JButton("yes");
+        button.setPreferredSize(DI);
+        button.setBorder(LINE);
+        button.setBackground(PURPLE);
+        button.addActionListener(event -> queue.offer(true));
+        return button;
+    }
+
+    private JButton no(BlockingQueue<Boolean> queue) {
+        final var button = new JButton("no");
+        button.setPreferredSize(DI);
+        button.setBorder(LINE);
+        button.setBackground(GREEN);
+        button.addActionListener(event -> queue.offer(false));
+        return button;
     }
 }

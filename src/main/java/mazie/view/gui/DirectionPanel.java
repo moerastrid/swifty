@@ -58,7 +58,7 @@ public class DirectionPanel extends JPanel {
         final var icon = PngMap.getPng(screenType);
         final var image = icon.getImage();
 
-        final var width = (double)getWidth();
+        final var width = (double)getWidth() + 20;
         final var factor = width / icon.getIconWidth();
         final var height = icon.getIconHeight() * factor;
         final var x = (getWidth() - width) / 2;

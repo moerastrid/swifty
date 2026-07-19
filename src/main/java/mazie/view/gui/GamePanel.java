@@ -60,7 +60,7 @@ public class GamePanel extends JPanel {
         this.setSubPanel(new LevelUpPanel(hero, latch));
     }
 
-    public void setRunSucces(Monster monster, boolean success) {
+    public void setRunSuccess(Monster monster, boolean success) {
         final var text = success ? "You've escaped! %s got nothing on you" : "You can't find the exit of %s, there's no escaping now...";
         setLog(text.formatted(monster.getName()));
     }

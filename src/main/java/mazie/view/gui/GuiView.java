@@ -8,7 +8,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.SynchronousQueue;
 import java.util.function.Consumer;
-import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import mazie.exception.QuitException;
@@ -117,7 +116,7 @@ public class GuiView implements GameView {
 
     @Override
     public void showRunSuccess(Monster monster, boolean success) {
-        invokeLater(() -> panel.setRunSucces(monster, success));
+        invokeLater(() -> panel.setRunSuccess(monster, success));
     }
 
     @Override
