@@ -9,21 +9,21 @@ public class EmojiMap {
     private EmojiMap() {
     }
 
-    private static final Map<HeroType, String> heroEmojis = Map.of(
+    private static final Map<HeroType, String> HERO_TYPE_EMOJI = Map.of(
             HeroType.FROG, "🐸",
             HeroType.MOUSE, "🐁",
             HeroType.WEEVIL, "🪲"
     );
 
     public static String getEmoji(HeroType type) {
-        final var emoji = heroEmojis.get(type);
+        final var emoji = HERO_TYPE_EMOJI.get(type);
         if (emoji == null) {
             throw new IllegalStateException("Unexpected value: %s".formatted(type.name()));
         }
         return emoji;
     }
 
-    private static final Map<String, String> monsterNameEmoji = Map.ofEntries(
+    private static final Map<String, String> MONSTER_NAME_EMOJI = Map.ofEntries(
             Map.entry("the bus", "🚌"),
             Map.entry("a hairsalon", "✂️"),
             Map.entry("IKEA", "🛋️"),
@@ -38,7 +38,7 @@ public class EmojiMap {
             Map.entry("vim", "😈"));
 
     public static String getEmoji(Monster monster) {
-        final var emoji = monsterNameEmoji.get(monster.getName());
+        final var emoji = MONSTER_NAME_EMOJI.get(monster.getName());
         if (emoji == null) {
             throw new IllegalStateException("Unexpected value: %s".formatted(monster.getName()));
         }

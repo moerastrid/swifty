@@ -1,10 +1,14 @@
 package mazie.view.terminal;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.Set;
+import java.util.stream.Collectors;
 import mazie.exception.QuitException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
@@ -16,16 +20,42 @@ import mazie.view.GameView;
 
 public class TerminalView implements GameView {
 
-    private final Scanner scanner;
-    private Runnable switchListener;
-    private final static Map<String, Boolean> YES_NO = Map.of(
+    private static final Map<String, HeroType> HERO_TYPES = Map.of(
+            "w", HeroType.WEEVIL,
+            "weevil", HeroType.WEEVIL,
+            "f", HeroType.FROG,
+            "frog", HeroType.FROG,
+            "m", HeroType.MOUSE,
+            "mouse", HeroType.MOUSE
+    );
+    private static final Map<String, Boolean> YES_NO = Map.of(
             "y", true,
             "yes", true,
             "n", false,
-            "no", false);
+            "no", false
+    );
+    private static final Map<String, Direction> DIRECTIONS = Map.of(
+            "n", Direction.NORTH,
+            "north", Direction.NORTH,
+            "e", Direction.EAST,
+            "east", Direction.EAST,
+            "s", Direction.SOUTH,
+            "south", Direction.SOUTH,
+            "w", Direction.WEST,
+            "west", Direction.WEST
+    );
+    private static final Set<String> QUIT = Set.of("q", "quit", "exit");
+    private static final String SWITCH = "switch";
+
+    private final Scanner scanner;
+    private Runnable switchListener;
 
     public TerminalView() {
-        this.scanner = new Scanner(System.in);
+        this(new Scanner(System.in));
+    }
+
+    public TerminalView(Scanner scanner) {
+        this.scanner = scanner;
     }
 
     @Override
@@ -65,21 +95,12 @@ public class TerminalView implements GameView {
     public Hero createHero() {
         final var typePrompt = """
                 What do you want to be?
-                	- weevil (w)
-                	- frog (f)
-                	- mouse (m)
-                """;
+                %s
+                """.formatted(Arrays.stream(HeroType.values()).map(type ->
+                "\t- %s (%s)".formatted(type.name().toLowerCase(), type.name().toLowerCase().substring(0, 1))
+        ).collect(Collectors.joining("\n")));
 
-        final var options = new HashMap<String, HeroType>();
-        options.put("w", HeroType.WEEVIL);
-        options.put("weevil", HeroType.WEEVIL);
-        options.put("f", HeroType.FROG);
-        options.put("frog", HeroType.FROG);
-        options.put("m", HeroType.MOUSE);
-        options.put("mouse", HeroType.MOUSE);
-        // #todo waarom doe je dit hier handmatig putten? HeroType.values()
-
-        HeroType type = choose(typePrompt, options);
+        HeroType type = choose(typePrompt, HERO_TYPES);
 
         final var namePrompt = "Name your %s: ".formatted(type);
         colorPrint(AnsiColor.PURPLE, namePrompt);
@@ -112,8 +133,6 @@ public class TerminalView implements GameView {
 
     private void showHeroStats(Hero hero) {
 
-        final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(Artifact::toString).toList());
-
         final var stats = """
                 Hero(#%d) %s identifies as a %s,
                   lvl     :%d
@@ -123,13 +142,13 @@ public class TerminalView implements GameView {
                   hp      :%s
                 and is wearing:
                 - %s
-                """.formatted(hero.getId(), hero.getName(), hero.getType().toString().toLowerCase(),
+                """.formatted(hero.getId(), hero.getName(), hero.getType().name().toLowerCase(),
                 hero.getLevel(),
                 hero.getXp(),
                 hero.getAttackString(),
                 hero.getDefenceString(),
                 hero.getHpString(),
-                artifacts);
+                format(hero.getArtifacts()));
 
         colorPrint(AnsiColor.PURPLE, stats);
     }
@@ -149,18 +168,8 @@ public class TerminalView implements GameView {
     public Direction askDirection(Hero hero) {
         this.showHeroStats(hero);
         final var prompt = "where to go? (north/east/south/west)";
-        final var options = new HashMap<String, Direction>();
 
-        options.put("n", Direction.NORTH);
-        options.put("north", Direction.NORTH);
-        options.put("e", Direction.EAST);
-        options.put("east", Direction.EAST);
-        options.put("s", Direction.SOUTH);
-        options.put("south", Direction.SOUTH);
-        options.put("w", Direction.WEST);
-        options.put("west", Direction.WEST);
-
-        return choose(prompt, options);
+        return choose(prompt, DIRECTIONS);
     }
 
     @Override
@@ -171,7 +180,11 @@ public class TerminalView implements GameView {
     @Override
     public boolean wantToFightMonster(Hero hero, Monster monster) {
         this.showHeroStats(hero);
-        final var prompt = "Straight from the ghetto, something walks towards you..\n%s\nAre you bout that action? (y/n)".formatted(monster.toString());
+        final var prompt = """
+                you look around and noticed your surroundings changed..
+                you've entered %s
+                do you want to stay? (y/n)
+                """.formatted(monster.toString());
         return choose(prompt, YES_NO);
     }
 
@@ -270,30 +283,36 @@ public class TerminalView implements GameView {
     @Override
     public boolean askKeepArtifact(Artifact artifact, Hero hero) {
 
-        final var artifacts = hero.getArtifacts().isEmpty() ? "nothing" : String.join("\n- ", hero.getArtifacts().stream().map(Artifact::toString).toList());
-
         final var prompt = """
                 	litty, an artifact!
                 	%s
                 	Do you want to keep it? (y/n)
                 	You're currently wearing:
-                	- %s
-                """.formatted(artifact.toString(), artifacts);
+                	%s
+                """.formatted(artifact.toString(), format(hero.getArtifacts()));
 
         return choose(prompt, YES_NO);
     }
 
+    private String format(List<Artifact> artifacts) {
+        if (artifacts.isEmpty()) {
+            return "- nothing";
+        }
+        return artifacts.stream().map(artifact ->
+                "- %s".formatted(artifact.toString())).collect(Collectors.joining("\n"));
+    }
+
     private void colorPrint(AnsiColor color, String text) {
-        System.out.println(color + text + AnsiColor.RESET);
+        System.out.println(color.getCode() + text + AnsiColor.RESET.getCode());
     }
 
     private String scanNextLine() throws QuitException, SwitchViewException {
         try {
             final var line = scanner.nextLine();
             final var answer = line.strip().toLowerCase();
-            if (answer.equals("q") || answer.equals("quit") || answer.equals("exit")) {
+            if (QUIT.contains(answer)) {
                 throw new QuitException("user is a quitter\ndeveloper is disappointed");
-            } else if (answer.equals("switch")) {
+            } else if (SWITCH.equals(answer)) {
                 this.switchView();
             }
             return answer;
