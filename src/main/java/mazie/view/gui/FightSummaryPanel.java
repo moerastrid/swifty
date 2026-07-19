@@ -18,22 +18,29 @@ import static mazie.view.gui.ThemeColor.YELLOW;
 
 public class FightSummaryPanel extends JPanel {
     private static final Random RANDOM = new Random();
+    private final Monster monster;
+    private final Hero hero;
+    private final int damageToHero;
 
     public FightSummaryPanel(Monster monster, Hero hero, CountDownLatch latch, int damageToHero) {
-        this.setBackground(PURPLE);
-        this.setForeground(WHITE);
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBackground(PURPLE);
+        setForeground(WHITE);
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        this.add(note(monster));
-        this.add(monsterAction(monster, damageToHero));
-        this.add(heroAction(hero, monster));
-        this.add(new FightScenePanel(monster, hero));
-        this.add(conclusion(monster));
+        this.monster = monster;
+        this.hero = hero;
+        this.damageToHero = damageToHero;
 
-        this.add(okButton(latch));
+        add(note());
+        add(monsterAction());
+        add(heroAction());
+        add(new FightScenePanel(monster, hero));
+        add(conclusion());
+
+        add(okButton(latch));
     }
 
-    private JLabel note(Monster monster) {
+    private JLabel note() {
         final var label = new JLabel("You survived %s".formatted(monster.getName()));
         label.setForeground(YELLOW);
         label.setAlignmentX(CENTER_ALIGNMENT);
@@ -42,7 +49,7 @@ public class FightSummaryPanel extends JPanel {
         return label;
     }
 
-    private JLabel monsterAction(Monster monster, int damageToHero) {
+    private JLabel monsterAction() {
         final var info = "%s: -%d hp".formatted(monster.getAction(), damageToHero);
         final var label = new JLabel(info);
         label.setAlignmentX(CENTER_ALIGNMENT);
@@ -50,7 +57,7 @@ public class FightSummaryPanel extends JPanel {
         return label;
     }
 
-    private JLabel heroAction(Hero hero, Monster monster) {
+    private JLabel heroAction() {
         final var info = "%s: +%d xp".formatted(hero.getAction(), monster.getXpReward());
         final var label = new JLabel(info);
         label.setAlignmentX(CENTER_ALIGNMENT);
@@ -58,7 +65,7 @@ public class FightSummaryPanel extends JPanel {
         return label;
     }
 
-    private JLabel conclusion(Monster monster) {
+    private JLabel conclusion() {
         final var label = new JLabel(monster.getFinalMessage());
         label.setAlignmentX(CENTER_ALIGNMENT);
         label.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));

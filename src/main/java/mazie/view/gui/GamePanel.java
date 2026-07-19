@@ -27,21 +27,24 @@ public class GamePanel extends JPanel {
     private JLabel log;
 
     public GamePanel() {
-        this.setBorder(BorderFactory.createEmptyBorder());
-        this.setLayout(new BorderLayout());
+        setDefaultLog("", GREY, GREY);
+        setBorder(BorderFactory.createEmptyBorder());
+        setLayout(new BorderLayout());
     }
 
     public void setError(String error) {
-        this.setErrorLog(error);
+        setErrorLog(error);
     }
 
     public void setWelcomePanel(CountDownLatch latch) {
-        this.setSubPanel(new WelcomePanel(latch));
+        setDefaultLog("", GREY, GREY);
+        setSubPanel(new WelcomePanel(latch));
     }
 
     public void setEndPanel(Hero hero, CountDownLatch latch, boolean win) {
-        this.setHeroPanel(hero);
-        this.setSubPanel(new EndPanel(latch, win));
+        setDefaultLog("", GREY, GREY);
+        setHeroPanel(hero);
+        setSubPanel(new EndPanel(latch, win));
     }
 
     public void setEmptyStep() {
@@ -53,11 +56,12 @@ public class GamePanel extends JPanel {
     }
 
     public void setFightSummary(int damageToHero, Hero hero, Monster monster, CountDownLatch latch) {
-        this.setSubPanel(new FightSummaryPanel(monster, hero, latch, damageToHero));
+        setSubPanel(new FightSummaryPanel(monster, hero, latch, damageToHero));
     }
 
     public void setLevelUp(Hero hero, CountDownLatch latch) {
-        this.setSubPanel(new LevelUpPanel(hero, latch));
+        setDefaultLog("", GREY, GREY);
+        setSubPanel(new LevelUpPanel(hero, latch));
     }
 
     public void setRunSuccess(Monster monster, boolean success) {
@@ -66,58 +70,62 @@ public class GamePanel extends JPanel {
     }
 
     public void setDirectionPanel(Hero hero, BlockingQueue<Direction> queue) {
-        this.setHeroPanel(hero);
-        this.setSubPanel(new DirectionPanel(queue));
+        setHeroPanel(hero);
+        setSubPanel(new DirectionPanel(queue));
     }
 
     public void setArtifactPanel(Artifact artifact, Hero hero, BlockingQueue<Boolean> queue) {
-        this.setHeroPanel(hero);
-        this.setSubPanel(new ArtifactPanel(artifact, hero, queue));
+        setDefaultLog("", GREY, GREY);
+        setHeroPanel(hero);
+        setSubPanel(new ArtifactPanel(artifact, hero, queue));
     }
 
     public void setRunPanel(Hero hero, Monster monster, BlockingQueue<Boolean> queue) {
-        this.clearLog();
-        this.setHeroPanel(hero);
-        this.setSubPanel(new RunPanel(monster, hero, queue));
+        setDefaultLog("", GREY, GREY);
+        setHeroPanel(hero);
+        setSubPanel(new RunPanel(monster, hero, queue));
     }
 
     public void setNewOrLoadGamePanel(BlockingQueue<Boolean> queue) {
-        this.setSubPanel(new NewOrLoadGamePanel(queue));
+        setDefaultLog("", GREY, GREY);
+        setSubPanel(new NewOrLoadGamePanel(queue));
     }
 
     public void setNewHeroPanel(BlockingQueue<Hero> queue) {
-        this.setSubPanel(new NewHeroPanel(queue));
+        setDefaultLog("", GREY, GREY);
+        setSubPanel(new NewHeroPanel(queue));
     }
 
     public void setSelectHeroPanel(Map<Integer, Hero> heroes, BlockingQueue<Hero> queue) {
-        this.setSubPanel(new SelectHeroPanel(heroes, queue));
+        setDefaultLog("", GREY, GREY);
+        setSubPanel(new SelectHeroPanel(heroes, queue));
     }
 
     public void setConfirmPanel(Hero hero, BlockingQueue<Boolean> queue) {
-        this.clearLog();
-        this.setSubPanel(new ConfirmPanel(hero, queue));
+        setDefaultLog("", GREY, GREY);
+        setSubPanel(new ConfirmPanel(hero, queue));
     }
 
     public void setSwitchListener(Runnable switchListener) {
-        this.add(new MenuBarPanel(switchListener), BorderLayout.NORTH);
-        this.revalidate();
-        this.repaint();
+        add(new MenuBarPanel(switchListener), BorderLayout.NORTH);
+        revalidate();
+        repaint();
     }
 
     private void setSubPanel(JPanel screen) {
         if (subPanel != null) {
-            this.remove(subPanel);
+            remove(subPanel);
         }
         subPanel = screen;
-        this.add(subPanel, BorderLayout.CENTER);
-        this.setBackground(subPanel.getBackground());
-        this.revalidate();
-        this.repaint();
+        add(subPanel, BorderLayout.CENTER);
+        setBackground(subPanel.getBackground());
+        revalidate();
+        repaint();
     }
 
     private void setHeroPanel(Hero hero) {
         if (sidePanel != null) {
-            this.remove(sidePanel);
+            remove(sidePanel);
         }
         if (hero == null) {
             return;
@@ -127,7 +135,7 @@ public class GamePanel extends JPanel {
         panel.setBorder(BorderFactory.createEmptyBorder());
         panel.add(new HeroPanel(hero), BorderLayout.CENTER);
         sidePanel = panel;
-        this.add(sidePanel, BorderLayout.WEST);
+        add(sidePanel, BorderLayout.WEST);
     }
 
     private void setLog(String text) {
@@ -139,25 +147,25 @@ public class GamePanel extends JPanel {
     }
 
     private void setDefaultLog(String text, Color foreground, Color background) {
-        if (this.log != null) {
-            this.remove(this.log);
+        if (log != null) {
+            remove(log);
         }
-        this.log = new JLabel(text, JLabel.CENTER);
-        this.log.setForeground(foreground);
-        this.log.setBackground(background);
-        this.log.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
-        this.log.setOpaque(true);
-        this.add(log, BorderLayout.NORTH);
-        this.revalidate();
-        this.repaint();
+        log = new JLabel(text, JLabel.CENTER);
+        log.setForeground(foreground);
+        log.setBackground(background);
+        log.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
+        log.setOpaque(true);
+        add(log, BorderLayout.NORTH);
+        revalidate();
+        repaint();
     }
 
     private void clearLog() {
         if (log != null) {
-            this.setDefaultLog("", GREY, GREY);
+            setDefaultLog("", GREY, GREY);
             log.setOpaque(false);
         }
-        this.revalidate();
-        this.repaint();
+        revalidate();
+        repaint();
     }
 }

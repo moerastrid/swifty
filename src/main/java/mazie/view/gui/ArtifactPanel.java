@@ -19,16 +19,16 @@ public class ArtifactPanel extends JPanel {
         setForeground(PURPLE);
         setLayout(new GridLayout(4, 1, 20, 20));
 
-        final var note = new JLabel("The monster dropped an artifact!", JLabel.CENTER);
+        final var note = new JLabel("You found something!", JLabel.CENTER);
         note.setForeground(GREEN);
-        this.add(note);
+        add(note);
 
         final var question = new JTextArea("\nkeep this?\n\n%s".formatted(artifact.toString()));
         question.setEditable(false);
         question.setFocusable(false);
         question.setLineWrap(true);
         question.setWrapStyleWord(true);
-        this.add(question);
+        add(question);
 
         final var artifacts = hero.getArtifacts().stream().map(Artifact::toString).toList();
         final var info = artifacts.isEmpty() ? "nothing" : String.join("\n - ", artifacts);
@@ -37,8 +37,8 @@ public class ArtifactPanel extends JPanel {
         current.setFocusable(false);
         current.setLineWrap(true);
         current.setWrapStyleWord(true);
-        this.add(current);
+        add(current);
 
-        this.add(new YesNoButtonPanel(queue));
+        add(new YesNoButtonPanel(queue));
     }
 }

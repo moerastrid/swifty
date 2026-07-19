@@ -14,10 +14,10 @@ public class FightScenePanel extends JPanel {
     private final Image hero;
 
     public FightScenePanel(Monster monster, Hero hero) {
-        this.setBorder(BorderFactory.createEmptyBorder());
-        this.setOpaque(true);
-        this.setPreferredSize(new Dimension(600, 400));
-        this.background = PngMap.getPng(monster).getImage();
+        setBorder(BorderFactory.createEmptyBorder());
+        setOpaque(true);
+        setPreferredSize(new Dimension(600, 400));
+        background = PngMap.getPng(monster).getImage();
         this.hero = PngMap.getPng(hero.getType()).getImage();
     }
 
@@ -25,13 +25,13 @@ public class FightScenePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.drawImage(background, 0, 0, this.getWidth(), this.getHeight(), this);
-        this.drawHero(g);
+        g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
+        drawHero(g);
     }
 
     private void drawHero(Graphics g) {
-        final var ogWidth = this.hero.getWidth(this);
-        final var ogHeight = this.hero.getHeight(this);
+        final var ogWidth = hero.getWidth(this);
+        final var ogHeight = hero.getHeight(this);
 
         final var factor = calculateScale(ogWidth, ogHeight);
 
@@ -45,8 +45,8 @@ public class FightScenePanel extends JPanel {
     }
 
     private double calculateScale(int width, int height) {
-        final var maxWidth = this.getWidth() * 0.3;
-        final var maxHeight = this.getHeight() * 0.6;
+        final var maxWidth = getWidth() * 0.3;
+        final var maxHeight = getHeight() * 0.6;
 
         final var widthFactor = maxWidth / width;
         final var heightFactor = maxHeight / height;

@@ -13,13 +13,13 @@ public class DirectionButton extends JButton {
 
     public DirectionButton(Direction dir) {
         this.dir = dir;
-        this.setText(dir.toString().toLowerCase());
+        setText(dir.toString().toLowerCase());
         final var color = switch (dir) {
             case NORTH, SOUTH -> YELLOW;
             case EAST, WEST -> TEAL;
         };
-        this.setBackground(color);
-        this.setForeground(BLACK);
+        setBackground(color);
+        setForeground(BLACK);
     }
 
     public Direction getDirection() {

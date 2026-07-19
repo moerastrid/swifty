@@ -166,7 +166,7 @@ public class TerminalView implements GameView {
 
     @Override
     public Direction askDirection(Hero hero) {
-        this.showHeroStats(hero);
+        showHeroStats(hero);
         final var prompt = "where to go? (north/east/south/west)";
 
         return choose(prompt, DIRECTIONS);
@@ -179,7 +179,7 @@ public class TerminalView implements GameView {
 
     @Override
     public boolean wantToFightMonster(Hero hero, Monster monster) {
-        this.showHeroStats(hero);
+        showHeroStats(hero);
         final var prompt = """
                 you look around and noticed your surroundings changed..
                 you've entered %s
@@ -206,7 +206,7 @@ public class TerminalView implements GameView {
     @Override
     public void showEndGame(Hero hero, boolean win) {
         String prompt;
-        this.showHeroStats(hero);
+        showHeroStats(hero);
 
         if (win) {
             prompt = """
@@ -277,7 +277,7 @@ public class TerminalView implements GameView {
                 """;
 
         colorPrint(AnsiColor.GREEN, prompt);
-        this.showHeroStats(hero);
+        showHeroStats(hero);
     }
 
     @Override
@@ -313,7 +313,7 @@ public class TerminalView implements GameView {
             if (QUIT.contains(answer)) {
                 throw new QuitException("user is a quitter\ndeveloper is disappointed");
             } else if (SWITCH.equals(answer)) {
-                this.switchView();
+                switchView();
             }
             return answer;
         } catch (NoSuchElementException e) {
@@ -323,7 +323,7 @@ public class TerminalView implements GameView {
     }
 
     private void switchView() {
-        this.switchListener.run();
+        switchListener.run();
         throw new SwitchViewException();
     }
 
