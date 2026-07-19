@@ -64,14 +64,7 @@ public class SelectHeroPanel extends JPanel {
 
         selectButton.setMargin(new Insets(2, 10, 2, 10));
 
-        selectButton.addActionListener(event -> {
-            try {
-                queue.put(hero);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println("gui view interrupted: " + e.getMessage());
-            }
-        });
+        selectButton.addActionListener(event -> queue.offer(hero));
         return selectButton;
     }
 }

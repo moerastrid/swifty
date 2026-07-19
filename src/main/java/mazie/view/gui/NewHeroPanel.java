@@ -24,9 +24,9 @@ import static mazie.view.gui.ThemeColor.YELLOW;
 
 public class NewHeroPanel extends JPanel {
 
-    private HeroType type;
     private final JTextField nameField = new JTextField();
     private final JLabel errorLabel = new JLabel("", JLabel.CENTER);
+    private HeroType type;
 
     public NewHeroPanel(BlockingQueue<Hero> queue) {
         this.setBackground(TEAL);
@@ -98,17 +98,12 @@ public class NewHeroPanel extends JPanel {
         button.setMargin(new Insets(2, 10, 2, 10));
 
         button.addActionListener(event -> {
-            try {
-                if (type != null) {
-                    queue.put(new Hero(nameField.getText(), type));
-                } else {
-                    this.errorLabel.setText("select a type");
-                    this.errorLabel.setBackground(YELLOW);
-                    this.errorLabel.setOpaque(true);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println("gui view interrupted: " + e.getMessage());
+            if (type != null) {
+                queue.offer(new Hero(nameField.getText(), type));
+            } else {
+                this.errorLabel.setText("select a type");
+                this.errorLabel.setBackground(YELLOW);
+                this.errorLabel.setOpaque(true);
             }
         });
         return button;

@@ -46,23 +46,9 @@ public class NewOrLoadGamePanel extends JPanel {
         newButton.setMargin(new Insets(2, 10, 2, 10));
         loadButton.setMargin(new Insets(2, 10, 2, 10));
 
-        newButton.addActionListener(event -> {
-            try {
-                queue.put(true);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println("gui view interrupted: " + e.getMessage());
-            }
-        });
+        newButton.addActionListener(event -> queue.offer(true));
 
-        loadButton.addActionListener(event -> {
-            try {
-                queue.put(false);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println("gui view interrupted: " + e.getMessage());
-            }
-        });
+        loadButton.addActionListener(event -> queue.offer(false));
 
         panel.add(newButton);
         panel.add(loadButton);
