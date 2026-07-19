@@ -45,14 +45,9 @@ public class Application {
     }
 
     public void shutDownGracefully() {
-        System.err.println("Shutting down gracefully");
-        System.err.println("close controller");
         controller.close();
-        System.err.println("close view");
         view.close();
-        System.err.println("close repository");
         repository.close();
-        System.err.println("close validatorFactory");
         validatorFactory.close();
     }
 

@@ -150,13 +150,13 @@ public class SQLiteHeroRepository implements HeroRepository {
     @Override
     public void save(Hero hero) {
         try {
-            this.insertHero(hero);
-            this.insertArtifacts(hero);
+            insertHero(hero);
+            insertArtifacts(hero);
         } catch (SQLException e) {
-            this.rollbackConnection();
+            rollbackConnection();
             throw new RepositoryException(e.getMessage(), e);
         }
-        this.commitConnection();
+        commitConnection();
     }
 
     private void insertHero(Hero hero) throws SQLException {

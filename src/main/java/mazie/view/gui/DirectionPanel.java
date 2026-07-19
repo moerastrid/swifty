@@ -37,12 +37,7 @@ public class DirectionPanel extends JPanel {
 
     private void setListener(DirectionButton button, BlockingQueue<Direction> queue) {
         button.addActionListener(event -> {
-            try {
-                queue.put(button.getDirection());
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-                System.out.println("gui view interrupted: " + e.getMessage());
-            }
+            queue.offer(button.getDirection());
         });
     }
 }

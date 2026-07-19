@@ -35,6 +35,7 @@ public class GameEngine {
     }
 
     public boolean takeStep(Direction dir) {
+        System.out.println(map.toString()); //#todo remove
         final var monster = map.getMonsterInDirection(dir);
         if (monster == null) {
             map.moveHero(dir);

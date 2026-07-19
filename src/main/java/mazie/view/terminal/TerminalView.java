@@ -118,17 +118,17 @@ public class TerminalView implements GameView {
                 Hero(#%d) %s identifies as a %s,
                   lvl     :%d
                   xp      :%d
-                  attack  :%d  (total %d)
-                  defence :%d  (total %d)
-                  hp      :%d  (total %d)
+                  attack  :%s
+                  defence :%s
+                  hp      :%s
                 and is wearing:
                 - %s
                 """.formatted(hero.getId(), hero.getName(), hero.getType().toString().toLowerCase(),
                 hero.getLevel(),
                 hero.getXp(),
-                hero.getAttack(), hero.getTotalAttack(),
-                hero.getDefence(), hero.getTotalDefence(),
-                hero.getHp(), hero.getTotalHp(),
+                hero.getAttackString(),
+                hero.getDefenceString(),
+                hero.getHpString(),
                 artifacts);
 
         colorPrint(AnsiColor.PURPLE, stats);

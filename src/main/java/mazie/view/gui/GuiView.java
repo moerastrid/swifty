@@ -87,8 +87,6 @@ public class GuiView implements GameView {
     }
 
     private void handleInterruption(InterruptedException e) {
-        System.out.println("INTERRUPTED");
-
         if (this.switchRequested) {
             this.switchRequested = false;
             invokeLater(this::closeFrame);

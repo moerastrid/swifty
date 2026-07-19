@@ -8,12 +8,12 @@ public record Artifact(
 ) {
 
     public String getAction() {
-        return this.type.actionFor(this.name);
+        return type.actionFor(name);
     }
 
     @Override
     public String toString() {
         return String.format("%s, type:%s, value:%d",
-                this.name, this.type, this.value);
+                name, type, value);
     }
 }

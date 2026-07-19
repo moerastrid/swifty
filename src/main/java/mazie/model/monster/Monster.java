@@ -17,7 +17,7 @@ public abstract class Monster {
     private final int xpReward;
     private final Artifact artifact;
 
-    private static final Random random = new Random();
+    private static final Random RANDOM = new Random();
 
     protected Monster(String name, String[] actions, String finalMessage, int heroLevel, int baseAttack, int baseDefence, int baseHp, int baseXpReward) {
         this.name = name;
@@ -38,43 +38,44 @@ public abstract class Monster {
         if (actions.length == 0) {
             throw new ModelException("%s has no action".formatted(this.name));
         }
-        return actions[random.nextInt(actions.length)];
+        return actions[RANDOM.nextInt(actions.length)];
     }
 
     public String getFinalMessage() {
-        return this.finalMessage;
+        return finalMessage;
     }
 
     public int getAttack() {
-        return this.attack;
+        return attack;
     }
 
     public int counterAttack() {
-        final var miss = random.nextInt(3);
-        if (isDead() || miss == 1)
+        final var miss = RANDOM.nextInt(3);
+        if (isDead() || miss == 1) {
             return 0;
-        return this.attack;
+        }
+        return attack;
     }
 
     public int getDefence() {
-        return this.defence;
+        return defence;
     }
 
     public int getHp() {
-        return this.hp;
+        return hp;
     }
 
     public int getXpReward() {
         final var xpBonus = 42;
-        return this.xpReward + xpBonus;
+        return xpReward + xpBonus;
     }
 
     public Artifact getArtifact() {
-        return this.artifact;
+        return artifact;
     }
 
     private Artifact createArtifact() {
-        final var drop = random.nextInt(5);
+        final var drop = RANDOM.nextInt(5);
 
         final var type = switch (drop) {
             case 0 -> ArtifactType.WEAPON;
@@ -89,19 +90,25 @@ public abstract class Monster {
     }
 
     private int calcArtifactValue() {
-        final var value = this.xpReward / 20;
-        return Math.max(value, 1);
+        final var value = xpReward / 20;
+        final var luckFactor = switch(RANDOM.nextInt(10)) {
+            case 0, 1 -> 1;
+            case 2, 3 -> -1;
+            case 4 -> 2;
+            default -> 0;
+        };
+
+        return Math.max(value + luckFactor, 1);
     }
 
     public void takeDamage(int damage) {
-        final var damageSum = damage - this.defence;
+        final var damageSum = damage - defence;
         final var totalDamage = Math.max(damageSum, 1);
-        System.out.println("damage to monster: " + totalDamage); //#todo remove (debugging)
-        this.hp -= totalDamage;
+        hp -= totalDamage;
     }
 
     public boolean isDead() {
-        return this.hp <= 0;
+        return hp <= 0;
     }
 
     private int calcForLevel(int val, int level) {
@@ -115,7 +122,7 @@ public abstract class Monster {
                 """
                         Monster: %s
                          attack:%d, defence:%d, hp:%d
-                        """, this.name, this.attack, this.defence, this.hp
+                        """, name, attack, defence, hp
         );
     }
 }

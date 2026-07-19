@@ -55,21 +55,21 @@ public class Hero {
     }
 
     public int takeDamage(int damage) {
-        final var damageSum = damage - this.defence;
+        final var damageSum = damage - getTotalDefence();
         final var totalDamage = Math.max(damageSum, 1);
-        this.hp -= totalDamage;
+        hp -= totalDamage;
         return totalDamage;
     }
 
     public boolean isDead() {
-        return this.getTotalHp() <= 0;
+        return getTotalHp() <= 0;
     }
 
     /*
         returns true if lvlUp = true.
      */
     public boolean gainXp(int xp) {
-        final var xpNeed = (this.level * 1000) + ((level - 1) * (level - 1)) * 450;
+        final var xpNeed = (level * 1000) + ((level - 1) * (level - 1)) * 450;
 
         this.xp += xp;
 
@@ -81,20 +81,19 @@ public class Hero {
     }
 
     private void lvlUp() {
-        this.level += 1;
+        level += 1;
 
-        final var levelIncrement = Math.pow(1.1, (this.level - 1));
+        final var levelIncrement = Math.pow(1.1, (level - 1));
+        attack = (int) (type.baseAttack * levelIncrement);
+        defence = (int) (type.baseDefence * levelIncrement);
 
-        this.attack = (int) (type.baseAttack * levelIncrement);
-        this.defence = (int) (type.baseDefence * levelIncrement);
         final var hpMax = (int) (type.baseHp * levelIncrement);
-
-        final var newHp = this.hp + (hpMax / 2);
-        this.hp = Math.min(newHp, hpMax);
+        final var newHp = hp + (hpMax / 2);
+        hp = Math.min(newHp, hpMax);
     }
 
     public int getId() {
-        return this.id;
+        return id;
     }
 
     public void setId(int id) {
@@ -102,70 +101,76 @@ public class Hero {
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public HeroType getType() {
-        return this.type;
+        return type;
     }
 
     public int getLevel() {
-        return this.level;
+        return level;
     }
 
     public int getXp() {
-        return this.xp;
+        return xp;
     }
 
     public int getAttack() {
-        return this.attack;
+        return attack;
     }
 
     public int getTotalAttack() {
-        return (this.weapon == null) ? this.attack : this.attack + this.weapon.value();
+        return (weapon == null) ? attack : attack + weapon.value();
     }
 
     public String getAttackString() {
-        final var bonus = (this.weapon == null) ? 0 : this.weapon.value();
-        return ("%d (%d + %d)".formatted(this.getTotalAttack(), this.getAttack(), bonus));
+        if (weapon == null) {
+            return "%d".formatted(attack);
+        }
+        return "%d (%d + %d)".formatted(getTotalAttack(), attack, weapon.value());
     }
 
     public int getDefence() {
-        return this.defence;
+        return defence;
     }
 
-    public int getTotalDefence() {
-        return (this.armour == null) ? this.defence : this.defence + this.armour.value();
+    private int getTotalDefence() {
+        return (armour == null) ? defence : defence + armour.value();
     }
 
     public String getDefenceString() {
-        final var bonus = (this.armour == null) ? 0 : this.armour.value();
-        return ("%d (%d + %d)".formatted(this.getTotalDefence(), this.getDefence(), bonus));
+        if (armour == null) {
+            return "%d".formatted(defence);
+        }
+        return ("%d (%d + %d)".formatted(getTotalDefence(), defence, armour.value()));
     }
 
     public int getHp() {
-        return this.hp;
+        return hp;
     }
 
-    public int getTotalHp() {
-        return (this.helmet == null) ? this.hp : this.hp + this.helmet.value();
+    private int getTotalHp() {
+        return (helmet == null) ? hp : hp + helmet.value();
     }
 
     public String getHpString() {
-        final var bonus = (this.helmet == null) ? 0 : this.helmet.value();
-        return ("%d (%d + %d)".formatted(this.getTotalHp(), this.getHp(), bonus));
+        if (helmet == null) {
+            return "%d".formatted(hp);
+        }
+        return ("%d (%d + %d)".formatted(getTotalHp(), hp, helmet.value()));
     }
 
     public List<Artifact> getArtifacts() {
         final var artifacts = new ArrayList<Artifact>();
-        if (this.weapon != null) {
-            artifacts.add(this.weapon);
+        if (weapon != null) {
+            artifacts.add(weapon);
         }
-        if (this.armour != null) {
-            artifacts.add(this.armour);
+        if (armour != null) {
+            artifacts.add(armour);
         }
-        if (this.helmet != null) {
-            artifacts.add(this.helmet);
+        if (helmet != null) {
+            artifacts.add(helmet);
         }
         return artifacts;
     }
@@ -176,9 +181,9 @@ public class Hero {
         }
 
         switch (artifact.type()) {
-            case WEAPON -> this.weapon = artifact;
-            case ARMOUR -> this.armour = artifact;
-            case HELMET -> this.helmet = artifact;
+            case WEAPON -> weapon = artifact;
+            case ARMOUR -> armour = artifact;
+            case HELMET -> helmet = artifact;
         }
     }
 
@@ -195,20 +200,20 @@ public class Hero {
                 "zoned out (professionally)"
         ));
 
-        final var artifacts = this.getArtifacts();
+        final var artifacts = getArtifacts();
         if (!artifacts.isEmpty()) {
             final var artifactActions = artifacts.stream().map(Artifact::getAction).toList();
-            // (adding the artifact Actions twice for having a higher change of getting those)
+            // (adding the artifact Actions twice for having a higher chance of getting those)
             actions.addAll(artifactActions);
             actions.addAll(artifactActions);
         }
 
-        return "%s %s".formatted(this.name, actions.get(random.nextInt(actions.size())));
+        return "%s %s".formatted(name, actions.get(random.nextInt(actions.size())));
     }
 
     @Override
     public String toString() {
-        return "Hero(#%d) %s %s, lvl:%d, xp:%d, attack:%d, defence:%d, hp:%d, artifacts:%s"
-                .formatted(this.id, this.name, this.type, this.level, this.xp, this.attack, this.defence, this.hp, this.getArtifacts());
+        return "Hero(#%d) %s %s, lvl:%d, xp:%d, attack:%d, defence:%d,y hp:%d, artifacts:%s"
+                .formatted(id, name, type, level, xp, attack, defence, hp, getArtifacts());
     }
 }

@@ -15,9 +15,9 @@ public record GameSetupService(Validator validator, GameView view, HeroRepositor
         final var heroes = repository.loadAllHeroes();
 
         Hero hero = null;
-        while (!this.confirm(hero)) {
+        while (!confirm(hero)) {
             hero = switch (defineGameType(heroes)) {
-                case NEW -> this.createHero();
+                case NEW -> createHero();
                 case EXISTING -> view.selectHero(heroes);
             };
         }
@@ -51,7 +51,7 @@ public record GameSetupService(Validator validator, GameView view, HeroRepositor
                     violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.joining(", "))
             );
             view.showError(errorMessage);
-            return this.createHero();
+            return createHero();
         }
 
         return hero;

@@ -25,9 +25,7 @@ public class GameController {
             this.session = new GameSession(view, repository, hero);
             this.session.start();
         } catch (QuitException e) {
-            System.out.println("QUIT EXCEPTION");
-//            view.showError("You're such a Quitter");
-//            this.close();
+            view.showError("You're such a Quitter");
             throw e;
         }
     }

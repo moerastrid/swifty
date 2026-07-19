@@ -56,7 +56,7 @@ public class GameMap {
     }
 
     private void generateMonsters(int heroLevel) {
-        final int total = (int) (0.23 * internalSize * internalSize);
+        final var total = (int) (0.23 * internalSize * internalSize);
         final var factory = MonsterFactory.getInstance();
         final var random = new Random();
 
