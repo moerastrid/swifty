@@ -15,20 +15,19 @@ import static mazie.view.gui.ThemeColor.WHITE;
 public class HeroPanel extends JPanel {
 
     public HeroPanel(Hero hero) {
-        this.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        this.add(this.nameLabel(hero.getName()));
-        this.add(this.imageLabel(hero));
-        this.add(this.statsPanel(hero));
-        this.add(this.artifactTextArea(hero));
+        add(nameLabel(hero.getName()));
+        add(imageLabel(hero));
+        add(statsPanel(hero));
+        add(artifactTextArea(hero));
     }
 
     private JLabel nameLabel(String name) {
         final var label = new JLabel(name);
         label.setAlignmentX(CENTER_ALIGNMENT);
         label.setForeground(PURPLE);
-        label.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         return label;
     }
 
@@ -36,7 +35,6 @@ public class HeroPanel extends JPanel {
         final var image = PngMap.getSidebarIcon(hero);
         final var label = new JLabel(image);
         label.setAlignmentX(CENTER_ALIGNMENT);
-        label.setBorder(BorderFactory.createEmptyBorder(15, 10, 15, 10));
         return label;
     }
 
@@ -77,7 +75,6 @@ public class HeroPanel extends JPanel {
     private JLabel tag(String text) {
         final var tag = new JLabel(text);
         tag.setAlignmentX(CENTER_ALIGNMENT);
-        tag.setForeground(WHITE);
         return tag;
     }
 }

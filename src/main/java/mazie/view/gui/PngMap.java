@@ -9,6 +9,24 @@ import mazie.model.monster.Monster;
 
 public class PngMap {
 
+    public enum ScreenType {
+        LOGO,
+        ICON,
+        WHERE,
+        HUH,
+        WIN,
+        GAMEOVER
+    }
+
+    private static final Map<ScreenType, String> screenPngPath = Map.of(
+            ScreenType.LOGO, "/mazie-logo.png",
+            ScreenType.ICON,"/mazie-icon.png",
+            ScreenType.WHERE,"/where.png",
+            ScreenType.HUH, "/huh.png",
+            ScreenType.WIN,"/win.png",
+            ScreenType.GAMEOVER,"/gameover.png"
+    );
+
     private static final Map<HeroType, String> heroPngPath = Map.of(
             HeroType.FROG, "/frog.png",
             HeroType.MOUSE, "/mouse.png",
@@ -46,8 +64,7 @@ public class PngMap {
         return new ImageIcon(scaledImage);
     }
 
-    public static ImageIcon getPng(Hero hero) {
-        final var type = hero.getType();
+    public static ImageIcon getPng(HeroType type) {
         final var path = heroPngPath.get(type);
         if (path == null) {
             throw new IllegalStateException("Unexpected value: %s".formatted(type.name()));
@@ -55,8 +72,19 @@ public class PngMap {
         return loadIcon(path);
     }
 
+    public static ImageIcon getButtonIcon(HeroType type) {
+        final var png = getPng(type);
+
+        final var maxHeight = 100.0;
+
+        final double factor = maxHeight / png.getIconHeight();
+        final var newWidth = png.getIconWidth() * factor;
+
+        return scale(png, (int) newWidth, (int) maxHeight);
+    }
+
     public static ImageIcon getSidebarIcon(Hero hero) {
-        final var png = getPng(hero);
+        final var png = getPng(hero.getType());
         final var width = png.getIconWidth();
         final var height = png.getIconHeight();
         final var maxHeight = 150;
@@ -71,6 +99,14 @@ public class PngMap {
         final var path = monsterNamePngPath.get(monster.getName());
         if (path == null) {
             throw new IllegalStateException("Unexpected value: %s".formatted(monster.getName()));
+        }
+        return loadIcon(path);
+    }
+
+    public static ImageIcon getPng(ScreenType screen) {
+        final var path = screenPngPath.get(screen);
+        if (path == null) {
+            throw new IllegalStateException("Unexpected value: %s".formatted(screen.name()));
         }
         return loadIcon(path);
     }

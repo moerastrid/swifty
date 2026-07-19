@@ -62,15 +62,7 @@ public class GuiView implements GameView {
     }
 
     private void setIcon() {
-        final var url = "/mazie-icon.png";
-        final var path = getClass().getResource(url);
-
-        if (path != null) {
-            final var icon = new ImageIcon(path);
-            this.frame.setIconImage(icon.getImage());
-        } else {
-            System.err.printf("[WAARNING] url[%s] not available?%n", url);
-        }
+        this.frame.setIconImage(PngMap.getPng(PngMap.ScreenType.ICON).getImage());
     }
 
     @Override

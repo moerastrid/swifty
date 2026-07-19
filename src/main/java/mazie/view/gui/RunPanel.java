@@ -40,7 +40,6 @@ public class RunPanel extends JPanel {
     private JLabel about(Monster monster) {
         final var info = "attack: %d      defence: %d      hp: %d".formatted(monster.getAttack(), monster.getDefence(), monster.getHp());
         final var label = new JLabel(info);
-        label.setForeground(WHITE);
         label.setAlignmentX(CENTER_ALIGNMENT);
         label.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         return label;
@@ -48,7 +47,6 @@ public class RunPanel extends JPanel {
 
     private JLabel question() {
         final var label = new JLabel("are you willing to stay?");
-        label.setForeground(WHITE);
         label.setAlignmentX(CENTER_ALIGNMENT);
         label.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         return label;

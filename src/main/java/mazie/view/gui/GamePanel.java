@@ -15,6 +15,7 @@ import mazie.model.monster.Monster;
 
 import static mazie.view.gui.ThemeColor.BLACK;
 import static mazie.view.gui.ThemeColor.GREEN;
+import static mazie.view.gui.ThemeColor.GREY;
 import static mazie.view.gui.ThemeColor.WHITE;
 import static mazie.view.gui.ThemeColor.YELLOW;
 
@@ -123,7 +124,7 @@ public class GamePanel extends JPanel {
         }
         final var panel = new JPanel();
         panel.setLayout(new BorderLayout(20, 0));
-        panel.setBackground(WHITE);
+        panel.setBorder(BorderFactory.createEmptyBorder());
         panel.add(new HeroPanel(hero), BorderLayout.CENTER);
         sidePanel = panel;
         this.add(sidePanel, BorderLayout.WEST);
@@ -146,14 +147,15 @@ public class GamePanel extends JPanel {
         this.log.setBackground(background);
         this.log.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 0));
         this.log.setOpaque(true);
-        this.add(log, BorderLayout.SOUTH);
+        this.add(log, BorderLayout.NORTH);
         this.revalidate();
         this.repaint();
     }
 
     private void clearLog() {
         if (log != null) {
-            this.remove(log);
+            this.setDefaultLog("", GREY, GREY);
+            log.setOpaque(false);
         }
         this.revalidate();
         this.repaint();

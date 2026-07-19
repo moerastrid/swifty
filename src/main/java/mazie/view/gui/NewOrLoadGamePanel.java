@@ -2,6 +2,7 @@ package mazie.view.gui;
 
 import java.awt.BorderLayout;
 import java.util.concurrent.BlockingQueue;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -14,18 +15,13 @@ import static mazie.view.gui.ThemeColor.YELLOW;
 public class NewOrLoadGamePanel extends JPanel {
 
     public NewOrLoadGamePanel(BlockingQueue<Boolean> queue) {
-        this.setLayout(new BorderLayout(10, 10));
-        this.setLogo();
-        this.add(buttonPanel(queue), BorderLayout.SOUTH);
+        setLayout(new BorderLayout(10, 10));
+        setLogo();
+        add(buttonPanel(queue), BorderLayout.SOUTH);
     }
 
     private void setLogo() {
-        final var url = getClass().getResource("/mazie-logo.png");
-        if (url != null) {
-            final var image = new ImageIcon(url);
-            final var imageLabel = new JLabel(image);
-            this.add(imageLabel, BorderLayout.CENTER);
-        }
+        add(new JLabel(PngMap.getPng(PngMap.ScreenType.LOGO)), BorderLayout.CENTER);
     }
 
     private JPanel buttonPanel(BlockingQueue<Boolean> queue) {
@@ -40,7 +36,6 @@ public class NewOrLoadGamePanel extends JPanel {
         loadButton.setForeground(BLACK);
 
         newButton.addActionListener(event -> queue.offer(true));
-
         loadButton.addActionListener(event -> queue.offer(false));
 
         panel.add(newButton);

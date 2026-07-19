@@ -45,7 +45,6 @@ public class FightSummaryPanel extends JPanel {
     private JLabel monsterAction(Monster monster, int damageToHero) {
         final var info = "%s: -%d hp".formatted(monster.getAction(), damageToHero);
         final var label = new JLabel(info);
-        label.setForeground(WHITE);
         label.setAlignmentX(CENTER_ALIGNMENT);
         label.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         return label;
@@ -54,7 +53,6 @@ public class FightSummaryPanel extends JPanel {
     private JLabel heroAction(Hero hero, Monster monster) {
         final var info = "%s: +%d xp".formatted(hero.getAction(), monster.getXpReward());
         final var label = new JLabel(info);
-        label.setForeground(WHITE);
         label.setAlignmentX(CENTER_ALIGNMENT);
         label.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         return label;
@@ -62,7 +60,6 @@ public class FightSummaryPanel extends JPanel {
 
     private JLabel conclusion(Monster monster) {
         final var label = new JLabel(monster.getFinalMessage());
-        label.setForeground(WHITE);
         label.setAlignmentX(CENTER_ALIGNMENT);
         label.setBorder(BorderFactory.createEmptyBorder(15, 0, 0, 0));
         return label;

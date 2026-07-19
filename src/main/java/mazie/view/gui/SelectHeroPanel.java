@@ -22,9 +22,7 @@ public class SelectHeroPanel extends JPanel {
         this.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
         this.setLayout(new BorderLayout(10, 10));
 
-        final var question = new JLabel("choose your fighter", JLabel.CENTER);
-        question.setForeground(WHITE);
-        this.add(question, BorderLayout.NORTH);
+        this.add(new JLabel("choose your fighter", JLabel.CENTER), BorderLayout.NORTH);
 
         final var scrollPane = new JScrollPane(listPanel(heroes, queue));
 //        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);

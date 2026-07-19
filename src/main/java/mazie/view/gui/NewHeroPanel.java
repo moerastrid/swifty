@@ -1,10 +1,11 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Dimension;
+import java.awt.Font;
 import java.util.concurrent.BlockingQueue;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,70 +17,69 @@ import mazie.model.HeroType;
 
 import static mazie.view.gui.ThemeColor.BLACK;
 import static mazie.view.gui.ThemeColor.GREEN;
+import static mazie.view.gui.ThemeColor.LILA;
 import static mazie.view.gui.ThemeColor.PURPLE;
 import static mazie.view.gui.ThemeColor.TEAL;
-import static mazie.view.gui.ThemeColor.WHITE;
 import static mazie.view.gui.ThemeColor.YELLOW;
 
 public class NewHeroPanel extends JPanel {
 
-    private final JTextField nameField = new JTextField();
-    private final JLabel errorLabel = new JLabel("", JLabel.CENTER);
+    private final JTextField nameField;
+    private final JLabel errorLabel;
     private HeroType type;
 
     public NewHeroPanel(BlockingQueue<Hero> queue) {
         this.setBackground(TEAL);
-        this.setLayout(new GridLayout(5, 1));
+        this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
-        errorLabel.setForeground(BLACK);
-        this.add(errorLabel);
-
-        this.add(new JLabel("create your hero", JLabel.CENTER));
-
+        this.add(title());
         this.add(typeButtons());
 
-        this.add(namePanel(nameField));
+        nameField = createNameField();
+        this.add(nameField);
+
+        errorLabel = createErrorLabel();
+        this.add(errorLabel);
 
         this.add(okButton(queue));
     }
 
-    private JPanel namePanel(JTextField nameField) {
-        final var panel = new JPanel();
-        panel.setBackground(TEAL);
-        panel.setLayout(new BorderLayout());
-        panel.setBorder(BorderFactory.createEmptyBorder());
-
-        final var nameLabel = new JLabel("give it a name: ", JLabel.CENTER);
-        nameLabel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.add(nameLabel, BorderLayout.NORTH);
-
-        nameField.setHorizontalAlignment(JTextField.CENTER);
-        nameField.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        panel.add(nameField, BorderLayout.CENTER);
-
-        return panel;
+    private JLabel title() {
+        final var label = new JLabel("create your hero", JLabel.CENTER);
+        label.setForeground(BLACK);
+        final var bigFont = label.getFont().deriveFont(Font.BOLD, 24f);
+        label.setFont(bigFont);
+        label.setAlignmentX(CENTER_ALIGNMENT);
+        return label;
     }
+
+    private JTextField createNameField() {
+        final var field = new JTextField();
+        field.setBorder(BorderFactory.createTitledBorder(Theme.TEXT_AREA_BORDER, "give it a name:"));
+        field.setHorizontalAlignment(JTextField.CENTER);
+        field.setMaximumSize(new Dimension(300, 100));
+        return field;
+    }
+
 
     private JPanel typeButtons() {
         final var panel = new JPanel();
-        panel.setBorder(BorderFactory.createEmptyBorder());
-        panel.setLayout(new FlowLayout());
         panel.setBackground(TEAL);
 
         final var group = new ButtonGroup();
 
         for (var typeSelect : HeroType.values()) {
-            final var button = new JToggleButton(typeSelect.toString().toLowerCase());
-            button.setSize(100, 60);
-            button.setBackground(GREEN);
-            button.setForeground(WHITE);
 
+            final var typeTitle = typeSelect.toString().toLowerCase();
+            final var typeIcon = PngMap.getButtonIcon(typeSelect);
+            final var button = new JToggleButton(typeTitle, typeIcon);
+            button.setSize(100, 60);
             button.addItemListener(event -> {
                 if (button.isSelected()) {
                     this.type = typeSelect;
                     button.setForeground(GREEN);
                 } else {
-                    button.setForeground(WHITE);
+                    button.setForeground(LILA);
                 }
             });
             group.add(button);
@@ -87,6 +87,14 @@ public class NewHeroPanel extends JPanel {
         }
 
         return panel;
+    }
+
+    private JLabel createErrorLabel() {
+        final var label = new JLabel("", JLabel.CENTER);
+        label.setForeground(BLACK);
+        label.setBackground(YELLOW);
+        label.setOpaque(false);
+        return label;
     }
 
     private JButton okButton(BlockingQueue<Hero> queue) {
@@ -98,9 +106,8 @@ public class NewHeroPanel extends JPanel {
             if (type != null) {
                 queue.offer(new Hero(nameField.getText(), type));
             } else {
-                this.errorLabel.setText("select a type");
-                this.errorLabel.setBackground(YELLOW);
-                this.errorLabel.setOpaque(true);
+                errorLabel.setText("select a type");
+                errorLabel.setOpaque(true);
             }
         });
         return button;

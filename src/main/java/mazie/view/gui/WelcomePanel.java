@@ -2,6 +2,7 @@ package mazie.view.gui;
 
 import java.awt.BorderLayout;
 import java.util.concurrent.CountDownLatch;
+import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -16,6 +17,7 @@ public class WelcomePanel extends JPanel {
         if (url != null) {
             final var image = new ImageIcon(url);
             final var imageLabel = new JLabel(image);
+            imageLabel.setBorder(BorderFactory.createEmptyBorder());
             this.add(imageLabel, BorderLayout.CENTER);
         }
 

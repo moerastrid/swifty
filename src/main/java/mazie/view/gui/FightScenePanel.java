@@ -18,7 +18,7 @@ public class FightScenePanel extends JPanel {
         this.setOpaque(true);
         this.setPreferredSize(new Dimension(600, 400));
         this.background = PngMap.getPng(monster).getImage();
-        this.hero = PngMap.getPng(hero).getImage();
+        this.hero = PngMap.getPng(hero.getType()).getImage();
     }
 
     @Override

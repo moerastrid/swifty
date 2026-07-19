@@ -13,7 +13,6 @@ public class ConfirmPanel extends JPanel {
         this.setLayout(new BorderLayout(10, 10));
 
         final var question = new JLabel("confirm hero?", JLabel.CENTER);
-        question.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         this.add(question, BorderLayout.NORTH);
         this.add(new HeroPanel(hero), BorderLayout.CENTER);
         this.add(new YesNoButtonPanel(queue), BorderLayout.SOUTH);
