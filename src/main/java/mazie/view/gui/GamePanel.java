@@ -92,7 +92,6 @@ public class GamePanel extends JPanel {
     }
 
     public void setNewHeroPanel(BlockingQueue<Hero> queue) {
-        setDefaultLog("", GREY, GREY);
         setSubPanel(new NewHeroPanel(queue));
     }
 
