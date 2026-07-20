@@ -1,10 +1,10 @@
-# Swingy — Project Plan & Handoff
+# Swingy — Project Plan
 
 ## Source of truth
 
 - **Subject PDF**: `swingy.en.subject.pdf` in the root of this repo — this is the ULTIMATE source of truth for requirements.
 - **Flowchart**: `Mazie.drawio` in the root — student's own design, used to derive the GameView interface. Open with draw.io desktop or diagrams.net.
-- **This file**: current plan + wishlist, kept up to date by the agent as work progresses. This is the plan, not a changelog — finished work is summarized briefly, not narrated in detail. Detailed rationale for decisions that are done and settled belongs in memory (`/memories/repo/`) or git history, not here.
+- **This file**: current plan + wishlist.
 
 ---
 
@@ -30,106 +30,51 @@ The goal is that after this project the student can sit in front of a peer evalu
 
 ## Current status
 
-Mandatory subject requirements: complete
-.
-Bonus requirements: complete.
- 
-Remaining work is polish, UX and optional features.
+Mandatory subject requirements: complete. Bonus requirements: complete. Remaining work is polish, UX and optional features.
 
----
-
-## Project structure
-
-```text
-swingy/
-  src/          ← ACTIVE project (work here)
-  old/            ← old attempt.
-  swingy.en.subject.pdf 
-  Mazie.drawio
-```
-
-Build & run commands (from `mazie/`):
+Build & run:
 
 ```bash
 mvn clean package
-java -jar target/mazie.jar console
-java -jar target/mazie.jar gui
+java -jar target/swingy.jar console
+java -jar target/swingy.jar gui
 ```
 
 ---
 
-## Wishlist — next up
-
-Organized by topic.
+## Todo
 
 ### General / robustness
 
-- [ ] **Decide what happens after a player wins.** Quit entirely? Back to the main/new-game menu? Offer to immediately start a fresh map with the same hero?
+- [ ] Decide what happens after a player wins. Quit entirely? Back to the main/new-game menu? Offer to immediately start a fresh map with the same hero?
 - [ ] Write player-facing instructions / how-to-play text.
 - [ ] *(idea, not decided)* Consider `java.util.logging` instead of scattered `System.err.println(...)` calls.
 
-
 ### GitHub / submission
 
-- [x] Write a README for GitHub.
 - [ ] Consider publishing builds under GitHub Releases.
-
 
 ### Persistence
 
 - [ ] Allow deleting a hero from the load-game / select-hero screen.
 
-
 ### High scores (new idea, not designed yet)
 
-- [ ] On win *or* loss, record something about the hero as a persistent "high score" entry (new SQLite table, same repository pattern as `HeroRepository`). 
-- Open questions: what counts as "the score" (level? xp? turns survived?), where it's shown, whether it's global or per hero type.
-
-
-### Game engine
-
-- [ ] Decide: does winning reward the player with anything besides "you win"? 
-  - (see High scores idea above — might answer this.)
-
-- [x] *(idea recovered from `old/`, not adopted)* 
-  - `old/model/{Quality,util/QualityDefiner}.java` had a `BAD/NORMAL/GOOD` artifact-quality roll 
-  - independent of monster stats — current `dropArtifact()` only scales off `monster.getXpReward()`. 
-  - Could add a quality tier on top.
+- [ ] On win *or* loss, record something about the hero as a persistent "high score" entry (new SQLite table, same repository pattern as `HeroRepository`). Open questions: what counts as "the score" (level? xp? turns survived?), where it's shown, whether it's global or per hero type.
 
 ### Builder pattern (deliberate learning goal, not just a feature)
 
-- [ ] Student wants to apply the Builder pattern somewhere and be able to explain it. 
-  - Best candidate: `Hero`'s DB-loading constructor (8 positional params). 
-  - Worth discussing honestly whether Builder is the textbook-correct fit here (all params required, no optionals) 
-  - or a deliberate retrofit to practice the pattern — 
-  - either is fine, but the student should be able to say which for peer-eval defense.
+- [ ] Apply the Builder pattern somewhere and be able to explain it. Best candidate: `Hero`'s DB-loading constructor (8 positional params). Worth deciding honestly whether Builder is the textbook-correct fit here (all params required, no optionals) or a deliberate retrofit to practice the pattern — either is fine, but be able to say which for peer-eval defense.
 
 ### Swing GUI
 
 - [ ] Arrow-key navigation for movement (N/E/S/W), and consider extending keyboard control to other screens.
-
-- [x] Win/lose screen artwork.
 - [ ] Kanteen screen artwork.
-
-
-- [x] *(idea recovered from `oldold/`, not adopted)* OS-aware named system fonts instead of the L&F default 
-  - (no font files exist anywhere in `old/`/`oldold/`, just a code pattern).
-
-
-### Repo cleanup (`old/` + `oldold/`)
-
-Both folders are superseded prototypes — nothing essential is missing from `mazie/` 
-(verified 2026-07-06; the only two reusable ideas, artifact quality tiers and OS-aware fonts, are already folded into the wishlist above). 
-**Proposed, not yet done:** delete `old/` and `oldold/`, flatten `mazie/` up to the repo root — 
-needs student go-ahead first (touches build commands, this file, and repo memory).
-
 
 ### Open questions / other
 
 - [ ] Reconcile Hibernate Validator's rules with what `GameController`/the repository actually check — any duplication or gaps?
-
 - [ ] Re-verify MVC separation once more against the subject's "only a good and clear implementation will be accepted" — a full, deliberate pass.
-
 - [ ] Re-verify "best practices suited for this problem" — no concrete checklist for this yet.
 
 ---
