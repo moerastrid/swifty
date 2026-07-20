@@ -7,10 +7,9 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.GREEN;
-import static mazie.view.gui.ThemeColor.PURPLE;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.GREEN;
+import static mazie.view.gui.theme.ThemeColor.PURPLE;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
 
 public class YesNoButtonPanel extends JPanel {
     private static final Dimension DI = new Dimension(100, 35);

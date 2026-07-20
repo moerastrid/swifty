@@ -11,9 +11,9 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import mazie.model.Hero;
 
-import static mazie.view.gui.ThemeColor.LILA;
-import static mazie.view.gui.ThemeColor.PURPLE;
-import static mazie.view.gui.ThemeColor.WHITE;
+import static mazie.view.gui.theme.ThemeColor.LILA;
+import static mazie.view.gui.theme.ThemeColor.PURPLE;
+import static mazie.view.gui.theme.ThemeColor.WHITE;
 
 public class SelectHeroPanel extends JPanel {
 

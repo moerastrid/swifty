@@ -13,11 +13,11 @@ import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.GREEN;
-import static mazie.view.gui.ThemeColor.GREY;
-import static mazie.view.gui.ThemeColor.WHITE;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.BLACK;
+import static mazie.view.gui.theme.ThemeColor.GREEN;
+import static mazie.view.gui.theme.ThemeColor.GREY;
+import static mazie.view.gui.theme.ThemeColor.WHITE;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
 
 // gamePanel is persistent. Hierin zitten kleinere panels die je kunt afwisselen, geloof ik?
 public class GamePanel extends JPanel {

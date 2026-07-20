@@ -8,9 +8,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import mazie.model.Hero;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.GREEN;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.BLACK;
+import static mazie.view.gui.theme.ThemeColor.GREEN;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeFont.HEADER;
 
 public class LevelUpPanel extends JPanel {
 
@@ -20,8 +21,7 @@ public class LevelUpPanel extends JPanel {
 
         final var label = new JLabel("level up", JLabel.CENTER);
         label.setForeground(GREEN);
-        final var bigFont = label.getFont().deriveFont(Font.BOLD, 24f);
-        label.setFont(bigFont);
+        label.setFont(HEADER);
         this.add(label, BorderLayout.NORTH);
 
         final var heroPanel = new HeroPanel(hero);

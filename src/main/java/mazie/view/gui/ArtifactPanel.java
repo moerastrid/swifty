@@ -8,9 +8,9 @@ import javax.swing.JTextArea;
 import mazie.model.Artifact;
 import mazie.model.Hero;
 
-import static mazie.view.gui.ThemeColor.GREEN;
-import static mazie.view.gui.ThemeColor.PURPLE;
-import static mazie.view.gui.ThemeColor.TEAL;
+import static mazie.view.gui.theme.ThemeColor.GREEN;
+import static mazie.view.gui.theme.ThemeColor.PURPLE;
+import static mazie.view.gui.theme.ThemeColor.TEAL;
 
 public class ArtifactPanel extends JPanel {
 
@@ -32,7 +32,7 @@ public class ArtifactPanel extends JPanel {
 
         final var artifacts = hero.getArtifacts().stream().map(Artifact::toString).toList();
         final var info = artifacts.isEmpty() ? "nothing" : String.join("\n - ", artifacts);
-        final var current = new JTextArea("\nyou're currently wearing:\n\n - %s".formatted(info));
+        final var current = new JTextArea("you're currently wearing:\n - %s".formatted(info));
         current.setEditable(false);
         current.setFocusable(false);
         current.setLineWrap(true);

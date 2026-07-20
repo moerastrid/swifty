@@ -3,9 +3,9 @@ package mazie.view.gui;
 import javax.swing.JButton;
 import mazie.model.Direction;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.TEAL;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.BLACK;
+import static mazie.view.gui.theme.ThemeColor.TEAL;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
 
 public class DirectionButton extends JButton {
 

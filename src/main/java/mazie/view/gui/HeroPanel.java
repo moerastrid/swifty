@@ -1,5 +1,6 @@
 package mazie.view.gui;
 
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -8,9 +9,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import mazie.model.Hero;
 
-import static mazie.view.gui.ThemeColor.LILA;
-import static mazie.view.gui.ThemeColor.PURPLE;
-import static mazie.view.gui.ThemeColor.WHITE;
+import static mazie.view.gui.theme.ThemeColor.LILA;
+import static mazie.view.gui.theme.ThemeColor.PURPLE;
+import static mazie.view.gui.theme.ThemeColor.WHITE;
+import static mazie.view.gui.theme.ThemeFont.HEADER;
 
 public class HeroPanel extends JPanel {
 
@@ -28,6 +30,8 @@ public class HeroPanel extends JPanel {
         final var label = new JLabel(name);
         label.setAlignmentX(CENTER_ALIGNMENT);
         label.setForeground(PURPLE);
+        label.setFont(HEADER);
+        label.setPreferredSize(new Dimension(80, 40));
         return label;
     }
 
@@ -47,6 +51,7 @@ public class HeroPanel extends JPanel {
         textArea.setFocusable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
+        textArea.setPreferredSize(new Dimension(80, 100));
         return textArea;
     }
 

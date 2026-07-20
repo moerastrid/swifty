@@ -7,6 +7,8 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import static mazie.view.gui.theme.ThemeFont.HEADER;
+
 public class EndPanel extends JPanel {
 
     public EndPanel(CountDownLatch latch, boolean win) {
@@ -14,8 +16,7 @@ public class EndPanel extends JPanel {
 
         String text = win ? "you win" : "you lost";
         final var label = new JLabel(text, JLabel.CENTER);
-        final var bigFont = label.getFont().deriveFont(Font.BOLD, 24f);
-        label.setFont(bigFont);
+        label.setFont(HEADER);
 
         add(label, BorderLayout.NORTH);
 

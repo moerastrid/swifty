@@ -1,4 +1,4 @@
-package mazie.view.gui;
+package mazie.view.gui.theme;
 
 import java.awt.Color;
 

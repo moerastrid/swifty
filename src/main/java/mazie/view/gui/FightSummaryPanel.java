@@ -12,9 +12,10 @@ import javax.swing.JPanel;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 
-import static mazie.view.gui.ThemeColor.PURPLE;
-import static mazie.view.gui.ThemeColor.WHITE;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.PURPLE;
+import static mazie.view.gui.theme.ThemeColor.WHITE;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeFont.HEADER;
 
 public class FightSummaryPanel extends JPanel {
     private static final Random RANDOM = new Random();
@@ -44,8 +45,7 @@ public class FightSummaryPanel extends JPanel {
         final var label = new JLabel("You survived %s".formatted(monster.getName()));
         label.setForeground(YELLOW);
         label.setAlignmentX(CENTER_ALIGNMENT);
-        final var bigFont = label.getFont().deriveFont(Font.BOLD, 24f);
-        label.setFont(bigFont);
+        label.setFont(HEADER);
         return label;
     }
 

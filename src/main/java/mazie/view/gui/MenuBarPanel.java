@@ -6,8 +6,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.BLACK;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
 
 public class MenuBarPanel extends JPanel {
 

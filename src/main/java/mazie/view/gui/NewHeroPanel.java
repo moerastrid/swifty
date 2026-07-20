@@ -1,6 +1,5 @@
 package mazie.view.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.concurrent.BlockingQueue;
@@ -14,13 +13,15 @@ import javax.swing.JTextField;
 import javax.swing.JToggleButton;
 import mazie.model.Hero;
 import mazie.model.HeroType;
+import mazie.view.gui.theme.Theme;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.GREEN;
-import static mazie.view.gui.ThemeColor.LILA;
-import static mazie.view.gui.ThemeColor.PURPLE;
-import static mazie.view.gui.ThemeColor.TEAL;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.BLACK;
+import static mazie.view.gui.theme.ThemeColor.GREEN;
+import static mazie.view.gui.theme.ThemeColor.LILA;
+import static mazie.view.gui.theme.ThemeColor.PURPLE;
+import static mazie.view.gui.theme.ThemeColor.TEAL;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeFont.HEADER;
 
 public class NewHeroPanel extends JPanel {
 
@@ -47,8 +48,7 @@ public class NewHeroPanel extends JPanel {
     private JLabel title() {
         final var label = new JLabel("create your hero", JLabel.CENTER);
         label.setForeground(BLACK);
-        final var bigFont = label.getFont().deriveFont(Font.BOLD, 24f);
-        label.setFont(bigFont);
+        label.setFont(HEADER);
         label.setAlignmentX(CENTER_ALIGNMENT);
         return label;
     }

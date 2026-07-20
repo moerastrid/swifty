@@ -1,16 +1,18 @@
-package mazie.view.gui;
+package mazie.view.gui.theme;
 
 import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.GREY;
-import static mazie.view.gui.ThemeColor.LILA;
-import static mazie.view.gui.ThemeColor.PURPLE;
-import static mazie.view.gui.ThemeColor.WHITE;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.BLACK;
+import static mazie.view.gui.theme.ThemeColor.GREY;
+import static mazie.view.gui.theme.ThemeColor.LILA;
+import static mazie.view.gui.theme.ThemeColor.PURPLE;
+import static mazie.view.gui.theme.ThemeColor.WHITE;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeFont.INPUT;
+import static mazie.view.gui.theme.ThemeFont.TEXT;
 
 public class Theme {
     private static final Border PANEL_BORDER =  BorderFactory.createEmptyBorder(10, 10, 10, 10);
@@ -28,18 +30,22 @@ public class Theme {
         UIManager.put("TextArea.background", GREY);
         UIManager.put("TextArea.foreground", BLACK);
         UIManager.put("TextArea.border", TEXT_AREA_BORDER);
+        UIManager.put("TextArea.font", TEXT);
 
         UIManager.put("Button.background", PURPLE);
         UIManager.put("Button.foreground", YELLOW);
         UIManager.put("Button.margin", BUTTON_MARGIN);
         UIManager.put("Button.select", LILA);
+        UIManager.put("Button.font", INPUT);
 
         UIManager.put("Label.foreground", WHITE);
         UIManager.put("Label.border", PANEL_BORDER);
+        UIManager.put("Label.font", TEXT);
 
         UIManager.put("ToggleButton.background", GREY);
         UIManager.put("ToggleButton.foreground", LILA);
         UIManager.put("ToggleButton.margin", BUTTON_MARGIN);
         UIManager.put("ToggleButton.select", YELLOW);
+        UIManager.put("ToggleButton.font", INPUT);
     }
 }

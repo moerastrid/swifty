@@ -17,6 +17,7 @@ import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.view.GameView;
+import mazie.view.gui.theme.Theme;
 
 import static java.lang.Thread.currentThread;
 import static javax.swing.SwingUtilities.invokeLater;

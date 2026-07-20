@@ -2,15 +2,13 @@ package mazie.view.gui;
 
 import java.awt.BorderLayout;
 import java.util.concurrent.BlockingQueue;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import static mazie.view.gui.ThemeColor.BLACK;
-import static mazie.view.gui.ThemeColor.TEAL;
-import static mazie.view.gui.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColor.BLACK;
+import static mazie.view.gui.theme.ThemeColor.TEAL;
+import static mazie.view.gui.theme.ThemeColor.YELLOW;
 
 public class NewOrLoadGamePanel extends JPanel {
 
