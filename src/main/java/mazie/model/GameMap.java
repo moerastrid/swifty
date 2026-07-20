@@ -1,9 +1,9 @@
 package mazie.model;
 
+import java.util.Random;
+
 import mazie.model.monster.Monster;
 import mazie.model.monster.MonsterFactory;
-
-import java.util.Random;
 
 public class GameMap {
 
@@ -30,12 +30,16 @@ public class GameMap {
         final var x = heroX + dir.dx;
         final var y = heroY + dir.dy;
 
-        return (monsters[x][y]);
+        return (getMonster(x, y));
     }
 
     public void moveHero(Direction dir) {
         final var x = heroX + dir.dx;
         final var y = heroY + dir.dy;
+
+        if (!isInBounds(x, y)) {
+            throw new IllegalStateException("coordinate out of bounds");
+        }
 
         if (isHeroOnEdge() || isMonster(x, y)) {
             throw new IllegalStateException("GameMap: invalid hero move");
@@ -88,15 +92,32 @@ public class GameMap {
     }
 
     private boolean isHeroPos(int x, int y) {
+        if (!isInBounds(x, y)) {
+            throw new IllegalStateException("coordinate out of bounds");
+        }
         return (heroX == x && heroY == y);
     }
 
     private boolean isEdge(int x, int y) {
+        if (!isInBounds(x, y)) {
+            throw new IllegalStateException("coordinate out of bounds");
+        }
         return (x == 0 || y == 0 || x == size - 1 || y == size - 1);
     }
 
     private boolean isMonster(int x, int y) {
-        return (monsters[x][y] != null);
+        return (getMonster(x, y) != null);
+    }
+
+    private Monster getMonster(int x, int y) {
+        if (!isInBounds(x, y)) {
+            throw new IllegalStateException("coordinate out of bounds");
+        }
+        return monsters[x][y];
+    }
+
+    private boolean isInBounds(int x, int y) {
+        return (x>= 0 && x < size && y>= 0 && y < size);
     }
 
     @Override

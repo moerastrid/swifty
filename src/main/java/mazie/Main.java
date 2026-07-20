@@ -1,6 +1,7 @@
 package mazie;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
 import mazie.bootstrap.Application;
 import mazie.exception.FatalException;
 import mazie.exception.ModelException;
@@ -90,6 +91,7 @@ public class Main {
 
     private static void safeExit(int exitCode) {
         if (shuttingDown.compareAndSet(false, true)) {
+            shutDownApp();
             System.exit(exitCode);
         }
     }

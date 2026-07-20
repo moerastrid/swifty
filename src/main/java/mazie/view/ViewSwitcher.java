@@ -1,5 +1,7 @@
 package mazie.view;
 
+import java.util.Map;
+
 import mazie.exception.FatalException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
@@ -8,8 +10,6 @@ import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
-
-import java.util.Map;
 
 public class ViewSwitcher implements GameView {
 
@@ -30,14 +30,11 @@ public class ViewSwitcher implements GameView {
     }
 
     private void switchView() {
-        System.out.println("switching view"); //#todo remove debug message
 
         final var newView = (view instanceof TerminalView) ? new GuiView() : new TerminalView();
 
         this.view = newView;
         this.setListener(newView);
-
-        System.out.println("view switched"); //#todo remove debug message
     }
 
     @Override

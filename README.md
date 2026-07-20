@@ -2,12 +2,11 @@
 
 hello friend.
 
-Are you lost? 
+Are you lost?
 
 What are you doing inside this project?
 
 Are you willing to get lost?
-
 
 ## run Mazie
 
@@ -17,22 +16,21 @@ setup + run:
 
 ```bash
 mvn clean package
-java -jar target/mazie.jar console
-java -jar target/mazie.jar gui
+java -jar target/swingy.jar console
+java -jar target/swingy.jar gui
 ```
-
 
 default mode : GUI.
 
 ## play Mazie
-
 
 make a new hero or select an existing one.
 hero name between 2 and 30 chars.
 
 your hero can only carry one item of each type (helmet, armour, weapon).
 
-you can always: 
+you can always:
+
 - switch views (switch button or type 'switch')
 - quit the game (close window or type 'q' 'quit' or 'exit')
 
@@ -49,3 +47,11 @@ _also be careful to not get stuck in vim, you might not be able to escape._
 
 - java 21
 - maven 3.9+
+
+## what else
+
+to reset the database, run:
+
+```bash
+rm data/swingy.db
+```
