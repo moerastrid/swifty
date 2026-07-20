@@ -42,9 +42,8 @@ Remaining work is polish, UX and optional features.
 
 ```text
 swingy/
-  mazie/          ← ACTIVE project (work here)
-  old/            ← old attempt with SQL, let a subagent explore for reusage if nessecary.
-  oldold/         ← old attempt with Swing, let a subagent explore for reusage if nessecary. 
+  src/          ← ACTIVE project (work here)
+  old/            ← old attempt.
   swingy.en.subject.pdf 
   Mazie.drawio
 ```
@@ -72,7 +71,7 @@ Organized by topic.
 
 ### GitHub / submission
 
-- [ ] Write a README for GitHub.
+- [x] Write a README for GitHub.
 - [ ] Consider publishing builds under GitHub Releases.
 
 
@@ -92,7 +91,7 @@ Organized by topic.
 - [ ] Decide: does winning reward the player with anything besides "you win"? 
   - (see High scores idea above — might answer this.)
 
-- [ ] *(idea recovered from `old/`, not adopted)* 
+- [x] *(idea recovered from `old/`, not adopted)* 
   - `old/model/{Quality,util/QualityDefiner}.java` had a `BAD/NORMAL/GOOD` artifact-quality roll 
   - independent of monster stats — current `dropArtifact()` only scales off `monster.getXpReward()`. 
   - Could add a quality tier on top.
@@ -109,11 +108,11 @@ Organized by topic.
 
 - [ ] Arrow-key navigation for movement (N/E/S/W), and consider extending keyboard control to other screens.
 
-- [ ] Win/lose screen artwork.
+- [x] Win/lose screen artwork.
 - [ ] Kanteen screen artwork.
 
 
-- [ ] *(idea recovered from `oldold/`, not adopted)* OS-aware named system fonts instead of the L&F default 
+- [x] *(idea recovered from `oldold/`, not adopted)* OS-aware named system fonts instead of the L&F default 
   - (no font files exist anywhere in `old/`/`oldold/`, just a code pattern).
 
 
