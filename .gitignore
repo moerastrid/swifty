@@ -1,4 +1,5 @@
 target/
+# data/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -35,3 +36,9 @@ build/
 .DS_Store
 
 *.log
+
+### github ###
+.github
+
+### intellij
+# .idea
