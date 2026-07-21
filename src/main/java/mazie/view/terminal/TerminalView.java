@@ -50,7 +50,6 @@ public class TerminalView extends AbstractGameView {
     private static final Set<String> QUIT = Set.of("q", "quit", "exit");
     private static final String SWITCH = "switch";
 
-
     private Runnable switchListener;
     private static final BlockingQueue<String> inputQueue = new SynchronousQueue<>();
     private static final AtomicBoolean scannerStarted = new AtomicBoolean(false);
@@ -64,16 +63,22 @@ public class TerminalView extends AbstractGameView {
         if (!scannerStarted.compareAndSet(false, true)) {
             return;
         }
-        
+
         final var thread = new Thread(() -> scanLoop(mainThread), "scannerThread");
         thread.setDaemon(true);
         thread.start();
     }
 
     private static void scanLoop(Thread mainThread) {
+        /*  
+            @SuppressWarnings("resource")
+            explicit choise: for view switching.
+            no biggie, runs on deamon thread.
+        */
+        @SuppressWarnings("resource")
         final var scanner = new Scanner(System.in);
         try {
-            while(scanner.hasNextLine()) {
+            while (scanner.hasNextLine()) {
                 inputQueue.put(scanner.nextLine());
             }
         } catch (InterruptedException e) {
@@ -84,7 +89,6 @@ public class TerminalView extends AbstractGameView {
 
     private String scanNextLine() throws QuitException, SwitchViewException {
         try {
-            System.out.println("here 6" + Thread.currentThread().getName());
             final var line = inputQueue.take();
             final var answer = line.strip().toLowerCase();
             if (QUIT.contains(answer)) {
@@ -94,7 +98,6 @@ public class TerminalView extends AbstractGameView {
             }
             return answer;
         } catch (InterruptedException e) {
-            System.out.println("here 7" + Thread.currentThread().getName());
             Thread.currentThread().interrupt();
             throw new QuitException("thread interruption");
         }
@@ -117,7 +120,7 @@ public class TerminalView extends AbstractGameView {
 
     @Override
     public void showError(String error) {
-        colorPrint(AnsiColor.YELLOW, error);
+        colourPrint(AnsiColour.YELLOW, error);
     }
 
     @Override
@@ -143,14 +146,14 @@ public class TerminalView extends AbstractGameView {
         final var typePrompt = """
                 What do you want to be?
                 %s
-                """.formatted(Arrays.stream(HeroType.values()).map(type ->
-                "\t- %s (%s)".formatted(type.name().toLowerCase(), type.name().toLowerCase().substring(0, 1))
+                """.formatted(Arrays.stream(HeroType.values()).map(type
+                -> "\t- %s (%s)".formatted(type.name().toLowerCase(), type.name().toLowerCase().substring(0, 1))
         ).collect(Collectors.joining("\n")));
 
         HeroType type = choose(typePrompt, HERO_TYPES);
 
         final var namePrompt = "Name your %s: ".formatted(type);
-        colorPrint(AnsiColor.PURPLE, namePrompt);
+        colourPrint(AnsiColour.PURPLE, namePrompt);
 
         return new Hero(scanNextLine(), type);
     }
@@ -197,7 +200,7 @@ public class TerminalView extends AbstractGameView {
                 hero.getHpString(),
                 format(hero.getArtifacts()));
 
-        colorPrint(AnsiColor.PURPLE, stats);
+        colourPrint(AnsiColour.PURPLE, stats);
     }
 
     @Override
@@ -208,7 +211,7 @@ public class TerminalView extends AbstractGameView {
                       ╔═╝║ ║ ║ ╔═╝╔╔╝   ║ ╔═║╔═╝  ║║║╔═║╔╝ ║╔═╝
                       ══╝╝ ╝ ╝ ══╝╝ ╝   ╝ ╝ ╝══╝  ╝╝╝╝ ╝══╝╝══╝
                 """;
-        colorPrint(AnsiColor.BLUE, prompt);
+        colourPrint(AnsiColour.BLUE, prompt);
     }
 
     @Override
@@ -221,7 +224,7 @@ public class TerminalView extends AbstractGameView {
 
     @Override
     public void showEmptyStep() {
-        colorPrint(AnsiColor.PURPLE, "one step forward!");
+        colourPrint(AnsiColour.PURPLE, "one step forward!");
     }
 
     @Override
@@ -247,7 +250,7 @@ public class TerminalView extends AbstractGameView {
                     	Your heart starts beating faster. There's no escape now..."
                     """;
         }
-        colorPrint(AnsiColor.PURPLE, prompt);
+        colourPrint(AnsiColour.PURPLE, prompt);
     }
 
     @Override
@@ -289,7 +292,7 @@ public class TerminalView extends AbstractGameView {
                                      ▐
                     """;
         }
-        colorPrint(AnsiColor.RED, prompt);
+        colourPrint(AnsiColour.RED, prompt);
     }
 
     @Override
@@ -298,13 +301,12 @@ public class TerminalView extends AbstractGameView {
         final var endSummary = "---------------------";
         final var damageSummary = "- %d hp     + %d xp".formatted(damageToHero, monster.getXpReward());
 
-
-        colorPrint(AnsiColor.BLUE, startSummary);
-        colorPrint(AnsiColor.GREEN, EmojiMap.getEmoji(hero.getType()) + hero.getAction());
-        colorPrint(AnsiColor.PURPLE, EmojiMap.getEmoji(monster) + monster.getAction());
-        colorPrint(AnsiColor.BLUE, damageSummary);
-        colorPrint(AnsiColor.GREEN, monster.getFinalMessage());
-        colorPrint(AnsiColor.BLUE, endSummary);
+        colourPrint(AnsiColour.BLUE, startSummary);
+        colourPrint(AnsiColour.GREEN, EmojiMap.getEmoji(hero.getType()) + hero.getAction());
+        colourPrint(AnsiColour.PURPLE, EmojiMap.getEmoji(monster) + monster.getAction());
+        colourPrint(AnsiColour.BLUE, damageSummary);
+        colourPrint(AnsiColour.GREEN, monster.getFinalMessage());
+        colourPrint(AnsiColour.BLUE, endSummary);
     }
 
     @Override
@@ -323,7 +325,7 @@ public class TerminalView extends AbstractGameView {
                                          ░
                 """;
 
-        colorPrint(AnsiColor.GREEN, prompt);
+        colourPrint(AnsiColour.GREEN, prompt);
         showHeroStats(hero);
     }
 
@@ -345,16 +347,16 @@ public class TerminalView extends AbstractGameView {
         if (artifacts.isEmpty()) {
             return "- nothing";
         }
-        return artifacts.stream().map(artifact ->
-                "- %s".formatted(artifact.toString())).collect(Collectors.joining("\n"));
+        return artifacts.stream().map(artifact
+                -> "- %s".formatted(artifact.toString())).collect(Collectors.joining("\n"));
     }
 
-    private void colorPrint(AnsiColor color, String text) {
-        System.out.println(color.getCode() + text + AnsiColor.RESET.getCode());
+    private void colourPrint(AnsiColour colour, String text) {
+        System.out.println(colour.getCode() + text + AnsiColour.RESET.getCode());
     }
 
     private <T> T choose(String prompt, Map<String, T> options) {
-        colorPrint(AnsiColor.CYAN, prompt);
+        colourPrint(AnsiColour.CYAN, prompt);
 
         final var answer = scanNextLine();
         if (options.containsKey(answer)) {

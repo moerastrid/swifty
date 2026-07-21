@@ -39,7 +39,6 @@ public class Main {
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("custom shut down hook");
             if (shuttingDown.compareAndSet(false, true)) {
                 mainThread.interrupt();
                 shutDownApp();
@@ -66,13 +65,12 @@ public class Main {
 
     private static int setExitCode(RuntimeException ex) {
         if (edtCrashed) {
-            System.out.println("hoi");
             return EX_GENERAL;
         }
         if (ex instanceof QuitException) {
             return EX_SUCCESS;
         }
-        throw ex;
+        return EX_GENERAL;
     }
 
     private static void safeExit(int exitCode) {

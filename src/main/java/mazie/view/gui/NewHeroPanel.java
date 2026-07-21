@@ -15,12 +15,12 @@ import javax.swing.JToggleButton;
 import mazie.model.Hero;
 import mazie.model.HeroType;
 import mazie.view.gui.theme.Theme;
-import static mazie.view.gui.theme.ThemeColor.BLACK;
-import static mazie.view.gui.theme.ThemeColor.GREEN;
-import static mazie.view.gui.theme.ThemeColor.LILA;
-import static mazie.view.gui.theme.ThemeColor.PURPLE;
-import static mazie.view.gui.theme.ThemeColor.TEAL;
-import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColour.BLACK;
+import static mazie.view.gui.theme.ThemeColour.GREEN;
+import static mazie.view.gui.theme.ThemeColour.LILA;
+import static mazie.view.gui.theme.ThemeColour.PURPLE;
+import static mazie.view.gui.theme.ThemeColour.TEAL;
+import static mazie.view.gui.theme.ThemeColour.YELLOW;
 import static mazie.view.gui.theme.ThemeFont.HEADER;
 
 public class NewHeroPanel extends JPanel {
@@ -60,7 +60,6 @@ public class NewHeroPanel extends JPanel {
         field.setMaximumSize(new Dimension(300, 100));
         return field;
     }
-
 
     private JPanel typeButtons() {
         final var panel = new JPanel();

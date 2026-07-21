@@ -8,9 +8,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import mazie.model.Hero;
-import static mazie.view.gui.theme.ThemeColor.BLACK;
-import static mazie.view.gui.theme.ThemeColor.GREEN;
-import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColour.BLACK;
+import static mazie.view.gui.theme.ThemeColour.GREEN;
+import static mazie.view.gui.theme.ThemeColour.YELLOW;
 import static mazie.view.gui.theme.ThemeFont.HEADER;
 
 public class LevelUpPanel extends JPanel {

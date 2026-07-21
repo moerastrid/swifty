@@ -34,7 +34,7 @@ public class ViewSwitcher implements GameView {
         final var newView = (view instanceof TerminalView) ? new GuiView(mainThread) : new TerminalView(mainThread);
         view.close();
         view = newView;
-        this.setListener(view);
+        setListener(view);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class ViewSwitcher implements GameView {
         try {
             view.showError(error);
         } catch (SwitchViewException se) {
-            this.showError(error);
+            showError(error);
         }
     }
 
@@ -57,7 +57,7 @@ public class ViewSwitcher implements GameView {
         try {
             view.showWelcome();
         } catch (SwitchViewException se) {
-            this.showWelcome();
+            showWelcome();
         }
     }
 
@@ -66,7 +66,7 @@ public class ViewSwitcher implements GameView {
         try {
             return view.askNewGame();
         } catch (SwitchViewException se) {
-            return this.askNewGame();
+            return askNewGame();
         }
     }
 
@@ -75,7 +75,7 @@ public class ViewSwitcher implements GameView {
         try {
             return view.createHero();
         } catch (SwitchViewException se) {
-            return this.createHero();
+            return createHero();
         }
     }
 
@@ -84,7 +84,7 @@ public class ViewSwitcher implements GameView {
         try {
             return view.selectHero(heroes);
         } catch (SwitchViewException se) {
-            return this.selectHero(heroes);
+            return selectHero(heroes);
         }
     }
 
@@ -93,7 +93,7 @@ public class ViewSwitcher implements GameView {
         try {
             return view.confirmHero(hero);
         } catch (SwitchViewException se) {
-            return this.confirmHero(hero);
+            return confirmHero(hero);
         }
     }
 
@@ -102,7 +102,7 @@ public class ViewSwitcher implements GameView {
         try {
             view.showStartGame();
         } catch (SwitchViewException se) {
-            this.showStartGame();
+            showStartGame();
         }
     }
 
@@ -120,7 +120,7 @@ public class ViewSwitcher implements GameView {
         try {
             view.showEmptyStep();
         } catch (SwitchViewException se) {
-            this.showEmptyStep();
+            showEmptyStep();
         }
     }
 
@@ -138,7 +138,7 @@ public class ViewSwitcher implements GameView {
         try {
             view.showRunSuccess(monster, success);
         } catch (SwitchViewException se) {
-            this.showRunSuccess(monster, success);
+            showRunSuccess(monster, success);
         }
     }
 
@@ -147,7 +147,7 @@ public class ViewSwitcher implements GameView {
         try {
             view.showEndGame(hero, win);
         } catch (SwitchViewException se) {
-            this.showEndGame(hero, win);
+            showEndGame(hero, win);
         }
     }
 
@@ -156,7 +156,7 @@ public class ViewSwitcher implements GameView {
         try {
             view.showFightSummary(damageToHero, hero, monster);
         } catch (SwitchViewException se) {
-            this.showFightSummary(damageToHero, hero, monster);
+            showFightSummary(damageToHero, hero, monster);
         }
     }
 
@@ -165,7 +165,7 @@ public class ViewSwitcher implements GameView {
         try {
             view.showLevelUp(hero);
         } catch (SwitchViewException se) {
-            this.showLevelUp(hero);
+            showLevelUp(hero);
         }
     }
 

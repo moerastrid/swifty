@@ -7,11 +7,12 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
 
-import static mazie.view.gui.theme.ThemeColor.GREEN;
-import static mazie.view.gui.theme.ThemeColor.PURPLE;
-import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColour.GREEN;
+import static mazie.view.gui.theme.ThemeColour.PURPLE;
+import static mazie.view.gui.theme.ThemeColour.YELLOW;
 
 public class YesNoButtonPanel extends JPanel {
+
     private static final Dimension DI = new Dimension(100, 35);
     private static final Border LINE = BorderFactory.createLineBorder(YELLOW, 2, true);
 

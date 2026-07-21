@@ -9,9 +9,9 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import mazie.model.Hero;
 
-import static mazie.view.gui.theme.ThemeColor.LILA;
-import static mazie.view.gui.theme.ThemeColor.PURPLE;
-import static mazie.view.gui.theme.ThemeColor.WHITE;
+import static mazie.view.gui.theme.ThemeColour.LILA;
+import static mazie.view.gui.theme.ThemeColour.PURPLE;
+import static mazie.view.gui.theme.ThemeColour.WHITE;
 import static mazie.view.gui.theme.ThemeFont.HEADER;
 
 public class HeroPanel extends JPanel {

@@ -2,7 +2,8 @@ package mazie.view.gui.theme;
 
 import java.awt.Color;
 
-public class ThemeColor {
+public class ThemeColour {
+
     public static final Color BLACK = Color.BLACK;
     public static final Color PURPLE = new Color(99, 65, 204);
     public static final Color LILA = new Color(133, 118, 204);
@@ -12,6 +13,6 @@ public class ThemeColor {
     public static final Color GREY = new Color(195, 195, 195);
     public static final Color WHITE = Color.WHITE;
 
-    private ThemeColor() {
+    private ThemeColour() {
     }
 }

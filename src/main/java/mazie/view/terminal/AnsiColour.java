@@ -1,6 +1,6 @@
 package mazie.view.terminal;
 
-public enum AnsiColor {
+public enum AnsiColour {
 
     RESET("\u001B[0m"),
     BLACK("\u001B[30m"),
@@ -14,7 +14,7 @@ public enum AnsiColor {
 
     private final String code;
 
-    AnsiColor(String code) {
+    AnsiColour(String code) {
         this.code = code;
     }
 

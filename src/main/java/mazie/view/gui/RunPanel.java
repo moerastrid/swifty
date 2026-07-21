@@ -9,12 +9,13 @@ import javax.swing.JPanel;
 
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
-import static mazie.view.gui.theme.ThemeColor.PURPLE;
-import static mazie.view.gui.theme.ThemeColor.WHITE;
-import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColour.PURPLE;
+import static mazie.view.gui.theme.ThemeColour.WHITE;
+import static mazie.view.gui.theme.ThemeColour.YELLOW;
 import static mazie.view.gui.theme.ThemeFont.HEADER;
 
 public class RunPanel extends JPanel {
+
     public RunPanel(Monster monster, Hero hero, BlockingQueue<Boolean> queue) {
         this.setBackground(PURPLE);
         this.setForeground(WHITE);

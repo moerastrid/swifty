@@ -1,22 +1,24 @@
 package mazie.view.gui.theme;
 
 import java.awt.Insets;
+
 import javax.swing.BorderFactory;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 
-import static mazie.view.gui.theme.ThemeColor.BLACK;
-import static mazie.view.gui.theme.ThemeColor.GREY;
-import static mazie.view.gui.theme.ThemeColor.LILA;
-import static mazie.view.gui.theme.ThemeColor.PURPLE;
-import static mazie.view.gui.theme.ThemeColor.WHITE;
-import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColour.BLACK;
+import static mazie.view.gui.theme.ThemeColour.GREY;
+import static mazie.view.gui.theme.ThemeColour.LILA;
+import static mazie.view.gui.theme.ThemeColour.PURPLE;
+import static mazie.view.gui.theme.ThemeColour.WHITE;
+import static mazie.view.gui.theme.ThemeColour.YELLOW;
 import static mazie.view.gui.theme.ThemeFont.INPUT;
 import static mazie.view.gui.theme.ThemeFont.TEXT;
 
 public class Theme {
-    private static final Border PANEL_BORDER =  BorderFactory.createEmptyBorder(10, 10, 10, 10);
-    public static final Border TEXT_AREA_BORDER =  BorderFactory.createEmptyBorder(4, 4, 4, 4);
+
+    private static final Border PANEL_BORDER = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+    public static final Border TEXT_AREA_BORDER = BorderFactory.createEmptyBorder(4, 4, 4, 4);
     private static final Insets BUTTON_MARGIN = new Insets(2, 10, 2, 10);
 
     private Theme() {

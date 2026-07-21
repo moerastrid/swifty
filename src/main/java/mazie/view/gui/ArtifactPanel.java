@@ -8,9 +8,9 @@ import javax.swing.JTextArea;
 import mazie.model.Artifact;
 import mazie.model.Hero;
 
-import static mazie.view.gui.theme.ThemeColor.GREEN;
-import static mazie.view.gui.theme.ThemeColor.PURPLE;
-import static mazie.view.gui.theme.ThemeColor.TEAL;
+import static mazie.view.gui.theme.ThemeColour.GREEN;
+import static mazie.view.gui.theme.ThemeColour.PURPLE;
+import static mazie.view.gui.theme.ThemeColour.TEAL;
 
 public class ArtifactPanel extends JPanel {
 

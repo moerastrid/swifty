@@ -1,8 +1,8 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.util.concurrent.CountDownLatch;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;

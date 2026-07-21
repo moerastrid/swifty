@@ -6,9 +6,9 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import static mazie.view.gui.theme.ThemeColor.BLACK;
-import static mazie.view.gui.theme.ThemeColor.TEAL;
-import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColour.BLACK;
+import static mazie.view.gui.theme.ThemeColour.TEAL;
+import static mazie.view.gui.theme.ThemeColour.YELLOW;
 
 public class NewOrLoadGamePanel extends JPanel {
 

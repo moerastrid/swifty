@@ -1,12 +1,13 @@
 package mazie.view.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+
 import javax.swing.JPanel;
+
 import mazie.model.Direction;
 
 public class DirectionPanel extends JPanel {

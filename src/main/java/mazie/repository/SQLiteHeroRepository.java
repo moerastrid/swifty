@@ -1,11 +1,5 @@
 package mazie.repository;
 
-import mazie.exception.FatalException;
-import mazie.exception.RepositoryException;
-import mazie.model.ArtifactType;
-import mazie.model.Hero;
-import mazie.model.HeroType;
-
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -14,6 +8,12 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import mazie.exception.FatalException;
+import mazie.exception.RepositoryException;
+import mazie.model.ArtifactType;
+import mazie.model.Hero;
+import mazie.model.HeroType;
 
 public class SQLiteHeroRepository implements HeroRepository {
     private static final String DB_URL = "jdbc:sqlite:data/swingy.db";
@@ -141,8 +141,10 @@ public class SQLiteHeroRepository implements HeroRepository {
     public Map<Integer, Hero> loadAllHeroes() {
         try (final var statement = connection.createStatement()) {
             final var resultSet = statement.executeQuery(LOAD_HEROES_SQL);
+            commitConnection();
             return SQLiteHeroMapper.mapHeroes(resultSet);
         } catch (SQLException e) {
+            rollbackConnection();
             throw new RepositoryException(e.getMessage(), e);
         }
     }
@@ -152,11 +154,11 @@ public class SQLiteHeroRepository implements HeroRepository {
         try {
             insertHero(hero);
             insertArtifacts(hero);
+            commitConnection();
         } catch (SQLException e) {
             rollbackConnection();
             throw new RepositoryException(e.getMessage(), e);
         }
-        commitConnection();
     }
 
     private void insertHero(Hero hero) throws SQLException {
@@ -202,12 +204,12 @@ public class SQLiteHeroRepository implements HeroRepository {
         }
 
         try {
-            this.deleteArtifacts(hero);
-            this.updateHero(hero);
-            this.insertArtifacts(hero);
-            this.commitConnection();
+            deleteArtifacts(hero);
+            updateHero(hero);
+            insertArtifacts(hero);
+            commitConnection();
         } catch (SQLException e) {
-            this.rollbackConnection();
+            rollbackConnection();
             throw new RepositoryException(e.getMessage(), e);
         }
     }

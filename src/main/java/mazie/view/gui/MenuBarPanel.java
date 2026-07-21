@@ -8,10 +8,10 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import static mazie.view.gui.theme.ThemeColor.BLACK;
-import static mazie.view.gui.theme.ThemeColor.GREY;
-import static mazie.view.gui.theme.ThemeColor.LILA;
-import static mazie.view.gui.theme.ThemeColor.YELLOW;
+import static mazie.view.gui.theme.ThemeColour.BLACK;
+import static mazie.view.gui.theme.ThemeColour.GREY;
+import static mazie.view.gui.theme.ThemeColour.LILA;
+import static mazie.view.gui.theme.ThemeColour.YELLOW;
 
 public class MenuBarPanel extends JPanel {
 
