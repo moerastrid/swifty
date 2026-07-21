@@ -3,66 +3,67 @@ package mazie.view.gui;
 import java.awt.BorderLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.SynchronousQueue;
 import java.util.function.Consumer;
+
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import static javax.swing.SwingUtilities.invokeAndWait;
+import static javax.swing.SwingUtilities.invokeLater;
+
+import mazie.exception.FatalException;
 import mazie.exception.QuitException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
-import mazie.view.GameView;
+import mazie.view.AbstractGameView;
 import mazie.view.gui.theme.Theme;
 
-import static java.lang.Thread.currentThread;
-import static javax.swing.SwingUtilities.invokeLater;
-
-public class GuiView implements GameView {
+public class GuiView extends AbstractGameView {
 
     private static final String TITLE = "Mazie - an a-maze-ing RPG";
-    private final Thread controllerThread;
-    private final JFrame frame;
-    private final GamePanel panel;
+    private JFrame frame;
+    private GamePanel panel;
     private volatile boolean switchRequested = false;
 
-    public GuiView() {
-        this.controllerThread = currentThread();
-
-        Theme.configure();
-
-        this.panel = new GamePanel();
-        this.frame = initFrame();
-        setIcon();
-        this.frame.getContentPane().add(this.panel);
-
-        invokeLater(() -> this.frame.setVisible(true));
+    public GuiView(Thread mainThread) {
+        super(mainThread);
+        try {
+            invokeAndWait(() -> initGUI());
+        } catch (InterruptedException e) {
+            handleInterruption(e);
+            throw new AssertionError(e);
+        } catch (InvocationTargetException e) {
+            throw new FatalException("Cannot start gui view", e.getCause());
+        }   
     }
 
-    private JFrame initFrame() {
-        final var fr = new JFrame(TITLE);
+    private void initGUI() {
+        Theme.configure();
+        frame = new JFrame(TITLE);
 
-        fr.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        fr.addWindowListener(new WindowAdapter() {
+        frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                controllerThread.interrupt();
-                fr.dispose();
+                mainThread.interrupt();
+                frame.dispose();
             }
         });
-        fr.setSize(800, 600);
-        fr.setLayout(new BorderLayout(10, 10));
-        fr.setLocationRelativeTo(null);
+        frame.setIconImage(PngMap.getPng(PngMap.ScreenType.ICON).getImage());
+        frame.setSize(800, 600);
+        frame.setLayout(new BorderLayout(10, 10));
+        frame.setLocationRelativeTo(null);
 
-        return fr;
-    }
-
-    private void setIcon() {
-        this.frame.setIconImage(PngMap.getPng(PngMap.ScreenType.ICON).getImage());
+        panel = new GamePanel();
+        frame.getContentPane().add(panel);
+        frame.setVisible(true);
     }
 
     @Override
@@ -96,7 +97,7 @@ public class GuiView implements GameView {
         invokeLater(() -> panel.setSwitchListener(() -> {
             this.switchRequested = true;
             switchListener.run();
-            controllerThread.interrupt();
+            mainThread.interrupt();
         }));
     }
 

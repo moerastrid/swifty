@@ -1,6 +1,6 @@
-*This project has been created as part of the 42 curriculum by ageels.*
-
 # MAZIE - an a-maze-ing RPG
+
+*This project has been created as part of the 42 curriculum by ageels.*
 
 hello friend.
 
@@ -43,7 +43,7 @@ when you die, your hero gets deleted and is gone forever.
 the size of the map and difficulty of the monsters is dependent on the level of the hero.
 try to see how far you can get before your hero dies.
 
-_also be careful to not get stuck in vim, you might not be able to escape._
+*also be careful to not get stuck in vim, you might not be able to escape.*
 
 ## requirements
 

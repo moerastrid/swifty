@@ -1,13 +1,13 @@
 package mazie.view.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Font;
 import java.util.concurrent.CountDownLatch;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import mazie.model.Hero;
 
+import mazie.model.Hero;
 import static mazie.view.gui.theme.ThemeColor.BLACK;
 import static mazie.view.gui.theme.ThemeColor.GREEN;
 import static mazie.view.gui.theme.ThemeColor.YELLOW;

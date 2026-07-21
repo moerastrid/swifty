@@ -1,14 +1,14 @@
 package mazie.view.gui;
 
-import java.awt.Font;
 import java.util.concurrent.BlockingQueue;
+
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
-
 import static mazie.view.gui.theme.ThemeColor.PURPLE;
 import static mazie.view.gui.theme.ThemeColor.WHITE;
 import static mazie.view.gui.theme.ThemeColor.YELLOW;

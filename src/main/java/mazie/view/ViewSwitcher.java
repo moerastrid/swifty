@@ -13,11 +13,12 @@ import mazie.view.terminal.TerminalView;
 
 public class ViewSwitcher implements GameView {
 
-    private volatile GameView view;
+    private final Thread mainThread = Thread.currentThread();
+    private volatile AbstractGameView view;
 
-    public ViewSwitcher(GameView initial) {
-        this.view = initial;
-        this.setListener(initial);
+    public ViewSwitcher(AbstractGameView view) {
+        this.view = view;
+        setListener(view);
     }
 
     @Override
@@ -25,16 +26,15 @@ public class ViewSwitcher implements GameView {
         view.close();
     }
 
-    private void setListener(GameView v) {
+    private void setListener(AbstractGameView v) {
         v.setSwitchListener(this::switchView);
     }
 
     private void switchView() {
-
-        final var newView = (view instanceof TerminalView) ? new GuiView() : new TerminalView();
-
-        this.view = newView;
-        this.setListener(newView);
+        final var newView = (view instanceof TerminalView) ? new GuiView(mainThread) : new TerminalView(mainThread);
+        view.close();
+        view = newView;
+        this.setListener(view);
     }
 
     @Override

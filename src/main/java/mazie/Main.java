@@ -3,19 +3,12 @@ package mazie;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import mazie.bootstrap.Application;
-import mazie.exception.FatalException;
-import mazie.exception.ModelException;
-import mazie.exception.ParseException;
 import mazie.exception.QuitException;
-import mazie.exception.RepositoryException;
 
 public class Main {
 
     private static final int EX_SUCCESS = 0;
     private static final int EX_GENERAL = 1;
-    private static final int EX_USAGE = 64;
-    private static final int EX_UNAVAILABLE = 69;
-    private static final int EX_SOFTWARE = 70;
 
     private static volatile boolean edtCrashed = false;
     private static final AtomicBoolean shuttingDown = new AtomicBoolean(false);
@@ -30,15 +23,10 @@ public class Main {
         try {
             application = new Application(args);
             application.start();
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             System.err.println(ex.getMessage());
             safeExit(setExitCode(ex));
         }
-
-        if (edtCrashed) {
-            safeExit(EX_SOFTWARE);
-        }
-
         safeExit(EX_SUCCESS);
     }
 
@@ -51,12 +39,12 @@ public class Main {
         });
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-
+            System.out.println("custom shut down hook");
             if (shuttingDown.compareAndSet(false, true)) {
                 mainThread.interrupt();
                 shutDownApp();
                 try {
-                    mainThread.join();
+                    mainThread.join(500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
@@ -70,23 +58,21 @@ public class Main {
         }
         try {
             application.shutDownGracefully();
-        } catch (Exception ex) {
+        } catch (RuntimeException ex) {
             System.err.printf("WARNER: shutdown failed: %s%n", ex.getMessage());
             throw ex;
         }
     }
 
-    private static int setExitCode(Exception ex) {
-        return switch (ex) {
-            case FatalException ignored -> EX_UNAVAILABLE;
-            case RepositoryException ignored -> EX_UNAVAILABLE;
-            case ModelException ignored -> EX_SOFTWARE;
-            case IllegalArgumentException ignored -> EX_SOFTWARE;
-            case IllegalStateException ignored -> EX_SOFTWARE;
-            case ParseException ignored -> EX_USAGE;
-            case QuitException ignored -> EX_SUCCESS;
-            default -> EX_GENERAL;
-        };
+    private static int setExitCode(RuntimeException ex) {
+        if (edtCrashed) {
+            System.out.println("hoi");
+            return EX_GENERAL;
+        }
+        if (ex instanceof QuitException) {
+            return EX_SUCCESS;
+        }
+        throw ex;
     }
 
     private static void safeExit(int exitCode) {

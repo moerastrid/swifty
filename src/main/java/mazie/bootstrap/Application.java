@@ -1,5 +1,7 @@
 package mazie.bootstrap;
 
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
+
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 import mazie.controller.GameController;
@@ -10,7 +12,6 @@ import mazie.view.GameView;
 import mazie.view.ViewSwitcher;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
-import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 public class Application {
 
@@ -30,9 +31,10 @@ public class Application {
 
         validatorFactory = Validation.byDefaultProvider().configure().messageInterpolator(new ParameterMessageInterpolator()).buildValidatorFactory();
 
+        final var mainThread = Thread.currentThread();
         final var initialView = switch (viewType) {
-            case TERMINAL -> new TerminalView();
-            case GUI -> new GuiView();
+            case TERMINAL -> new TerminalView(mainThread);
+            case GUI -> new GuiView(mainThread);
         };
 
         view = new ViewSwitcher(initialView);

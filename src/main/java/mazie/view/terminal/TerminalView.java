@@ -5,10 +5,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+
 import mazie.exception.QuitException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
@@ -16,9 +19,9 @@ import mazie.model.Direction;
 import mazie.model.Hero;
 import mazie.model.HeroType;
 import mazie.model.monster.Monster;
-import mazie.view.GameView;
+import mazie.view.AbstractGameView;
 
-public class TerminalView implements GameView {
+public class TerminalView extends AbstractGameView {
 
     private static final Map<String, HeroType> HERO_TYPES = Map.of(
             "w", HeroType.WEEVIL,
@@ -47,20 +50,64 @@ public class TerminalView implements GameView {
     private static final Set<String> QUIT = Set.of("q", "quit", "exit");
     private static final String SWITCH = "switch";
 
-    private final Scanner scanner;
-    private Runnable switchListener;
 
-    public TerminalView() {
-        this(new Scanner(System.in));
+    private Runnable switchListener;
+    private static final BlockingQueue<String> inputQueue = new SynchronousQueue<>();
+    private static final AtomicBoolean scannerStarted = new AtomicBoolean(false);
+
+    public TerminalView(Thread mainThread) {
+        super(mainThread);
+        startScannerOnce(mainThread);
     }
 
-    public TerminalView(Scanner scanner) {
-        this.scanner = scanner;
+    private static void startScannerOnce(Thread mainThread) {
+        if (!scannerStarted.compareAndSet(false, true)) {
+            return;
+        }
+        
+        final var thread = new Thread(() -> scanLoop(mainThread), "scannerThread");
+        thread.setDaemon(true);
+        thread.start();
+    }
+
+    private static void scanLoop(Thread mainThread) {
+        final var scanner = new Scanner(System.in);
+        try {
+            while(scanner.hasNextLine()) {
+                inputQueue.put(scanner.nextLine());
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        mainThread.interrupt();
+    }
+
+    private String scanNextLine() throws QuitException, SwitchViewException {
+        try {
+            System.out.println("here 6" + Thread.currentThread().getName());
+            final var line = inputQueue.take();
+            final var answer = line.strip().toLowerCase();
+            if (QUIT.contains(answer)) {
+                throw new QuitException("user is a quitter\ndeveloper is disappointed");
+            } else if (SWITCH.equals(answer)) {
+                switchView();
+            }
+            return answer;
+        } catch (InterruptedException e) {
+            System.out.println("here 7" + Thread.currentThread().getName());
+            Thread.currentThread().interrupt();
+            throw new QuitException("thread interruption");
+        }
+    }
+
+    private void switchView() {
+        switchListener.run();
+        throw new SwitchViewException();
     }
 
     @Override
     public void close() {
-        // nothing (terminal stays open)
+        //
     }
 
     @Override
@@ -304,27 +351,6 @@ public class TerminalView implements GameView {
 
     private void colorPrint(AnsiColor color, String text) {
         System.out.println(color.getCode() + text + AnsiColor.RESET.getCode());
-    }
-
-    private String scanNextLine() throws QuitException, SwitchViewException {
-        try {
-            final var line = scanner.nextLine();
-            final var answer = line.strip().toLowerCase();
-            if (QUIT.contains(answer)) {
-                throw new QuitException("user is a quitter\ndeveloper is disappointed");
-            } else if (SWITCH.equals(answer)) {
-                switchView();
-            }
-            return answer;
-        } catch (NoSuchElementException e) {
-            showError("?user entered ^C or ^D in terminal?");
-            throw new QuitException("?user entered ^C or ^D in terminal?", e);
-        }
-    }
-
-    private void switchView() {
-        switchListener.run();
-        throw new SwitchViewException();
     }
 
     private <T> T choose(String prompt, Map<String, T> options) {
