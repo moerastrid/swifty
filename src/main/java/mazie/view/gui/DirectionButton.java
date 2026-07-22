@@ -15,10 +15,8 @@ public class DirectionButton extends JButton {
         this.dir = dir;
         setText(dir.toString().toLowerCase());
         final var color = switch (dir) {
-            case NORTH, SOUTH ->
-                YELLOW;
-            case EAST, WEST ->
-                TEAL;
+            case NORTH, SOUTH -> YELLOW;
+            case EAST, WEST -> TEAL;
         };
         setBackground(color);
         setForeground(BLACK);

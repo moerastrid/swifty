@@ -2,7 +2,6 @@ package mazie.view.gui;
 
 import java.awt.Dimension;
 import java.util.concurrent.BlockingQueue;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
@@ -11,10 +10,10 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.JToggleButton;
-
 import mazie.model.Hero;
 import mazie.model.HeroType;
 import mazie.view.gui.theme.Theme;
+
 import static mazie.view.gui.theme.ThemeColour.BLACK;
 import static mazie.view.gui.theme.ThemeColour.GREEN;
 import static mazie.view.gui.theme.ThemeColour.LILA;

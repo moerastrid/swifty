@@ -1,7 +1,6 @@
 package mazie.view;
 
 import java.util.Map;
-
 import mazie.exception.FatalException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;

@@ -9,24 +9,14 @@ import mazie.model.monster.Monster;
 
 public class PngMap {
 
-    public enum ScreenType {
-        LOGO,
-        ICON,
-        WHERE,
-        HUH,
-        WIN,
-        GAMEOVER
-    }
-
     private static final Map<ScreenType, String> screenPngPath = Map.of(
             ScreenType.LOGO, "/mazie-logo.png",
-            ScreenType.ICON,"/mazie-icon.png",
-            ScreenType.WHERE,"/where.png",
+            ScreenType.ICON, "/mazie-icon.png",
+            ScreenType.WHERE, "/where.png",
             ScreenType.HUH, "/huh.png",
-            ScreenType.WIN,"/win.png",
-            ScreenType.GAMEOVER,"/gameover.png"
+            ScreenType.WIN, "/win.png",
+            ScreenType.GAMEOVER, "/gameover.png"
     );
-
     private static final Map<HeroType, String> heroPngPath = Map.of(
             HeroType.FROG, "/frog.png",
             HeroType.MOUSE, "/mouse.png",
@@ -46,7 +36,6 @@ public class PngMap {
             Map.entry("a teambuilding event", "/teambuilding.png"),
             Map.entry("a teams meeting", "/teams.png"),
             Map.entry("vim", "/vim.png"));
-
     private PngMap() {
     }
 
@@ -109,5 +98,14 @@ public class PngMap {
             throw new IllegalStateException("Unexpected value: %s".formatted(screen.name()));
         }
         return loadIcon(path);
+    }
+
+    public enum ScreenType {
+        LOGO,
+        ICON,
+        WHERE,
+        HUH,
+        WIN,
+        GAMEOVER
     }
 }

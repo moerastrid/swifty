@@ -1,10 +1,9 @@
 package mazie.controller;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
+import java.util.Map;
+import java.util.stream.Collectors;
 import mazie.exception.DuplicateNameException;
 import mazie.model.Hero;
 import mazie.repository.HeroRepository;
@@ -18,10 +17,8 @@ public record GameSetupService(Validator validator, GameView view, HeroRepositor
         Hero hero = null;
         while (!confirm(hero)) {
             hero = switch (defineGameType(heroes)) {
-                case NEW ->
-                    createHero();
-                case EXISTING ->
-                    view.selectHero(heroes);
+                case NEW -> createHero();
+                case EXISTING -> view.selectHero(heroes);
             };
         }
         if (hero.getId() == 0) {

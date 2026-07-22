@@ -1,7 +1,6 @@
 package mazie.model;
 
 import java.util.Random;
-
 import mazie.model.monster.Monster;
 import mazie.model.monster.MonsterFactory;
 
@@ -117,7 +116,7 @@ public class GameMap {
     }
 
     private boolean isInBounds(int x, int y) {
-        return (x>= 0 && x < size && y>= 0 && y < size);
+        return (x >= 0 && x < size && y >= 0 && y < size);
     }
 
     @Override

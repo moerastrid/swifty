@@ -1,7 +1,6 @@
 package mazie.view.gui.theme;
 
 import java.awt.Insets;
-
 import javax.swing.BorderFactory;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
@@ -17,8 +16,8 @@ import static mazie.view.gui.theme.ThemeFont.TEXT;
 
 public class Theme {
 
-    private static final Border PANEL_BORDER = BorderFactory.createEmptyBorder(10, 10, 10, 10);
     public static final Border TEXT_AREA_BORDER = BorderFactory.createEmptyBorder(4, 4, 4, 4);
+    private static final Border PANEL_BORDER = BorderFactory.createEmptyBorder(10, 10, 10, 10);
     private static final Insets BUTTON_MARGIN = new Insets(2, 10, 2, 10);
 
     private Theme() {

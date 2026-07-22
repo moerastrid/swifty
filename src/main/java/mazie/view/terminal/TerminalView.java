@@ -11,7 +11,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
-
 import mazie.exception.QuitException;
 import mazie.exception.SwitchViewException;
 import mazie.model.Artifact;
@@ -49,10 +48,9 @@ public class TerminalView extends AbstractGameView {
     );
     private static final Set<String> QUIT = Set.of("q", "quit", "exit");
     private static final String SWITCH = "switch";
-
-    private Runnable switchListener;
     private static final BlockingQueue<String> inputQueue = new SynchronousQueue<>();
     private static final AtomicBoolean scannerStarted = new AtomicBoolean(false);
+    private Runnable switchListener;
 
     public TerminalView(Thread mainThread) {
         super(mainThread);
@@ -75,8 +73,7 @@ public class TerminalView extends AbstractGameView {
             explicit choise: for view switching.
             no biggie, runs on deamon thread.
         */
-        @SuppressWarnings("resource")
-        final var scanner = new Scanner(System.in);
+        @SuppressWarnings("resource") final var scanner = new Scanner(System.in);
         try {
             while (scanner.hasNextLine()) {
                 inputQueue.put(scanner.nextLine());
@@ -276,20 +273,20 @@ public class TerminalView extends AbstractGameView {
         } else {
             prompt = """
                     
-                  ▄▀▀▀▀▄    ▄▀▀█▄   ▄▀▀▄ ▄▀▄  ▄▀▀█▄▄▄▄
-                 █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐
-                 █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄
-                 █     █ █  ▄▀   █   █    █    █    ▌
-                 ▐▀▄▄▄▄▀ ▐ █   ▄▀  ▄▀   ▄▀    ▄▀▄▄▄▄
-                 ▐         ▐   ▐   █    █     █    ▐
-                                   ▐    ▐     ▐
-                  ▄▀▀▀▀▄   ▄▀▀▄ ▄▀▀▄  ▄▀▀█▄▄▄▄  ▄▀▀▄▀▀▀▄
-                 █      █ █   █    █ ▐  ▄▀   ▐ █   █   █
-                 █      █ ▐  █    █    █▄▄▄▄▄  ▐  █▀▀█▀
-                 ▀▄    ▄▀    █   ▄▀    █    ▌   ▄▀    █
-                   ▀▀▀▀       ▀▄▀     ▄▀▄▄▄▄   █     █
-                                     █    ▐   ▐     ▐
-                                     ▐
+                     ▄▀▀▀▀▄    ▄▀▀█▄   ▄▀▀▄ ▄▀▄  ▄▀▀█▄▄▄▄
+                    █         ▐ ▄▀ ▀▄ █  █ ▀  █ ▐  ▄▀   ▐
+                    █    ▀▄▄    █▄▄▄█ ▐  █    █   █▄▄▄▄▄
+                    █     █ █  ▄▀   █   █    █    █    ▌
+                    ▐▀▄▄▄▄▀ ▐ █   ▄▀  ▄▀   ▄▀    ▄▀▄▄▄▄
+                    ▐         ▐   ▐   █    █     █    ▐
+                                      ▐    ▐     ▐
+                     ▄▀▀▀▀▄   ▄▀▀▄ ▄▀▀▄  ▄▀▀█▄▄▄▄  ▄▀▀▄▀▀▀▄
+                    █      █ █   █    █ ▐  ▄▀   ▐ █   █   █
+                    █      █ ▐  █    █    █▄▄▄▄▄  ▐  █▀▀█▀
+                    ▀▄    ▄▀    █   ▄▀    █    ▌   ▄▀    █
+                      ▀▀▀▀       ▀▄▀     ▄▀▄▄▄▄   █     █
+                                        █    ▐   ▐     ▐
+                                        ▐
                     """;
         }
         colourPrint(AnsiColour.RED, prompt);

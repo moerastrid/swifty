@@ -7,12 +7,6 @@ public class MonsterFactory {
     private static final MonsterFactory instance = new MonsterFactory();
     private final Random random = new Random();
 
-    private enum Difficulty {
-        EASY,
-        MEDIUM,
-        HARD
-    }
-
     private MonsterFactory() {
     }
 
@@ -70,5 +64,11 @@ public class MonsterFactory {
             case 2 -> new Supermarket(heroLevel);
             default -> new Vim(heroLevel);
         };
+    }
+
+    private enum Difficulty {
+        EASY,
+        MEDIUM,
+        HARD
     }
 }

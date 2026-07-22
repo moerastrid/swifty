@@ -29,13 +29,12 @@ public enum ArtifactType {
             "sunglasses", "looks mysterious"
     ));
 
+    private static final Random RANDOM = new Random();
     private final Map<String, String> nameActionMap;
 
     ArtifactType(Map<String, String> nameActionMap) {
         this.nameActionMap = nameActionMap;
     }
-
-    private static final Random RANDOM = new Random();
 
     public String randomName() {
         final var names = this.nameActionMap.keySet().stream().toList();

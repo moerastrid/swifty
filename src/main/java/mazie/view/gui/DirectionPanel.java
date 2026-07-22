@@ -5,9 +5,7 @@ import java.awt.Graphics;
 import java.awt.GridLayout;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
-
 import javax.swing.JPanel;
-
 import mazie.model.Direction;
 
 public class DirectionPanel extends JPanel {
@@ -59,7 +57,7 @@ public class DirectionPanel extends JPanel {
         final var icon = PngMap.getPng(screenType);
         final var image = icon.getImage();
 
-        final var width = (double)getWidth() + 20;
+        final var width = (double) getWidth() + 20;
         final var factor = width / icon.getIconWidth();
         final var height = icon.getIconHeight() * factor;
         final var x = (getWidth() - width) / 2;

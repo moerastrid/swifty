@@ -4,10 +4,8 @@ import java.awt.BorderLayout;
 import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-
 import mazie.model.Artifact;
 import mazie.model.Direction;
 import mazie.model.Hero;
@@ -15,9 +13,9 @@ import mazie.model.monster.Monster;
 
 public class GamePanel extends JPanel {
 
+    private final MenuBarPanel menuBar;
     private JPanel subPanel;
     private JPanel sidePanel;
-    private final MenuBarPanel menuBar;
 
     public GamePanel() {
         setBorder(BorderFactory.createEmptyBorder());

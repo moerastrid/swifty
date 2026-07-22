@@ -10,7 +10,8 @@ public final class ThemeFont {
     public static final Font INPUT = new Font(selectFont("Lucida Console", "DialogInput", "Monospaced"), Font.PLAIN, 14);
     public static final Font TEXT = new Font(selectFont("Lucida Console", "Dialog", "SansSerif"), Font.PLAIN, 14);
 
-    private ThemeFont() {}
+    private ThemeFont() {
+    }
 
     private static boolean isFontAvailable(String fontName) {
         final var fonts = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames();

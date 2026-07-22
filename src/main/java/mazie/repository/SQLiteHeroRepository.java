@@ -8,16 +8,14 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.sqlite.SQLiteErrorCode;
-import org.sqlite.SQLiteException;
-
 import mazie.exception.DuplicateNameException;
 import mazie.exception.FatalException;
 import mazie.exception.RepositoryException;
 import mazie.model.ArtifactType;
 import mazie.model.Hero;
 import mazie.model.HeroType;
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
 
 public class SQLiteHeroRepository implements HeroRepository {
     private static final String DB_URL = "jdbc:sqlite:data/swingy.db";

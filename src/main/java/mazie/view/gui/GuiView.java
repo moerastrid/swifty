@@ -9,12 +9,8 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.SynchronousQueue;
 import java.util.function.Consumer;
-
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-import static javax.swing.SwingUtilities.invokeAndWait;
-import static javax.swing.SwingUtilities.invokeLater;
-
 import mazie.exception.FatalException;
 import mazie.exception.QuitException;
 import mazie.exception.SwitchViewException;
@@ -24,6 +20,9 @@ import mazie.model.Hero;
 import mazie.model.monster.Monster;
 import mazie.view.AbstractGameView;
 import mazie.view.gui.theme.Theme;
+
+import static javax.swing.SwingUtilities.invokeAndWait;
+import static javax.swing.SwingUtilities.invokeLater;
 
 public class GuiView extends AbstractGameView {
 
@@ -41,7 +40,7 @@ public class GuiView extends AbstractGameView {
             throw new AssertionError(e);
         } catch (InvocationTargetException e) {
             throw new FatalException("Cannot start gui view", e.getCause());
-        }   
+        }
     }
 
     private void initGUI() {

@@ -1,7 +1,6 @@
 package mazie;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-
 import mazie.bootstrap.Application;
 import mazie.exception.QuitException;
 
@@ -9,13 +8,12 @@ public class Main {
 
     private static final int EX_SUCCESS = 0;
     private static final int EX_GENERAL = 1;
-
-    private static volatile boolean edtCrashed = false;
     private static final AtomicBoolean shuttingDown = new AtomicBoolean(false);
-
+    private static volatile boolean edtCrashed = false;
     private static Application application;
 
-    private Main() {}
+    private Main() {
+    }
 
     public static void main(final String[] args) {
         threadConfig();

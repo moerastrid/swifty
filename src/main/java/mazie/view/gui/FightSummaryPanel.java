@@ -3,15 +3,14 @@ package mazie.view.gui;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-
 import mazie.model.Hero;
 import mazie.model.monster.Monster;
+
 import static mazie.view.gui.theme.ThemeColour.PURPLE;
 import static mazie.view.gui.theme.ThemeColour.WHITE;
 import static mazie.view.gui.theme.ThemeColour.YELLOW;

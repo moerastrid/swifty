@@ -1,14 +1,13 @@
 package mazie.repository;
 
-import mazie.model.Artifact;
-import mazie.model.ArtifactType;
-import mazie.model.Hero;
-import mazie.model.HeroType;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import mazie.model.Artifact;
+import mazie.model.ArtifactType;
+import mazie.model.Hero;
+import mazie.model.HeroType;
 
 public class SQLiteHeroMapper {
 

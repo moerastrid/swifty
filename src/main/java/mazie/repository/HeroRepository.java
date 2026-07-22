@@ -1,8 +1,7 @@
 package mazie.repository;
 
-import mazie.model.Hero;
-
 import java.util.Map;
+import mazie.model.Hero;
 
 public interface HeroRepository {
 

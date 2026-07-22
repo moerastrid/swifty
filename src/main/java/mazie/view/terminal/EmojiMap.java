@@ -6,23 +6,11 @@ import mazie.model.monster.Monster;
 
 public class EmojiMap {
 
-    private EmojiMap() {
-    }
-
     private static final Map<HeroType, String> HERO_TYPE_EMOJI = Map.of(
             HeroType.FROG, "🐸",
             HeroType.MOUSE, "🐁",
             HeroType.WEEVIL, "🪲"
     );
-
-    public static String getEmoji(HeroType type) {
-        final var emoji = HERO_TYPE_EMOJI.get(type);
-        if (emoji == null) {
-            throw new IllegalStateException("Unexpected value: %s".formatted(type.name()));
-        }
-        return emoji;
-    }
-
     private static final Map<String, String> MONSTER_NAME_EMOJI = Map.ofEntries(
             Map.entry("the bus", "🚌"),
             Map.entry("a hairsalon", "✂️"),
@@ -36,6 +24,17 @@ public class EmojiMap {
             Map.entry("a teambuilding event", "🤼‍♂️"),
             Map.entry("a teams meeting", "👥"),
             Map.entry("vim", "😈"));
+
+    private EmojiMap() {
+    }
+
+    public static String getEmoji(HeroType type) {
+        final var emoji = HERO_TYPE_EMOJI.get(type);
+        if (emoji == null) {
+            throw new IllegalStateException("Unexpected value: %s".formatted(type.name()));
+        }
+        return emoji;
+    }
 
     public static String getEmoji(Monster monster) {
         final var emoji = MONSTER_NAME_EMOJI.get(monster.getName());
