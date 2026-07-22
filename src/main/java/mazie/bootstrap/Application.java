@@ -1,7 +1,5 @@
 package mazie.bootstrap;
 
-import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
-
 import jakarta.validation.Validation;
 import jakarta.validation.ValidatorFactory;
 import mazie.controller.GameController;
@@ -12,6 +10,7 @@ import mazie.view.GameView;
 import mazie.view.ViewSwitcher;
 import mazie.view.gui.GuiView;
 import mazie.view.terminal.TerminalView;
+import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
 public class Application {
 
@@ -19,11 +18,6 @@ public class Application {
     private final GameView view;
     private final HeroRepository repository;
     private final GameController controller;
-
-    private enum ViewType {
-        TERMINAL,
-        GUI
-    }
 
     public Application(String[] args) {
 
@@ -42,17 +36,6 @@ public class Application {
         controller = new GameController(validatorFactory.getValidator(), view, repository);
     }
 
-    public void start() {
-        controller.start();
-    }
-
-    public void shutDownGracefully() {
-        controller.close();
-        view.close();
-        repository.close();
-        validatorFactory.close();
-    }
-
     private static ViewType parse(final String[] args) {
         if (args.length == 0) {
             return ViewType.GUI;
@@ -67,5 +50,21 @@ public class Application {
             case "gui", "g" -> ViewType.GUI;
             default -> throw new ParseException("unknown argument: [%s]".formatted(args[0]));
         };
+    }
+
+    public void start() {
+        controller.start();
+    }
+
+    public void shutDownGracefully() {
+        controller.close();
+        view.close();
+        repository.close();
+        validatorFactory.close();
+    }
+
+    private enum ViewType {
+        TERMINAL,
+        GUI
     }
 }

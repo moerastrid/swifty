@@ -9,6 +9,10 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.sqlite.SQLiteErrorCode;
+import org.sqlite.SQLiteException;
+
+import mazie.exception.DuplicateNameException;
 import mazie.exception.FatalException;
 import mazie.exception.RepositoryException;
 import mazie.model.ArtifactType;
@@ -155,6 +159,12 @@ public class SQLiteHeroRepository implements HeroRepository {
             insertHero(hero);
             insertArtifacts(hero);
             commitConnection();
+        } catch (SQLiteException e) {
+            rollbackConnection();
+            if (e.getResultCode() == SQLiteErrorCode.SQLITE_CONSTRAINT_UNIQUE) {
+                throw new DuplicateNameException(hero.getName());
+            }
+            throw new RepositoryException(e.getMessage(), e);
         } catch (SQLException e) {
             rollbackConnection();
             throw new RepositoryException(e.getMessage(), e);
