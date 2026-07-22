@@ -22,6 +22,15 @@ java -jar target/swingy.jar console
 java -jar target/swingy.jar gui
 ```
 
+or if you feel like it
+
+```bash
+mvn clean package
+cd target
+java -jar swingy.jar console
+java -jar swingy.jar gui
+```
+
 default mode : GUI.
 
 ## play Mazie
